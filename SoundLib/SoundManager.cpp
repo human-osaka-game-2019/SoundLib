@@ -15,19 +15,23 @@
 #endif
 
 
-SoundManager::SoundManager() : hMmio(nullptr), buf(nullptr) {
+SoundManager::SoundManager() : audio(nullptr), hMmio(nullptr), pVoice(nullptr), buf(nullptr) {
 	this->pCallback = new VoiceCallback(this);
 }
 
 SoundManager::~SoundManager() {
 	delete this->pCallback;
-	delete this->audio;
 
 	if (this->hMmio != nullptr) {
 		this->Stop();
 		mmioClose(this->hMmio, 0);
 		this->hMmio = nullptr;
 	}
+
+	if (this->audio != nullptr) {
+		this->audio->Release();
+	}
+	CoUninitialize();
 }
 
 bool SoundManager::Initialize() {
@@ -128,9 +132,10 @@ bool SoundManager::OpenSoundFile(char* filePath) {
 	return true;
 }
 
-bool SoundManager::Start() {
+bool SoundManager::Start(bool isLoopPlayback = false) {
+	this->isLoopPlayback = isLoopPlayback;
 	HRESULT ret = this->audio->CreateSourceVoice(
-		&this->voice,
+		&this->pVoice,
 		&waveFormatEx,
 		0,                          // UINT32 Flags = 0,
 		XAUDIO2_DEFAULT_FREQ_RATIO, // float MaxFrequencyRatio = XAUDIO2_DEFAULT_FREQ_RATIO,
@@ -142,7 +147,7 @@ bool SoundManager::Start() {
 		OutputDebugStringEx("error CreateSourceVoice ret=%d\n", ret);
 		return false;
 	}
-	this->voice->Start();
+	this->pVoice->Start();
 
 	this->buffer = { 0 };
 	this->buf = new BYTE*[BUF_LEN];
@@ -154,18 +159,32 @@ bool SoundManager::Start() {
 	this->buf_cnt = 0;
 
 	this->Push();
+
+	return true;
 }
 
 void SoundManager::Stop() {
-	this->voice->Stop();
-	this->voice->DestroyVoice();
+	if (this->pVoice != nullptr) {
+		this->pVoice->Stop();
+		this->pVoice->DestroyVoice();
+		this->pVoice = nullptr;
+	}
+
 	if (this->buf != nullptr) {
 		for (int i = 0; i < BUF_LEN; i++) {
 			delete[] this->buf[i];
 		}
+		delete this->buf;
+		this->buf = nullptr;
 	}
-	delete this->buf;
-	this->buf = nullptr;
+}
+
+void SoundManager::Pause() {
+	this->pVoice->Stop();
+}
+
+void SoundManager::Resume() {
+	this->pVoice->Start();
 }
 
 void SoundManager::BufferEndCallback() {
@@ -177,11 +196,11 @@ long SoundManager::ReadSoundData() {
 
 	// データの部分格納
 	long size = mmioRead(this->hMmio, (HPSTR)this->buf[this->buf_cnt], this->len);
-	if (size <= 0) {
+	if (size <= 0 && this->isLoopPlayback) {
 		// 最後まで読み込んだ場合は最初に戻る
-		//mmioSeek(hMmio, -curOffset, SEEK_CUR);
-		//curOffset = 0;   // ファイルポインタを先頭に戻す
-		//size = mmioRead(hMmio, (HPSTR)pData, readSize);
+		mmioSeek(this->hMmio, -curOffset, SEEK_CUR);
+		curOffset = 0;   // ファイルポインタを先頭に戻す
+		size = mmioRead(this->hMmio, (HPSTR)this->buf[this->buf_cnt], this->len);
 	}
 
 	curOffset += size;   // ファイルポインタのオフセット値
@@ -198,7 +217,7 @@ void SoundManager::Push() {
 	}
 	this->buffer.AudioBytes = size;
 	this->buffer.pAudioData = this->buf[this->buf_cnt];
-	HRESULT ret = this->voice->SubmitSourceBuffer(&this->buffer);
+	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->buffer);
 	if (FAILED(ret)) {
 		OutputDebugStringEx("error SubmitSourceBuffer ret=%d\n", ret);
 		return;

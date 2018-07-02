@@ -13,8 +13,10 @@ public:
 	~SoundManager();
 	bool Initialize();
 	bool OpenSoundFile(char* filePath);
-	bool Start();
+	bool Start(bool isLoopPlayback);
 	void Stop();
+	void Pause();
+	void Resume();
 	void BufferEndCallback();
 
 private:
@@ -23,12 +25,13 @@ private:
 	HMMIO hMmio;
 	WAVEFORMATEX waveFormatEx;
 	IXAudio2* audio;
-	IXAudio2SourceVoice* voice;
+	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pCallback;
 	XAUDIO2_BUFFER buffer;
 	BYTE** buf;
 	int len;
 	int buf_cnt;
+	bool isLoopPlayback;
 
 	long ReadSoundData();
 	void Push();

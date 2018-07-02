@@ -33,11 +33,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		return -1;
 	}
 
-	if (!soundManager.Start()) {
+	if (!soundManager.Start(true)) {
 		return -1;
 	}
 
+	Sleep(2000);
+
+	soundManager.Pause();
+	Sleep(1000);
+	soundManager.Resume();
+
 	Sleep(10000);
+
+	soundManager.Stop();
 
 	return 0;
 }
