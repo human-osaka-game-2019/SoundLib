@@ -3,9 +3,12 @@
 
 #include <windows.h>
 #include <mmsystem.h>
+#include <mmreg.h>
 #include <xaudio2.h>
 #include "IVoiceCallbackDelegate.h"
 #include "VoiceCallback.h"
+#include "Mp3Reader.h"
+
 
 class SoundManager : public IVoiceCallbackDelegate {
 public:
@@ -22,7 +25,7 @@ public:
 private:
 	const int BUF_LEN = 2;
 
-	HMMIO hMmio;
+	Mp3Reader reader;
 	WAVEFORMATEX waveFormatEx;
 	IXAudio2* audio;
 	IXAudio2SourceVoice* pVoice;
@@ -33,9 +36,7 @@ private:
 	int buf_cnt;
 	bool isLoopPlayback;
 
-	long ReadSoundData();
 	void Push();
 
 };
-
 #endif

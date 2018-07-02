@@ -24,7 +24,10 @@
     <ClCompile Include="VoiceCallback.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SoundManager.cpp">
+    <ClCompile Include="Mp3Reader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundManager2.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,12 +35,21 @@
     <Media Include="Resources\toujyo.wav">
       <Filter>リソース ファイル</Filter>
     </Media>
+    <Media Include="Resources\musicbox.mp3">
+      <Filter>リソース ファイル</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SoundManager.h">
+    <ClInclude Include="IVoiceCallbackDelegate.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="IVoiceCallbackDelegate.h">
+    <ClInclude Include="Mp3Reader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager2.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

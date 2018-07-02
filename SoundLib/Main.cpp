@@ -3,10 +3,8 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <windows.h>
-#include <mmsystem.h>
-#include <xaudio2.h>
-#include "SoundManager.h"
-#include "VoiceCallback.h"
+#include "SoundManager2.h"
+
 
 
 #ifdef _DEBUG
@@ -23,7 +21,8 @@
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
-	char* filePath = (char*)"Resources\\toujyo.wav";
+	//char* filePath = (char*)"Resources\\toujyo.wav";
+	char* filePath = (char*)"Resources\\musicbox.mp3";
 
 	SoundManager soundManager;
 	soundManager.Initialize();
@@ -37,13 +36,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		return -1;
 	}
 
-	Sleep(2000);
-
-	soundManager.Pause();
-	Sleep(1000);
-	soundManager.Resume();
-
 	Sleep(10000);
+
+	//soundManager.Pause();
+	//Sleep(1000);
+	//soundManager.Resume();
+
+	//Sleep(10000);
 
 	soundManager.Stop();
 
