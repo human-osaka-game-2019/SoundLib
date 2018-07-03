@@ -1,50 +1,49 @@
-#include <stdio.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <tchar.h>
 #include <windows.h>
-#include "SoundManager2.h"
-
-
-
-#ifdef _DEBUG
-#define OutputDebugStringEx( str, ... ) \
-      { \
-        TCHAR c[256]; \
-        _stprintf_s( c, str, __VA_ARGS__ ); \
-        OutputDebugString( c ); \
-      }
-#else
-#    define OutputDebugString( str, ... ) // 空実装
-#endif
-
+#include "Common.h"
+#include "SoundsManager.h"
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
-	//char* filePath = (char*)"Resources\\toujyo.wav";
-	char* filePath = (char*)"Resources\\musicbox.mp3";
+	const char* filePath1 = "Resources\\toujyo.wav";
+	const char* filePath2 = "Resources\\musicbox.mp3";
+	const char* filePath3 = "Resources\\jump03.mp3";
 
-	SoundManager soundManager;
-	soundManager.Initialize();
+	SoundsManager soundsManager;
+	soundsManager.Initialize();
 	
 	// Waveファイルオープン
-	if (!soundManager.OpenSoundFile(filePath)) {
+	if (!soundsManager.AddFile(filePath1, "wav")) {
 		return -1;
 	}
 
-	if (!soundManager.Start(true)) {
+	// mp3ファイルオープン
+	if (!soundsManager.AddFile(filePath2, "mp3")) {
 		return -1;
 	}
 
-	Sleep(10000);
+	// mp3ファイルオープン
+	if (!soundsManager.AddFile(filePath3, "mp3SE")) {
+		return -1;
+	}
 
-	//soundManager.Pause();
-	//Sleep(1000);
-	//soundManager.Resume();
+	soundsManager.Start("wav", true);
 
-	//Sleep(10000);
+	Sleep(2000);
 
-	soundManager.Stop();
+	for (int i = 0; i < 1; ++i) {
+		soundsManager.Start("mp3SE");
+		Sleep(1200);
+	}
+
+	Sleep(1000);
+	soundsManager.Pause("wav");
+	Sleep(1000);
+	soundsManager.Resume("wav");
+
+	Sleep(2000);
+
+	soundsManager.Stop("wav");
 
 	return 0;
 }

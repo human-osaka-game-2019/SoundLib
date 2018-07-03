@@ -3,6 +3,7 @@
 
 class IVoiceCallbackDelegate {
 public:
+	virtual ~IVoiceCallbackDelegate() {}
 	virtual void BufferEndCallback(void) = 0;
 };
 

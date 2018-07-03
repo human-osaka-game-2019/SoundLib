@@ -1,22 +1,21 @@
-#ifndef SOUND_MANAGER_H
-#define SOUND_MANAGER_H
+#ifndef AUDIO_HANDLER_H
+#define AUDIO_HANDLER_H
 
 #include <windows.h>
 #include <mmsystem.h>
 #include <mmreg.h>
 #include <xaudio2.h>
 #include "IVoiceCallbackDelegate.h"
+#include "IAudio.h"
 #include "VoiceCallback.h"
-#include "Mp3Reader.h"
 
 
-class SoundManager : public IVoiceCallbackDelegate {
+class AudioHandler : public IVoiceCallbackDelegate {
 public:
-	SoundManager();
-	~SoundManager();
-	bool Initialize();
-	bool OpenSoundFile(char* filePath);
-	bool Start(bool isLoopPlayback);
+	AudioHandler(IAudio* pAudio);
+	~AudioHandler();
+	bool Prepare(IXAudio2* pXAudio2);
+	void Start(bool isLoopPlayback);
 	void Stop();
 	void Pause();
 	void Resume();
@@ -25,18 +24,16 @@ public:
 private:
 	const int BUF_LEN = 2;
 
-	Mp3Reader reader;
-	WAVEFORMATEX waveFormatEx;
-	IXAudio2* audio;
+	IAudio * pAudio;
 	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pCallback;
-	XAUDIO2_BUFFER buffer;
-	BYTE** buf;
-	int len;
+	XAUDIO2_BUFFER xAudioBuffer;
+	BYTE** readBufffers;
+	int readLength;
 	int buf_cnt;
 	bool isLoopPlayback;
 
 	void Push();
-
 };
+
 #endif
