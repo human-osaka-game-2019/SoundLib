@@ -1,4 +1,4 @@
-#include <stdint.h>
+ï»¿#include <stdint.h>
 #include <windows.h>
 #include "Common.h"
 #include "SoundsManager.h"
@@ -17,17 +17,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//SoundsManager soundsManager;
 	soundsManager.Initialize();
 	
-	// Waveƒtƒ@ƒCƒ‹ƒI[ƒvƒ“
+	// Waveãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³
 	if (!soundsManager.AddFile(filePath1, "wav")) {
 		return -1;
 	}
 
-	// mp3ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“
+	// mp3ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³
 	if (!soundsManager.AddFile(filePath2, "mp3")) {
 		return -1;
 	}
 
-	// mp3ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“
+	// mp3ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³
 	if (!soundsManager.AddFile(filePath3, "mp3SE")) {
 		return -1;
 	}

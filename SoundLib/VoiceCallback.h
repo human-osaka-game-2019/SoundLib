@@ -1,4 +1,4 @@
-#ifndef VOICE_CALLBACK_H
+﻿#ifndef VOICE_CALLBACK_H
 #define VOICE_CALLBACK_H
 
 #include <xaudio2.h>

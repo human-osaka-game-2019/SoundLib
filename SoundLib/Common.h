@@ -1,4 +1,4 @@
-#ifndef COMMON_H
+ï»¿#ifndef COMMON_H
 #define COMMON_H
 
 #include <stdio.h>
@@ -13,7 +13,7 @@
         OutputDebugString( c ); \
       }
 #else
-#    define OutputDebugString( str, ... ) // ‹óŽÀ‘•
+#    define OutputDebugString( str, ... ) // ç©ºå®Ÿè£…
 #endif
 
 #endif

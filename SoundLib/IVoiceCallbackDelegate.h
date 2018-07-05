@@ -1,4 +1,4 @@
-#ifndef IVOICE_CALLBACK_DELEGATE_H
+﻿#ifndef IVOICE_CALLBACK_DELEGATE_H
 #define IVOICE_CALLBACK_DELEGATE_H
 
 class IVoiceCallbackDelegate {

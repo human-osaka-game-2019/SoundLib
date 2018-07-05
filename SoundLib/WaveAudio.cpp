@@ -1,4 +1,4 @@
-#include "WaveAudio.h"
+ï»¿#include "WaveAudio.h"
 #include "Common.h"
 
 
@@ -16,17 +16,17 @@ WaveAudio::~WaveAudio() {
 bool WaveAudio::Load(const char* pFilePath) {
 	MMIOINFO mmioInfo;
 
-	// Waveƒtƒ@ƒCƒ‹ƒI[ƒvƒ“
+	// Waveãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³
 	memset(&mmioInfo, 0, sizeof(MMIOINFO));
 
 	this->hMmio = mmioOpen((LPSTR)pFilePath, &mmioInfo, MMIO_READ);
 	if (!this->hMmio) {
-		// ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“Ž¸”s
+		// ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³å¤±æ•—
 		OutputDebugStringEx("error mmioOpen\n");
 		return false;
 	}
 
-	// RIFFƒ`ƒƒƒ“ƒNŒŸõ
+	// RIFFãƒãƒ£ãƒ³ã‚¯æ¤œç´¢
 	MMRESULT mmRes;
 	MMCKINFO riffChunk;
 	riffChunk.fccType = mmioFOURCC('W', 'A', 'V', 'E');
@@ -37,7 +37,7 @@ bool WaveAudio::Load(const char* pFilePath) {
 		return false;
 	}
 
-	// ƒtƒH[ƒ}ƒbƒgƒ`ƒƒƒ“ƒNŒŸõ
+	// ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆãƒãƒ£ãƒ³ã‚¯æ¤œç´¢
 	MMCKINFO formatChunk;
 	formatChunk.ckid = mmioFOURCC('f', 'm', 't', ' ');
 	mmRes = mmioDescend(this->hMmio, &formatChunk, &riffChunk, MMIO_FINDCHUNK);
@@ -46,7 +46,7 @@ bool WaveAudio::Load(const char* pFilePath) {
 		return false;
 	}
 
-	// WAVEFORMATEX\‘¢‘ÌŠi”[
+	// WAVEFORMATEXæ§‹é€ ä½“æ ¼ç´
 	DWORD fmsize = formatChunk.cksize;
 	DWORD size = mmioRead(this->hMmio, (HPSTR)&this->waveFormatEx, fmsize);
 	if (size != fmsize) {
@@ -55,10 +55,10 @@ bool WaveAudio::Load(const char* pFilePath) {
 		return false;
 	}
 
-	// WAVEFORMATEX\‘¢‘ÌŠi”[
+	// WAVEFORMATEXæ§‹é€ ä½“æ ¼ç´
 	mmioAscend(this->hMmio, &formatChunk, 0);
 
-	// ƒf[ƒ^ƒ`ƒƒƒ“ƒNŒŸõ
+	// ãƒ‡ãƒ¼ã‚¿ãƒãƒ£ãƒ³ã‚¯æ¤œç´¢
 	MMCKINFO dataChunk;
 	dataChunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
 	mmRes = mmioDescend(this->hMmio, &dataChunk, &riffChunk, MMIO_FINDCHUNK);
@@ -72,10 +72,10 @@ bool WaveAudio::Load(const char* pFilePath) {
 }
 
 long WaveAudio::Read(BYTE* pBuffer, DWORD bufSize) {
-	// ƒf[ƒ^‚Ì•”•ªŠi”[
+	// ãƒ‡ãƒ¼ã‚¿ã®éƒ¨åˆ†æ ¼ç´
 	long size = mmioRead(this->hMmio, (HPSTR)pBuffer, bufSize);
 
-	this->pos += size;   // ƒtƒ@ƒCƒ‹ƒ|ƒCƒ“ƒ^‚ÌƒIƒtƒZƒbƒg’l
+	this->pos += size;   // ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚¤ãƒ³ã‚¿ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆå€¤
 
 	return size;
 }
@@ -86,5 +86,5 @@ const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() {
 
 void WaveAudio::Reset() {
 	mmioSeek(this->hMmio, -this->pos, SEEK_CUR);
-	this->pos = 0;   // ƒtƒ@ƒCƒ‹ƒ|ƒCƒ“ƒ^‚ðæ“ª‚É–ß‚·
+	this->pos = 0;   // ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚¤ãƒ³ã‚¿ã‚’å…ˆé ­ã«æˆ»ã™
 }

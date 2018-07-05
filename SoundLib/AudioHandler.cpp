@@ -1,4 +1,4 @@
-#include "AudioHandler.h"
+ï»¿#include "AudioHandler.h"
 #include "Common.h"
 
 
@@ -76,7 +76,7 @@ void AudioHandler::Push() {
 		return;
 	}
 
-	// ‰¹ƒf[ƒ^Ši”[
+	// éŸ³ãƒ‡ãƒ¼ã‚¿æ ¼ç´
 	long size = this->pAudio->Read(this->readBufffers[this->buf_cnt], this->readLength);
 	if (size <= 0 && this->isLoopPlayback) {
 		this->pAudio->Reset();

@@ -1,4 +1,4 @@
-#ifndef SOUNDS_MANAGER_H
+﻿#ifndef SOUNDS_MANAGER_H
 #define SOUNDS_MANAGER_H
 
 #include <unordered_map>

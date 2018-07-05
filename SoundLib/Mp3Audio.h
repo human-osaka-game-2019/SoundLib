@@ -1,4 +1,4 @@
-#ifndef MP3_AUDIO_H
+Ôªø#ifndef MP3_AUDIO_H
 #define MP3_AUDIO_H
 
 #include "IAudio.h"
@@ -17,8 +17,8 @@ public:
 
 private:
 	HANDLE hFile;
-	DWORD offset; // MP3ÉfÅ[É^ÇÃà íu
-	DWORD mp3DataSize; // MP3ÉfÅ[É^ÇÃÉTÉCÉY
+	DWORD offset; // MP3„Éá„Éº„Çø„ÅÆ‰ΩçÁΩÆ
+	DWORD mp3DataSize; // MP3„Éá„Éº„Çø„ÅÆ„Çµ„Ç§„Ç∫
 	WAVEFORMATEX waveFormatEx;
 	ACMSTREAMHEADER* pAsh;
 	HACMSTREAM has;

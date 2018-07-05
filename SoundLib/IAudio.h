@@ -1,4 +1,4 @@
-#ifndef IAUDIO_H
+﻿#ifndef IAUDIO_H
 #define IAUDIO_H
 
 #include <windows.h>

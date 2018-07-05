@@ -1,4 +1,4 @@
-#ifndef AUDIO_HANDLER_H
+﻿#ifndef AUDIO_HANDLER_H
 #define AUDIO_HANDLER_H
 
 #include <windows.h>

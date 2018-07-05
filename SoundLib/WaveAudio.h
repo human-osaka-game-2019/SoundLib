@@ -1,4 +1,4 @@
-#ifndef WAVE_AUDIO_H
+﻿#ifndef WAVE_AUDIO_H
 #define WAVE_AUDIO_H
 
 #include "IAudio.h"

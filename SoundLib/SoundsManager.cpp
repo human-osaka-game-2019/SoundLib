@@ -1,4 +1,4 @@
-#include "SoundsManager.h"
+﻿#include "SoundsManager.h"
 #include "Common.h"
 #include "WaveAudio.h"
 #include "Mp3Audio.h"
@@ -64,7 +64,7 @@ bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
 	} else if (strcmp(extension, ".mp3") == 0) {
 		pAudio = new Mp3Audio;
 	} else {
-		OutputDebugStringEx("�g���q%s�͑ΏۊO\n", extension);
+		OutputDebugStringEx("拡張子%sは対象外\n", extension);
 		return false;
 	}
 

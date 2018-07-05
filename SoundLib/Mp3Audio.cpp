@@ -1,9 +1,9 @@
-#include "Mp3Audio.h"
+ï»¿#include "Mp3Audio.h"
 #include "Common.h"
 
 
 namespace {
-	// ƒrƒbƒgƒŒ[ƒg‚Ìƒe[ƒuƒ‹
+	// ãƒ“ãƒƒãƒˆãƒ¬ãƒ¼ãƒˆã®ãƒ†ãƒ¼ãƒ–ãƒ«
 	const WORD BIT_RATE_TABLE[][16] = {
 		// MPEG1, Layer1
 		{ 0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,-1 },
@@ -17,7 +17,7 @@ namespace {
 		{ 0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,-1 }
 	};
 
-	// ƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg‚Ìƒe[ƒuƒ‹
+	// ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ãƒ¬ãƒ¼ãƒˆã®ãƒ†ãƒ¼ãƒ–ãƒ«
 	const WORD SAMPLE_RATE_TABLE[][4] = {
 		{ 44100, 48000, 32000, -1 }, // MPEG1
 		{ 22050, 24000, 16000, -1 }, // MPEG2
@@ -28,10 +28,10 @@ namespace {
 Mp3Audio::Mp3Audio() : hFile(nullptr), has(nullptr), pAsh(nullptr), pos(0) {}
 
 Mp3Audio::~Mp3Audio() {
-	// ACM‚ÌŒãn––
+	// ACMã®å¾Œå§‹æœ«
 	if (this->pAsh != nullptr) {
 		acmStreamUnprepareHeader(this->has, this->pAsh, 0);
-		// “®“IŠm•Û‚µ‚½ƒf[ƒ^‚ğŠJ•ú
+		// å‹•çš„ç¢ºä¿ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’é–‹æ”¾
 		delete[] this->pAsh->pbSrc;
 		delete[] this->pAsh->pbDst;
 
@@ -43,7 +43,7 @@ Mp3Audio::~Mp3Audio() {
 		this->has = nullptr;
 	}
 
-	// ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹
 	if (this->hFile != nullptr) {
 		CloseHandle(this->hFile);
 		this->hFile = nullptr;
@@ -51,7 +51,7 @@ Mp3Audio::~Mp3Audio() {
 }
 
 bool Mp3Audio::Load(const char* pFilePath) {
-	// ƒtƒ@ƒCƒ‹‚ğŠJ‚­
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
 	this->hFile = CreateFile(
 		pFilePath,
 		GENERIC_READ,
@@ -63,12 +63,12 @@ bool Mp3Audio::Load(const char* pFilePath) {
 	);
 
 	if (this->hFile == INVALID_HANDLE_VALUE)
-		return FALSE; // ƒGƒ‰[
+		return FALSE; // ã‚¨ãƒ©ãƒ¼
 
-	// ƒtƒ@ƒCƒ‹ƒTƒCƒYæ“¾
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºå–å¾—
 	this->mp3DataSize = GetDataSize();
 
-	// ƒtƒŒ[ƒ€ƒwƒbƒ_Šm”F
+	// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ˜ãƒƒãƒ€ç¢ºèª
 	BYTE header[4];
 	DWORD readSize;
 
@@ -76,22 +76,22 @@ bool Mp3Audio::Load(const char* pFilePath) {
 	if (!(header[0] == 0xFF && (header[1] & 0xE0) == 0xE0))
 		return FALSE;
 
-	// MPWGƒo[ƒWƒ‡ƒ“æ“¾
+	// MPWGãƒãƒ¼ã‚¸ãƒ§ãƒ³å–å¾—
 	BYTE version = (header[1] >> 3) & 0x03;
 
-	//@ƒrƒbƒgƒŒ[ƒgæ“¾
+	//ã€€ãƒ“ãƒƒãƒˆãƒ¬ãƒ¼ãƒˆå–å¾—
 	WORD bitRate = GetBitRate(header, version);
 
-	// ƒTƒ“ƒvƒ‹ƒŒ[ƒgæ“¾
+	// ã‚µãƒ³ãƒ—ãƒ«ãƒ¬ãƒ¼ãƒˆå–å¾—
 	WORD sampleRate = GetSampleRate(header, version);
 
 	BYTE padding = header[2] >> 1 & 0x01;
 	BYTE channel = header[3] >> 6;
 
-	// ƒTƒCƒYæ“¾
+	// ã‚µã‚¤ã‚ºå–å¾—
 	WORD blockSize = ((144 * bitRate * 1000) / sampleRate) + padding;
 
-	// ƒtƒH[ƒ}ƒbƒgæ“¾
+	// ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆå–å¾—
 	MPEGLAYER3WAVEFORMAT mf;
 	mf.wfx.wFormatTag = WAVE_FORMAT_MPEGLAYER3;
 	mf.wfx.nChannels = channel == 3 ? 1 : 2;
@@ -107,7 +107,7 @@ bool Mp3Audio::Load(const char* pFilePath) {
 	mf.nFramesPerBlock = 1;
 	mf.nCodecDelay = 1393;
 
-	// wavƒtƒH[ƒ}ƒbƒgæ“¾
+	// wavãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆå–å¾—
 	this->waveFormatEx.wFormatTag = WAVE_FORMAT_PCM;
 	acmFormatSuggest(
 		NULL,
@@ -117,10 +117,10 @@ bool Mp3Audio::Load(const char* pFilePath) {
 		ACM_FORMATSUGGESTF_WFORMATTAG
 	);
 
-	// ACMƒXƒgƒŠ[ƒ€‚ğŠJ‚­
+	// ACMã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’é–‹ã
 	acmStreamOpen(&this->has, NULL, &mf.wfx, &this->waveFormatEx, NULL, 0, 0, 0);
 
-	// WAV•ÏŠ·Œã‚ÌƒuƒƒbƒNƒTƒCƒYæ“¾
+	// WAVå¤‰æ›å¾Œã®ãƒ–ãƒ­ãƒƒã‚¯ã‚µã‚¤ã‚ºå–å¾—
 	DWORD mp3BlockSize = blockSize;
 	DWORD waveBlockSize;
 	acmStreamSize(this->has, mp3BlockSize, &waveBlockSize, ACM_STREAMSIZEF_SOURCE);
@@ -133,30 +133,30 @@ bool Mp3Audio::Load(const char* pFilePath) {
 	this->pAsh->pbDst = new BYTE[waveBlockSize];
 	this->pAsh->cbDstLength = waveBlockSize;
 
-	// ƒfƒR[ƒh€”õ
+	// ãƒ‡ã‚³ãƒ¼ãƒ‰æº–å‚™
 	acmStreamPrepareHeader(this->has, this->pAsh, 0);
 
 	return TRUE;
 }
 
 long Mp3Audio::Read(BYTE* pBuffer, DWORD bufSize) {
-	DWORD bufRead = 0;	// ƒoƒbƒtƒ@‚ğ“Ç‚İ‚ñ‚¾ƒTƒCƒY
+	DWORD bufRead = 0;	// ãƒãƒƒãƒ•ã‚¡ã‚’èª­ã¿è¾¼ã‚“ã ã‚µã‚¤ã‚º
 
-	while (this->mp3DataSize - this->pos >= this->pAsh->cbSrcLength) { // MP3ƒf[ƒ^‚ÌI’[H
-		// ‚PƒuƒƒbƒN•ª‚¾‚¯MP3ƒf[ƒ^‚ğ“Ç‚İ‚Ş
+	while (this->mp3DataSize - this->pos >= this->pAsh->cbSrcLength) { // MP3ãƒ‡ãƒ¼ã‚¿ã®çµ‚ç«¯ï¼Ÿ
+		// ï¼‘ãƒ–ãƒ­ãƒƒã‚¯åˆ†ã ã‘MP3ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€
 		DWORD readSize;
 		ReadFile(this->hFile, this->pAsh->pbSrc, this->pAsh->cbSrcLength, &readSize, NULL);
 		acmStreamConvert(this->has, this->pAsh, ACM_STREAMCONVERTF_BLOCKALIGN);
 		this->pos += readSize;
 
 		if (bufSize - bufRead > this->pAsh->cbDstLengthUsed) {
-			// WAVEƒf[ƒ^‚ğŠi”[‚·‚éƒoƒbƒtƒ@‚É—]—T‚ª‚ ‚ê‚ÎA
-			// ƒfƒR[ƒh‚µ‚½WAVEƒf[ƒ^‚ğ‚»‚Ì‚Ü‚ÜŠi”[
+			// WAVEãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã«ä½™è£•ãŒã‚ã‚Œã°ã€
+			// ãƒ‡ã‚³ãƒ¼ãƒ‰ã—ãŸWAVEãƒ‡ãƒ¼ã‚¿ã‚’ãã®ã¾ã¾æ ¼ç´
 			CopyMemory(pBuffer + bufRead, this->pAsh->pbDst, this->pAsh->cbDstLengthUsed);
 			bufRead += this->pAsh->cbDstLengthUsed;
 		} else {
-			// WAVEƒf[ƒ^‚ğŠi”[‚·‚éƒoƒbƒtƒ@‚É—]—T‚ª‚È‚¯‚ê‚ÎA
-			// ƒoƒbƒtƒ@‚Ìc‚è•ª‚¾‚¯ƒf[ƒ^‚ğ‘‚«‚Ş
+			// WAVEãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã«ä½™è£•ãŒãªã‘ã‚Œã°ã€
+			// ãƒãƒƒãƒ•ã‚¡ã®æ®‹ã‚Šåˆ†ã ã‘ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã‚€
 			CopyMemory(pBuffer + bufRead, this->pAsh->pbDst, bufSize - bufRead);
 			bufRead += bufSize - bufRead;
 			break;
@@ -171,7 +171,7 @@ const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() {
 }
 
 void Mp3Audio::Reset() {
-	// ƒtƒ@ƒCƒ‹ƒ|ƒCƒ“ƒ^‚ğMP3ƒf[ƒ^‚ÌŠJnˆÊ’u‚ÉˆÚ“®
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚¤ãƒ³ã‚¿ã‚’MP3ãƒ‡ãƒ¼ã‚¿ã®é–‹å§‹ä½ç½®ã«ç§»å‹•
 	SetFilePointer(this->hFile, this->offset, NULL, FILE_BEGIN);
 	this->pos = 0;
 }
@@ -183,39 +183,39 @@ DWORD Mp3Audio::GetDataSize() {
 	BYTE header[10];
 	DWORD readSize;
 
-	// ƒwƒbƒ_‚Ì“Ç‚İ‚İ
+	// ãƒ˜ãƒƒãƒ€ã®èª­ã¿è¾¼ã¿
 	ReadFile(this->hFile, header, 10, &readSize, NULL);
 
-	// æ“ª‚RƒoƒCƒg‚Ìƒ`ƒFƒbƒN
+	// å…ˆé ­ï¼“ãƒã‚¤ãƒˆã®ãƒã‚§ãƒƒã‚¯
 	if (memcmp(header, "ID3", 3) == 0) {
-		// ƒ^ƒOƒTƒCƒY‚ğæ“¾
+		// ã‚¿ã‚°ã‚µã‚¤ã‚ºã‚’å–å¾—
 		DWORD tagSize = ((header[6] << 21) | (header[7] << 14) | (header[8] << 7) | (header[9])) + 10;
 
-		// ƒf[ƒ^‚ÌˆÊ’uAƒTƒCƒY‚ğŒvZ
+		// ãƒ‡ãƒ¼ã‚¿ã®ä½ç½®ã€ã‚µã‚¤ã‚ºã‚’è¨ˆç®—
 		this->offset = tagSize;
 		ret = fileSize - offset;
 	} else {
-		// ––”ö‚Ìƒ^ƒO‚ÉˆÚ“®
+		// æœ«å°¾ã®ã‚¿ã‚°ã«ç§»å‹•
 		BYTE tag[3];
 		SetFilePointer(this->hFile, fileSize - 128, NULL, FILE_BEGIN);
 		ReadFile(this->hFile, tag, 3, &readSize, NULL);
 
-		// ƒf[ƒ^‚ÌˆÊ’uAƒTƒCƒY‚ğŒvZ
+		// ãƒ‡ãƒ¼ã‚¿ã®ä½ç½®ã€ã‚µã‚¤ã‚ºã‚’è¨ˆç®—
 		this->offset = 0;
 		if (memcmp(tag, "TAG", 3) == 0)
-			ret = fileSize - 128; // ––”ö‚Ìƒ^ƒO‚ğÈ‚­
+			ret = fileSize - 128; // æœ«å°¾ã®ã‚¿ã‚°ã‚’çœã
 		else
-			ret = fileSize; // ƒtƒ@ƒCƒ‹‘S‘Ì‚ªMP3ƒf[ƒ^
+			ret = fileSize; // ãƒ•ã‚¡ã‚¤ãƒ«å…¨ä½“ãŒMP3ãƒ‡ãƒ¼ã‚¿
 	}
 
-	// ƒtƒ@ƒCƒ‹ƒ|ƒCƒ“ƒ^‚ğMP3ƒf[ƒ^‚ÌŠJnˆÊ’u‚ÉˆÚ“®
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚¤ãƒ³ã‚¿ã‚’MP3ãƒ‡ãƒ¼ã‚¿ã®é–‹å§‹ä½ç½®ã«ç§»å‹•
 	SetFilePointer(this->hFile, this->offset, NULL, FILE_BEGIN);
 
 	return ret;
 }
 
 WORD Mp3Audio::GetBitRate(BYTE header[], int version) {
-	//@ƒŒƒCƒ„[”æ“¾
+	//ã€€ãƒ¬ã‚¤ãƒ¤ãƒ¼æ•°å–å¾—
 	BYTE layer = (header[1] >> 1) & 0x03;
 
 	INT index;

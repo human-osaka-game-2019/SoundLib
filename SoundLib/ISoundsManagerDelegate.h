@@ -1,4 +1,4 @@
-#ifndef ISOUNDS_MANAGER_DELEGATE_H
+﻿#ifndef ISOUNDS_MANAGER_DELEGATE_H
 #define ISOUNDS_MANAGER_DELEGATE_H
 
 #include "IAudioHandlerDelegate.h"

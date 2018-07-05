@@ -1,4 +1,4 @@
-#ifndef IAUDIO_HANDLER_DELEGATE_H
+﻿#ifndef IAUDIO_HANDLER_DELEGATE_H
 #define IAUDIO_HANDLER_DELEGATE_H
 
 class IAudioHandlerDelegate
