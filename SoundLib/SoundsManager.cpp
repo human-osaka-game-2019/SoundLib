@@ -55,7 +55,7 @@ bool SoundsManager::Initialize() {
 	return true;
 }
 
-bool SoundsManager::AddFile(const char* pFilePath, const char* key) {
+bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
 	char* extension = strstr((char*)pFilePath, ".");
 
 	IAudio* pAudio;
@@ -79,23 +79,31 @@ bool SoundsManager::AddFile(const char* pFilePath, const char* key) {
 	OutputDebugStringEx("bit/sample=%d\n", pFormat->wBitsPerSample);
 	OutputDebugStringEx("byte/sec  =%d\n", pFormat->nAvgBytesPerSec);
 
-	this->audioMap[key] = new AudioHandler(pAudio);
-	return this->audioMap[key]->Prepare(this->pXAudio2);
+	this->audioMap[pKey] = new AudioHandler(pKey, pAudio);
+	return this->audioMap[pKey]->Prepare(this->pXAudio2);
 }
 
-void SoundsManager::Start(const char* key, bool isLoopPlayback) {
-	this->audioMap[key]->Start(isLoopPlayback);
+void SoundsManager::Start(const char* pKey, bool isLoopPlayback) {
+	this->audioMap[pKey]->Start(isLoopPlayback);
 }
 
-void SoundsManager::Stop(const char* key) {
-	this->audioMap[key]->Stop();
+void SoundsManager::Start(const char* pKey, ISoundsManagerDelegate* pDelegate) {
+	this->audioMap[pKey]->Start(pDelegate);
 }
 
-void SoundsManager::Pause(const char* key) {
-	this->audioMap[key]->Pause();
+void SoundsManager::Start(const char* pKey, void(*onPlayedToEndCallback)(const char* pKey)) {
+	this->audioMap[pKey]->Start(onPlayedToEndCallback);
 }
 
-void SoundsManager::Resume(const char* key) {
-	this->audioMap[key]->Resume();
+void SoundsManager::Stop(const char* pKey) {
+	this->audioMap[pKey]->Stop();
+}
+
+void SoundsManager::Pause(const char* pKey) {
+	this->audioMap[pKey]->Pause();
+}
+
+void SoundsManager::Resume(const char* pKey) {
+	this->audioMap[pKey]->Resume();
 }
 

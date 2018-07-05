@@ -2,8 +2,8 @@
 #include "Common.h"
 
 
-AudioHandler::AudioHandler(IAudio* pAudio) : pAudio(pAudio), pVoice(nullptr) {
-	this->pCallback = new VoiceCallback(this);
+AudioHandler::AudioHandler(const char* pName, IAudio* pAudio) : pName(pName), pAudio(pAudio), pVoice(nullptr), pDelegate(nullptr), onPlayedToEndCallback(nullptr) {
+	this->pVoiceCallback = new VoiceCallback(this);
 }
 
 AudioHandler::~AudioHandler() {
@@ -20,7 +20,7 @@ AudioHandler::~AudioHandler() {
 		this->pAudio = nullptr;
 	}
 
-	delete this->pCallback;
+	delete this->pVoiceCallback;
 }
 
 bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
@@ -29,7 +29,7 @@ bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
 		this->pAudio->GetWaveFormatEx(),
 		0,                          // UINT32 Flags = 0,
 		XAUDIO2_DEFAULT_FREQ_RATIO, // float MaxFrequencyRatio = XAUDIO2_DEFAULT_FREQ_RATIO,
-		this->pCallback                   // IXAudio2VoiceCallback *pCallback = NULL,
+		this->pVoiceCallback                   // IXAudio2VoiceCallback *pCallback = NULL,
 										  // const XAUDIO2_VOICE_SENDS *pSendList = NULL,
 										  // const XAUDIO2_EFFECT_CHAIN *pEffectChain = NULL
 	);
@@ -42,7 +42,74 @@ bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
 
 void AudioHandler::Start(bool isLoopPlayback) {
 	this->isLoopPlayback = isLoopPlayback;
+	Start();
+}
 
+void AudioHandler::Start(IAudioHandlerDelegate* pDelegate) {
+	this->pDelegate = pDelegate;
+	Start();
+}
+
+void AudioHandler::Start(void(*onPlayedToEndCallback)(const char* pName)) {
+	this->onPlayedToEndCallback = onPlayedToEndCallback;
+	Start();
+}
+
+void AudioHandler::Stop() {
+	Stop(true);
+}
+
+void AudioHandler::Pause() {
+	this->pVoice->Stop();
+}
+
+void AudioHandler::Resume() {
+	this->pVoice->Start();
+}
+
+void AudioHandler::BufferEndCallback() {
+	Push();
+}
+
+void AudioHandler::Push() {
+	if (this->readBufffers == nullptr) {
+		return;
+	}
+
+	// ‰¹ƒf[ƒ^Ši”[
+	long size = this->pAudio->Read(this->readBufffers[this->buf_cnt], this->readLength);
+	if (size <= 0 && this->isLoopPlayback) {
+		this->pAudio->Reset();
+		size = this->pAudio->Read(this->readBufffers[this->buf_cnt], this->readLength);
+	}
+
+	if (size <= 0) {
+		this->Stop(false);
+		if (this->pDelegate != nullptr) {
+			this->pDelegate->OnPlayedToEnd(this->pName);
+			this->pDelegate = nullptr;
+		} else if (this->onPlayedToEndCallback != nullptr) {
+			this->onPlayedToEndCallback(this->pName);
+			this->onPlayedToEndCallback = nullptr;
+		}
+
+		return;
+	}
+
+	this->xAudioBuffer.AudioBytes = size;
+	this->xAudioBuffer.pAudioData = this->readBufffers[this->buf_cnt];
+	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
+	if (FAILED(ret)) {
+		OutputDebugStringEx("error SubmitSourceBuffer ret=%d\n", ret);
+		return;
+	}
+
+	if (BUF_LEN <= ++this->buf_cnt) {
+		this->buf_cnt = 0;
+	}
+}
+
+void AudioHandler::Start() {
 	this->xAudioBuffer = { 0 };
 	this->readBufffers = new BYTE*[BUF_LEN];
 	this->readLength = this->pAudio->GetWaveFormatEx()->nAvgBytesPerSec;
@@ -57,7 +124,7 @@ void AudioHandler::Start(bool isLoopPlayback) {
 	this->pVoice->Start();
 }
 
-void AudioHandler::Stop() {
+void AudioHandler::Stop(bool clearsCallback) {
 	this->pVoice->Stop();
 	this->pAudio->Reset();
 	if (this->readBufffers != nullptr) {
@@ -67,45 +134,9 @@ void AudioHandler::Stop() {
 		delete this->readBufffers;
 		this->readBufffers = nullptr;
 	}
-}
 
-void AudioHandler::Pause() {
-	this->pVoice->Stop();
-}
-
-void AudioHandler::Resume() {
-	this->pVoice->Start();
-}
-
-void AudioHandler::BufferEndCallback() {
-	this->Push();
-}
-
-void AudioHandler::Push() {
-	if (this->readBufffers == nullptr) {
-		return;
-	}
-
-	// ‰¹ƒf[ƒ^Ši”[
-	long size = this->pAudio->Read(this->readBufffers[this->buf_cnt], this->readLength);
-	if (size <= 0 && this->isLoopPlayback) {
-		size = this->pAudio->Read(this->readBufffers[this->buf_cnt], this->readLength);
-	}
-
-	if (size <= 0) {
-		this->Stop();
-		return;
-	}
-
-	this->xAudioBuffer.AudioBytes = size;
-	this->xAudioBuffer.pAudioData = this->readBufffers[this->buf_cnt];
-	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
-	if (FAILED(ret)) {
-		OutputDebugStringEx("error SubmitSourceBuffer ret=%d\n", ret);
-		return;
-	}
-
-	if (BUF_LEN <= ++this->buf_cnt) {
-		this->buf_cnt = 0;
+	if (clearsCallback) {
+		this->pDelegate = nullptr;
+		this->onPlayedToEndCallback = nullptr;
 	}
 }

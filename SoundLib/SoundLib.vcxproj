@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{25BD07A8-54D8-451F-8D35-D912558D3E30}</ProjectGuid>
     <RootNamespace>SoundLib</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -167,6 +167,8 @@
     <ClInclude Include="AudioHandler.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="IAudio.h" />
+    <ClInclude Include="IAudioHandlerDelegate.h" />
+    <ClInclude Include="ISoundsManagerDelegate.h" />
     <ClInclude Include="Mp3Audio.h" />
     <ClInclude Include="IVoiceCallbackDelegate.h" />
     <ClInclude Include="WaveAudio.h" />

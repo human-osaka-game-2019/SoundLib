@@ -8,14 +8,17 @@
 #include "IVoiceCallbackDelegate.h"
 #include "IAudio.h"
 #include "VoiceCallback.h"
+#include "IAudioHandlerDelegate.h"
 
 
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
-	AudioHandler(IAudio* pAudio);
+	AudioHandler(const char* pName, IAudio* pAudio);
 	~AudioHandler();
 	bool Prepare(IXAudio2* pXAudio2);
 	void Start(bool isLoopPlayback);
+	void Start(IAudioHandlerDelegate* pDelegate);
+	void Start(void(*onPlayedToEndCallback)(const char* pName));
 	void Stop();
 	void Pause();
 	void Resume();
@@ -24,16 +27,21 @@ public:
 private:
 	const int BUF_LEN = 2;
 
+	const char* pName;
 	IAudio * pAudio;
 	IXAudio2SourceVoice* pVoice;
-	VoiceCallback* pCallback;
+	VoiceCallback* pVoiceCallback;
 	XAUDIO2_BUFFER xAudioBuffer;
 	BYTE** readBufffers;
 	int readLength;
 	int buf_cnt;
 	bool isLoopPlayback;
+	IAudioHandlerDelegate* pDelegate;
+	void(*onPlayedToEndCallback)(const char* pName);
 
 	void Push();
+	void Start();
+	void Stop(bool clearsCallback);
 };
 
 #endif
