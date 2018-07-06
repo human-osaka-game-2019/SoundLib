@@ -144,7 +144,7 @@
     <ClCompile Include="WaveAudio.cpp" />
     <ClCompile Include="SoundsManager.cpp" />
     <ClCompile Include="VoiceCallback.cpp" />
-    <ClCompile Include="VoiceCallback.h" />
+    <ClInclude Include="VoiceCallback.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Resources\jump03.mp3">
@@ -161,6 +161,8 @@
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
     </Media>
   </ItemGroup>
   <ItemGroup>

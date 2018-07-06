@@ -32,7 +32,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		return -1;
 	}
 
-	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+	SoundLib::PlayingStatus status = soundsManager.GetStatus("wav");
+	OutputDebugStringEx("Status of the wave is %d\n", status);
 
 	soundsManager.Start("wav", OnPlayedToEnd);
 	Sleep(1000);
@@ -53,10 +54,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
 	Sleep(1000);
 
-	soundsManager.Stop("wav");
+	//soundsManager.Stop("wav");
 	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
 
-	Sleep(10000);
+	Sleep(5000);
+	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
 
 	return 0;
 }

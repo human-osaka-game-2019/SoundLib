@@ -57,6 +57,11 @@ bool SoundsManager::Initialize() {
 }
 
 bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
+	if (ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは既に登録済み\n", pKey);
+		return false;
+	}
+	
 	char* extension = strstr((char*)pFilePath, ".");
 
 	IAudio* pAudio;
@@ -84,31 +89,77 @@ bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
 	return this->audioMap[pKey]->Prepare(this->pXAudio2);
 }
 
-void SoundsManager::Start(const char* pKey, bool isLoopPlayback) {
+bool SoundsManager::Start(const char* pKey, bool isLoopPlayback) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		return false;
+	}
+
 	this->audioMap[pKey]->Start(isLoopPlayback);
+	return true;
 }
 
-void SoundsManager::Start(const char* pKey, ISoundsManagerDelegate* pDelegate) {
+bool SoundsManager::Start(const char* pKey, ISoundsManagerDelegate* pDelegate) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		return false;
+	}
+	
 	this->audioMap[pKey]->Start(pDelegate);
+	return true;
 }
 
-void SoundsManager::Start(const char* pKey, void(*onPlayedToEndCallback)(const char* pKey)) {
+bool SoundsManager::Start(const char* pKey, void(*onPlayedToEndCallback)(const char* pKey)) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		return false;
+	}
+	
 	this->audioMap[pKey]->Start(onPlayedToEndCallback);
+	return true;
 }
 
-void SoundsManager::Stop(const char* pKey) {
+bool SoundsManager::Stop(const char* pKey) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		return false;
+	}
+	
 	this->audioMap[pKey]->Stop();
+	return true;
 }
 
-void SoundsManager::Pause(const char* pKey) {
+bool SoundsManager::Pause(const char* pKey) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		return false;
+	}
+	
 	this->audioMap[pKey]->Pause();
+	return true;
 }
 
-void SoundsManager::Resume(const char* pKey) {
+bool SoundsManager::Resume(const char* pKey) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		return false;
+	}
+	
 	this->audioMap[pKey]->Resume();
+	return true;
 }
 
 PlayingStatus SoundsManager::GetStatus(const char* pKey) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		throw std::invalid_argument("キーが存在しません。");
+	}
+	
 	return this->audioMap[pKey]->GetStatus();
+}
+
+bool SoundsManager::ExistsKey(const char* pKey) {
+	auto itr = this->audioMap.find(pKey);
+	return (itr != this->audioMap.end());
 }
 }

@@ -13,7 +13,7 @@
         OutputDebugString( c ); \
       }
 #else
-#    define OutputDebugString( str, ... ) // 空実装
+#    define OutputDebugStringEx( str, ... ) // 空実装
 #endif
 
 #endif
