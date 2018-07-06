@@ -32,22 +32,29 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		return -1;
 	}
 
-	soundsManager.Start("wav", OnPlayedToEnd);
+	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
 
+	soundsManager.Start("wav", OnPlayedToEnd);
 	Sleep(1000);
-	for (int i = 0; i < 5; ++i) {
+	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+
+	for (int i = 0; i < 1; ++i) {
 		soundsManager.Start("mp3SE");
 		Sleep(1500);
 	}
 
-	Sleep(1000);
+	//Sleep(1000);
 	soundsManager.Pause("wav");
+	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
 	Sleep(1000);
-	soundsManager.Resume("wav");
 
-	Sleep(2000);
+
+	soundsManager.Resume("wav");
+	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+	Sleep(1000);
 
 	soundsManager.Stop("wav");
+	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
 
 	Sleep(10000);
 
@@ -55,5 +62,5 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 }
 
 static void OnPlayedToEnd(const char* pKey) {
-	soundsManager.Start("mp3");
+	//soundsManager.Start("mp3");
 }

@@ -107,4 +107,8 @@ void SoundsManager::Pause(const char* pKey) {
 void SoundsManager::Resume(const char* pKey) {
 	this->audioMap[pKey]->Resume();
 }
+
+PlayingStatus SoundsManager::GetStatus(const char* pKey) {
+	return this->audioMap[pKey]->GetStatus();
+}
 }

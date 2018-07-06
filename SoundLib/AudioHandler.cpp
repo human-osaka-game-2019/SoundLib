@@ -3,7 +3,7 @@
 
 
 namespace SoundLib {
-AudioHandler::AudioHandler(const char* pName, IAudio* pAudio) : pName(pName), pAudio(pAudio), pVoice(nullptr), pDelegate(nullptr), onPlayedToEndCallback(nullptr) {
+AudioHandler::AudioHandler(const char* pName, IAudio* pAudio) : pName(pName), pAudio(pAudio), pVoice(nullptr), pDelegate(nullptr), onPlayedToEndCallback(nullptr), status(PlayingStatus::Stopped) {
 	this->pVoiceCallback = new VoiceCallback(this);
 }
 
@@ -22,6 +22,10 @@ AudioHandler::~AudioHandler() {
 	}
 
 	delete this->pVoiceCallback;
+}
+
+PlayingStatus AudioHandler::GetStatus() {
+	return this->status;
 }
 
 bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
@@ -62,9 +66,11 @@ void AudioHandler::Stop() {
 
 void AudioHandler::Pause() {
 	this->pVoice->Stop();
+	this->status = PlayingStatus::Pausing;
 }
 
 void AudioHandler::Resume() {
+	this->status = PlayingStatus::Playing;
 	this->pVoice->Start();
 }
 
@@ -122,11 +128,13 @@ void AudioHandler::Start() {
 
 	this->Push();
 
+	this->status = PlayingStatus::Playing;
 	this->pVoice->Start();
 }
 
 void AudioHandler::Stop(bool clearsCallback) {
 	this->pVoice->Stop();
+	this->status = PlayingStatus::Stopped;
 	this->pAudio->Reset();
 	if (this->readBufffers != nullptr) {
 		for (int i = 0; i < BUF_LEN; i++) {

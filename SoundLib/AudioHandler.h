@@ -12,10 +12,19 @@
 
 
 namespace SoundLib {
+enum PlayingStatus {
+	Stopped,
+	Playing,
+	Pausing
+};
+
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
 	AudioHandler(const char* pName, IAudio* pAudio);
 	~AudioHandler();
+
+	PlayingStatus GetStatus();
+	
 	bool Prepare(IXAudio2* pXAudio2);
 	void Start(bool isLoopPlayback);
 	void Start(IAudioHandlerDelegate* pDelegate);
@@ -24,6 +33,7 @@ public:
 	void Pause();
 	void Resume();
 	void BufferEndCallback();
+
 
 private:
 	const int BUF_LEN = 2;
@@ -39,6 +49,7 @@ private:
 	bool isLoopPlayback;
 	IAudioHandlerDelegate* pDelegate;
 	void(*onPlayedToEndCallback)(const char* pName);
+	PlayingStatus status;
 
 	void Push();
 	void Start();

@@ -24,6 +24,7 @@ public:
 	void Stop(const char* pKey);
 	void Pause(const char* pKey);
 	void Resume(const char* pKey);
+	PlayingStatus GetStatus(const char* pKey);
 
 private:
 	IAudio * pAudio;
