@@ -5,6 +5,7 @@
 #include "IVoiceCallbackDelegate.h"
 
 
+namespace SoundLib {
 class VoiceCallback : public IXAudio2VoiceCallback
 {
 public:
@@ -24,5 +25,5 @@ private:
 	VoiceCallback();
 	VoiceCallback(const VoiceCallback&);
 };
-
+}
 #endif

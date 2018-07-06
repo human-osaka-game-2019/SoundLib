@@ -3,10 +3,12 @@
 
 #include "IAudioHandlerDelegate.h"
 
+
+namespace SoundLib {
 class ISoundsManagerDelegate : public IAudioHandlerDelegate {
-public :
+public:
 	virtual ~ISoundsManagerDelegate() = 0;
 	virtual void OnPlayedToEnd(const char* pKey) = 0;
 };
-
+}
 #endif

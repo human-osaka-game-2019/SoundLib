@@ -5,6 +5,8 @@
 #include <mmsystem.h>
 #include <mmreg.h>
 
+
+namespace SoundLib {
 class IAudio {
 public:
 	virtual ~IAudio() {};
@@ -13,5 +15,6 @@ public:
 	virtual const WAVEFORMATEX* GetWaveFormatEx() = 0;
 	virtual void Reset() = 0;
 };
+}
 
 #endif

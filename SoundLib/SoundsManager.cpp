@@ -4,6 +4,7 @@
 #include "Mp3Audio.h"
 
 
+namespace SoundLib {
 SoundsManager::SoundsManager() : pXAudio2(nullptr) {}
 
 SoundsManager::~SoundsManager() {
@@ -106,4 +107,4 @@ void SoundsManager::Pause(const char* pKey) {
 void SoundsManager::Resume(const char* pKey) {
 	this->audioMap[pKey]->Resume();
 }
-
+}

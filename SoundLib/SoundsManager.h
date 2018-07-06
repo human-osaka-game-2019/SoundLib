@@ -10,6 +10,8 @@
 #include "ISoundsManagerDelegate.h"
 
 
+namespace SoundLib {
+
 class SoundsManager {
 public:
 	SoundsManager();
@@ -24,8 +26,9 @@ public:
 	void Resume(const char* pKey);
 
 private:
-	IAudio* pAudio;
+	IAudio * pAudio;
 	std::unordered_map<const char*, AudioHandler*> audioMap;
 	IXAudio2* pXAudio2;
 };
+}
 #endif

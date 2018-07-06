@@ -2,6 +2,7 @@
 #include "Common.h"
 
 
+namespace SoundLib {
 AudioHandler::AudioHandler(const char* pName, IAudio* pAudio) : pName(pName), pAudio(pAudio), pVoice(nullptr), pDelegate(nullptr), onPlayedToEndCallback(nullptr) {
 	this->pVoiceCallback = new VoiceCallback(this);
 }
@@ -139,4 +140,5 @@ void AudioHandler::Stop(bool clearsCallback) {
 		this->pDelegate = nullptr;
 		this->onPlayedToEndCallback = nullptr;
 	}
+}
 }

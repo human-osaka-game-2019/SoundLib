@@ -4,6 +4,7 @@
 #include "IAudio.h"
 
 
+namespace SoundLib {
 class WaveAudio : public IAudio {
 public:
 	WaveAudio();
@@ -18,5 +19,5 @@ private:
 	WAVEFORMATEX waveFormatEx;
 	long pos;
 };
-
+}
 #endif

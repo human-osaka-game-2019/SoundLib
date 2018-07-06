@@ -6,6 +6,7 @@
 #include <msacm.h>
 
 
+namespace SoundLib {
 class Mp3Audio : public IAudio {
 public:
 	Mp3Audio();
@@ -28,5 +29,5 @@ private:
 	WORD GetBitRate(BYTE header[], int version);
 	WORD GetSampleRate(BYTE header[], int version);
 };
-
+}
 #endif

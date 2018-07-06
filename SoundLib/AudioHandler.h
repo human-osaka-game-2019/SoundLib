@@ -11,6 +11,7 @@
 #include "IAudioHandlerDelegate.h"
 
 
+namespace SoundLib {
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
 	AudioHandler(const char* pName, IAudio* pAudio);
@@ -43,5 +44,6 @@ private:
 	void Start();
 	void Stop(bool clearsCallback);
 };
+}
 
 #endif

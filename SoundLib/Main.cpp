@@ -4,7 +4,7 @@
 #include "SoundsManager.h"
 
 
-SoundsManager soundsManager;
+SoundLib::SoundsManager soundsManager;
 
 static void OnPlayedToEnd(const char* pKey);
 
