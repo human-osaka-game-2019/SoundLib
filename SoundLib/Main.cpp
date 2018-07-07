@@ -10,6 +10,9 @@ static void OnPlayedToEnd(const char* pKey);
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
+	// メモリリークチェック
+	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
+	
 	const char* filePath1 = "Resources\\toujyo.wav";
 	const char* filePath2 = "Resources\\musicbox.mp3";
 	const char* filePath3 = "Resources\\jump03.mp3";

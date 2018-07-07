@@ -43,7 +43,7 @@ private:
 	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pVoiceCallback;
 	XAUDIO2_BUFFER xAudioBuffer;
-	BYTE** readBufffers;
+	BYTE** readBuffers;
 	int readLength;
 	int buf_cnt;
 	bool isLoopPlayback;

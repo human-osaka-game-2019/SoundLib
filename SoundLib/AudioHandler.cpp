@@ -3,8 +3,15 @@
 
 
 namespace SoundLib {
-AudioHandler::AudioHandler(const char* pName, IAudio* pAudio) : pName(pName), pAudio(pAudio), pVoice(nullptr), pDelegate(nullptr), onPlayedToEndCallback(nullptr), status(PlayingStatus::Stopped) {
-	this->pVoiceCallback = new VoiceCallback(this);
+AudioHandler::AudioHandler(const char* pName, IAudio* pAudio) : 
+	pName(pName), 
+	pAudio(pAudio), 
+	pVoice(nullptr), 
+	readBuffers(nullptr), 
+	pDelegate(nullptr), 
+	onPlayedToEndCallback(nullptr), 
+	status(PlayingStatus::Stopped) {
+		this->pVoiceCallback = new VoiceCallback(this);
 }
 
 AudioHandler::~AudioHandler() {
@@ -79,15 +86,15 @@ void AudioHandler::BufferEndCallback() {
 }
 
 void AudioHandler::Push() {
-	if (this->readBufffers == nullptr) {
+	if (this->readBuffers == nullptr) {
 		return;
 	}
 
 	// 音データ格納
-	long size = this->pAudio->Read(this->readBufffers[this->buf_cnt], this->readLength);
+	long size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
 	if (size <= 0 && this->isLoopPlayback) {
 		this->pAudio->Reset();
-		size = this->pAudio->Read(this->readBufffers[this->buf_cnt], this->readLength);
+		size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
 	}
 
 	if (size <= 0) {
@@ -104,7 +111,7 @@ void AudioHandler::Push() {
 	}
 
 	this->xAudioBuffer.AudioBytes = size;
-	this->xAudioBuffer.pAudioData = this->readBufffers[this->buf_cnt];
+	this->xAudioBuffer.pAudioData = this->readBuffers[this->buf_cnt];
 	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
 	if (FAILED(ret)) {
 		OutputDebugStringEx("error SubmitSourceBuffer ret=%d\n", ret);
@@ -118,10 +125,10 @@ void AudioHandler::Push() {
 
 void AudioHandler::Start() {
 	this->xAudioBuffer = { 0 };
-	this->readBufffers = new BYTE*[BUF_LEN];
+	this->readBuffers = new BYTE*[BUF_LEN];
 	this->readLength = this->pAudio->GetWaveFormatEx()->nAvgBytesPerSec;
 	for (int i = 0; i < BUF_LEN; ++i) {
-		this->readBufffers[i] = new BYTE[this->readLength];
+		this->readBuffers[i] = new BYTE[this->readLength];
 	}
 
 	this->buf_cnt = 0;
@@ -136,12 +143,12 @@ void AudioHandler::Stop(bool clearsCallback) {
 	this->pVoice->Stop();
 	this->status = PlayingStatus::Stopped;
 	this->pAudio->Reset();
-	if (this->readBufffers != nullptr) {
+	if (this->readBuffers != nullptr) {
 		for (int i = 0; i < BUF_LEN; i++) {
-			delete[] this->readBufffers[i];
+			delete[] this->readBuffers[i];
 		}
-		delete this->readBufffers;
-		this->readBufffers = nullptr;
+		delete this->readBuffers;
+		this->readBuffers = nullptr;
 	}
 
 	if (clearsCallback) {

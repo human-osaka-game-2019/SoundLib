@@ -36,6 +36,7 @@ Mp3Audio::~Mp3Audio() {
 		delete[] this->pAsh->pbSrc;
 		delete[] this->pAsh->pbDst;
 
+		delete this->pAsh;
 		this->pAsh = nullptr;
 	}
 
@@ -137,7 +138,7 @@ bool Mp3Audio::Load(const char* pFilePath) {
 	// デコード準備
 	acmStreamPrepareHeader(this->has, this->pAsh, 0);
 
-	return TRUE;
+	return true;
 }
 
 long Mp3Audio::Read(BYTE* pBuffer, DWORD bufSize) {
