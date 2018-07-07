@@ -64,5 +64,5 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 }
 
 static void OnPlayedToEnd(const char* pKey) {
-	//soundsManager.Start("mp3");
+	soundsManager.Start("mp3");
 }

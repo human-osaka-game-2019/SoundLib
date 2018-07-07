@@ -1,4 +1,5 @@
-﻿#include "SoundsManager.h"
+﻿#include <typeinfo>
+#include "SoundsManager.h"
 #include "Common.h"
 #include "WaveAudio.h"
 #include "Mp3Audio.h"
@@ -8,12 +9,10 @@ namespace SoundLib {
 SoundsManager::SoundsManager() : pXAudio2(nullptr) {}
 
 SoundsManager::~SoundsManager() {
-	/*
 	for (auto& rAudioPair : this->audioMap) {
-		delete this->audioMap[rAudioPair.first];
+		delete rAudioPair.second;
 	}
 	this->audioMap.clear();
-	*/
 
 	if (this->pXAudio2 != nullptr) {
 		this->pXAudio2->Release();
@@ -58,24 +57,34 @@ bool SoundsManager::Initialize() {
 
 bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
 	if (ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは既に登録済み\n", pKey);
+		OutputDebugStringEx("キー%sは既に登録済み。\n", pKey);
 		return false;
 	}
 	
 	char* extension = strstr((char*)pFilePath, ".");
 
 	IAudio* pAudio;
-	if (strcmp(extension, ".wav") == 0) {
+	if (extension != nullptr && strcmp(extension, ".wav") == 0) {
 		pAudio = new WaveAudio();
-	} else if (strcmp(extension, ".mp3") == 0) {
-		pAudio = new Mp3Audio;
 	} else {
-		OutputDebugStringEx("拡張子%sは対象外\n", extension);
-		return false;
-	}
+		pAudio = new Mp3Audio();
+	} 
 
 	if (!pAudio->Load(pFilePath)) {
-		return false;
+		// 他の形式で読めるか試してみる
+		if (typeid(*pAudio) == typeid(WaveAudio)) {
+			delete pAudio;
+			pAudio = new Mp3Audio();
+		} else {
+			delete pAudio;
+			pAudio = new WaveAudio();
+		}
+
+		if (!pAudio->Load(pFilePath)) {
+			OutputDebugStringEx("%sはWAVE又MP3形式ではありません。\n", pFilePath);
+			delete pAudio;
+			return false;
+		}
 	}
 
 	const WAVEFORMATEX* pFormat = pAudio->GetWaveFormatEx();
@@ -91,7 +100,7 @@ bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
 
 bool SoundsManager::Start(const char* pKey, bool isLoopPlayback) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
 		return false;
 	}
 
@@ -101,7 +110,7 @@ bool SoundsManager::Start(const char* pKey, bool isLoopPlayback) {
 
 bool SoundsManager::Start(const char* pKey, ISoundsManagerDelegate* pDelegate) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
 		return false;
 	}
 	
@@ -111,7 +120,7 @@ bool SoundsManager::Start(const char* pKey, ISoundsManagerDelegate* pDelegate) {
 
 bool SoundsManager::Start(const char* pKey, void(*onPlayedToEndCallback)(const char* pKey)) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
 		return false;
 	}
 	
@@ -121,7 +130,7 @@ bool SoundsManager::Start(const char* pKey, void(*onPlayedToEndCallback)(const c
 
 bool SoundsManager::Stop(const char* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
 		return false;
 	}
 	
@@ -131,7 +140,7 @@ bool SoundsManager::Stop(const char* pKey) {
 
 bool SoundsManager::Pause(const char* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
 		return false;
 	}
 	
@@ -141,7 +150,7 @@ bool SoundsManager::Pause(const char* pKey) {
 
 bool SoundsManager::Resume(const char* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
 		return false;
 	}
 	
@@ -151,7 +160,7 @@ bool SoundsManager::Resume(const char* pKey) {
 
 PlayingStatus SoundsManager::GetStatus(const char* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません\n", pKey);
+		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
 		throw std::invalid_argument("キーが存在しません。");
 	}
 	
