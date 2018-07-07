@@ -6,66 +6,66 @@
 
 SoundLib::SoundsManager soundsManager;
 
-static void OnPlayedToEnd(const char* pKey);
+static void OnPlayedToEnd(const TCHAR* pKey);
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
 	// メモリリークチェック
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 	
-	const char* filePath1 = "Resources\\toujyo.wav";
-	const char* filePath2 = "Resources\\musicbox.mp3";
-	const char* filePath3 = "Resources\\jump03.mp3";
+	const TCHAR* filePath1 = _T("Resources\\toujyo.wav");
+	const TCHAR* filePath2 = _T("Resources\\musicbox.mp3");
+	const TCHAR* filePath3 = _T("Resources\\jump03.mp3");
 
 	//SoundsManager soundsManager;
 	soundsManager.Initialize();
 	
 	// Waveファイルオープン
-	if (!soundsManager.AddFile(filePath1, "wav")) {
+	if (!soundsManager.AddFile(filePath1, _T("wav"))) {
 		return -1;
 	}
 
 	// mp3ファイルオープン
-	if (!soundsManager.AddFile(filePath2, "mp3")) {
+	if (!soundsManager.AddFile(filePath2, _T("mp3"))) {
 		return -1;
 	}
 
 	// mp3ファイルオープン
-	if (!soundsManager.AddFile(filePath3, "mp3SE")) {
+	if (!soundsManager.AddFile(filePath3, _T("mp3SE"))) {
 		return -1;
 	}
 
-	SoundLib::PlayingStatus status = soundsManager.GetStatus("wav");
-	OutputDebugStringEx("Status of the wave is %d\n", status);
+	SoundLib::PlayingStatus status = soundsManager.GetStatus(_T("wav"));
+	OutputDebugStringEx(_T("Status of the wave is %d\n"), status);
 
-	soundsManager.Start("wav", OnPlayedToEnd);
+	soundsManager.Start(_T("wav"), OnPlayedToEnd);
 	Sleep(1000);
-	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
 
 	for (int i = 0; i < 1; ++i) {
-		soundsManager.Start("mp3SE");
+		soundsManager.Start(_T("mp3SE"));
 		Sleep(1500);
 	}
 
 	//Sleep(1000);
-	soundsManager.Pause("wav");
-	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+	soundsManager.Pause(_T("wav"));
+	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
 	Sleep(1000);
 
 
-	soundsManager.Resume("wav");
-	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+	soundsManager.Resume(_T("wav"));
+	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
 	Sleep(1000);
 
-	//soundsManager.Stop("wav");
-	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+	//soundsManager.Stop(_T("wav"));
+	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
 
 	Sleep(5000);
-	OutputDebugStringEx("Status of the wave is %d\n", soundsManager.GetStatus("wav"));
+	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
 
 	return 0;
 }
 
-static void OnPlayedToEnd(const char* pKey) {
-	soundsManager.Start("mp3");
+static void OnPlayedToEnd(const TCHAR* pKey) {
+	soundsManager.Start(_T("mp3"));
 }

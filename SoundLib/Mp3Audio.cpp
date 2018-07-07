@@ -52,7 +52,7 @@ Mp3Audio::~Mp3Audio() {
 	}
 }
 
-bool Mp3Audio::Load(const char* pFilePath) {
+bool Mp3Audio::Load(const TCHAR* pFilePath) {
 	// ファイルを開く
 	this->hFile = CreateFile(
 		pFilePath,
@@ -189,7 +189,7 @@ DWORD Mp3Audio::GetDataSize() {
 	ReadFile(this->hFile, header, 10, &readSize, NULL);
 
 	// 先頭３バイトのチェック
-	if (memcmp(header, "ID3", 3) == 0) {
+	if (memcmp(header, _T("ID3"), 3) == 0) {
 		// タグサイズを取得
 		DWORD tagSize = ((header[6] << 21) | (header[7] << 14) | (header[8] << 7) | (header[9])) + 10;
 
@@ -204,7 +204,7 @@ DWORD Mp3Audio::GetDataSize() {
 
 		// データの位置、サイズを計算
 		this->offset = 0;
-		if (memcmp(tag, "TAG", 3) == 0)
+		if (memcmp(tag, _T("TAG"), 3) == 0)
 			ret = fileSize - 128; // 末尾のタグを省く
 		else
 			ret = fileSize; // ファイル全体がMP3データ

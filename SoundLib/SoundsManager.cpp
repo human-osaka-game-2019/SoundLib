@@ -24,7 +24,7 @@ SoundsManager::~SoundsManager() {
 bool SoundsManager::Initialize() {
 	HRESULT ret = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error CoInitializeEx ret=%d\n", ret);
+		OutputDebugStringEx(_T("error CoInitializeEx ret=%d\n"), ret);
 		return false;
 	}
 
@@ -34,7 +34,7 @@ bool SoundsManager::Initialize() {
 		// XAUDIO2_PROCESSOR XAudio2Processor = XAUDIO2_DEFAULT_PROCESSOR
 	);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error XAudio2Create ret=%d\n", ret);
+		OutputDebugStringEx(_T("error XAudio2Create ret=%d\n"), ret);
 		return false;
 	}
 
@@ -48,23 +48,23 @@ bool SoundsManager::Initialize() {
 		// const XAUDIO2_EFFECT_CHAIN *pEffectChain = NULL
 	);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error CreateMasteringVoice ret=%d\n", ret);
+		OutputDebugStringEx(_T("error CreateMasteringVoice ret=%d\n"), ret);
 		return false;
 	}
 
 	return true;
 }
 
-bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
+bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 	if (ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは既に登録済み。\n", pKey);
+		OutputDebugStringEx(_T("キー%sは既に登録済み。\n"), pKey);
 		return false;
 	}
 	
-	char* extension = strstr((char*)pFilePath, ".");
+	const TCHAR* pExtension = _tcsstr(pFilePath, _T("."));
 
 	IAudio* pAudio;
-	if (extension != nullptr && strcmp(extension, ".wav") == 0) {
+	if (pExtension != nullptr && strcmp(pExtension, _T(".wav")) == 0) {
 		pAudio = new WaveAudio();
 	} else {
 		pAudio = new Mp3Audio();
@@ -81,26 +81,28 @@ bool SoundsManager::AddFile(const char* pFilePath, const char* pKey) {
 		}
 
 		if (!pAudio->Load(pFilePath)) {
-			OutputDebugStringEx("%sはWAVE又MP3形式ではありません。\n", pFilePath);
+			OutputDebugStringEx(_T("%sはWAVE又MP3形式ではありません。\n"), pFilePath);
 			delete pAudio;
 			return false;
 		}
 	}
 
 	const WAVEFORMATEX* pFormat = pAudio->GetWaveFormatEx();
-	OutputDebugStringEx("foramt    =%d\n", pFormat->wFormatTag);
-	OutputDebugStringEx("channel   =%d\n", pFormat->nChannels);
-	OutputDebugStringEx("sampling  =%dHz\n", pFormat->nSamplesPerSec);
-	OutputDebugStringEx("bit/sample=%d\n", pFormat->wBitsPerSample);
-	OutputDebugStringEx("byte/sec  =%d\n", pFormat->nAvgBytesPerSec);
+	OutputDebugStringEx(_T("-----------------キー%sのオーディオ情報--------------------\n"), pKey);
+	OutputDebugStringEx(_T("foramt    =%d\n"), pFormat->wFormatTag);
+	OutputDebugStringEx(_T("channel   =%d\n"), pFormat->nChannels);
+	OutputDebugStringEx(_T("sampling  =%dHz\n"), pFormat->nSamplesPerSec);
+	OutputDebugStringEx(_T("bit/sample=%d\n"), pFormat->wBitsPerSample);
+	OutputDebugStringEx(_T("byte/sec  =%d\n"), pFormat->nAvgBytesPerSec);
+	OutputDebugStringEx(_T("-----------------------------------------------------------\n"));
 
 	this->audioMap[pKey] = new AudioHandler(pKey, pAudio);
 	return this->audioMap[pKey]->Prepare(this->pXAudio2);
 }
 
-bool SoundsManager::Start(const char* pKey, bool isLoopPlayback) {
+bool SoundsManager::Start(const TCHAR* pKey, bool isLoopPlayback) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return false;
 	}
 
@@ -108,9 +110,9 @@ bool SoundsManager::Start(const char* pKey, bool isLoopPlayback) {
 	return true;
 }
 
-bool SoundsManager::Start(const char* pKey, ISoundsManagerDelegate* pDelegate) {
+bool SoundsManager::Start(const TCHAR* pKey, ISoundsManagerDelegate* pDelegate) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return false;
 	}
 	
@@ -118,9 +120,9 @@ bool SoundsManager::Start(const char* pKey, ISoundsManagerDelegate* pDelegate) {
 	return true;
 }
 
-bool SoundsManager::Start(const char* pKey, void(*onPlayedToEndCallback)(const char* pKey)) {
+bool SoundsManager::Start(const TCHAR* pKey, void(*onPlayedToEndCallback)(const TCHAR* pKey)) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return false;
 	}
 	
@@ -128,9 +130,9 @@ bool SoundsManager::Start(const char* pKey, void(*onPlayedToEndCallback)(const c
 	return true;
 }
 
-bool SoundsManager::Stop(const char* pKey) {
+bool SoundsManager::Stop(const TCHAR* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return false;
 	}
 	
@@ -138,9 +140,9 @@ bool SoundsManager::Stop(const char* pKey) {
 	return true;
 }
 
-bool SoundsManager::Pause(const char* pKey) {
+bool SoundsManager::Pause(const TCHAR* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return false;
 	}
 	
@@ -148,9 +150,9 @@ bool SoundsManager::Pause(const char* pKey) {
 	return true;
 }
 
-bool SoundsManager::Resume(const char* pKey) {
+bool SoundsManager::Resume(const TCHAR* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return false;
 	}
 	
@@ -158,16 +160,16 @@ bool SoundsManager::Resume(const char* pKey) {
 	return true;
 }
 
-PlayingStatus SoundsManager::GetStatus(const char* pKey) {
+PlayingStatus SoundsManager::GetStatus(const TCHAR* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キー%sは存在しません。\n", pKey);
-		throw std::invalid_argument("キーが存在しません。");
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
+		throw std::invalid_argument(_T("キーが存在しません。"));
 	}
 	
 	return this->audioMap[pKey]->GetStatus();
 }
 
-bool SoundsManager::ExistsKey(const char* pKey) {
+bool SoundsManager::ExistsKey(const TCHAR* pKey) {
 	auto itr = this->audioMap.find(pKey);
 	return (itr != this->audioMap.end());
 }

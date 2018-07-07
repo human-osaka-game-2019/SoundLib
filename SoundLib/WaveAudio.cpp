@@ -14,33 +14,33 @@ WaveAudio::~WaveAudio() {
 	}
 }
 
-bool WaveAudio::Load(const char* pFilePath) {
+bool WaveAudio::Load(const TCHAR* pFilePath) {
 	MMIOINFO mmioInfo;
 
 	// Waveファイルオープン
 	memset(&mmioInfo, 0, sizeof(MMIOINFO));
 
-	this->hMmio = mmioOpen((LPSTR)pFilePath, &mmioInfo, MMIO_READ);
+	this->hMmio = mmioOpen(const_cast<TCHAR*>(pFilePath), &mmioInfo, MMIO_READ);
 	if (!this->hMmio) {
 		// ファイルオープン失敗
-		OutputDebugStringEx("error mmioOpen\n");
+		OutputDebugStringEx(_T("error mmioOpen\n"));
 		return false;
 	}
 
 	// RIFFチャンク検索
 	MMRESULT mmRes;
 	MMCKINFO riffChunk;
-	riffChunk.fccType = mmioFOURCC('W', 'A', 'V', 'E');
+	riffChunk.fccType = mmioFOURCC(_T('W'), _T('A'), _T('V'), _T('E'));
 	mmRes = mmioDescend(this->hMmio, &riffChunk, NULL, MMIO_FINDRIFF);
 	if (mmRes != MMSYSERR_NOERROR) {
-		OutputDebugStringEx("error mmioDescend(wave) ret=%d\n", mmRes);
+		OutputDebugStringEx(_T("error mmioDescend(wave) ret=%d\n"), mmRes);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}
 
 	// フォーマットチャンク検索
 	MMCKINFO formatChunk;
-	formatChunk.ckid = mmioFOURCC('f', 'm', 't', ' ');
+	formatChunk.ckid = mmioFOURCC(_T('f'), _T('m'), _T('t'), _T(' '));
 	mmRes = mmioDescend(this->hMmio, &formatChunk, &riffChunk, MMIO_FINDCHUNK);
 	if (mmRes != MMSYSERR_NOERROR) {
 		mmioClose(this->hMmio, 0);
@@ -51,7 +51,7 @@ bool WaveAudio::Load(const char* pFilePath) {
 	DWORD fmsize = formatChunk.cksize;
 	DWORD size = mmioRead(this->hMmio, (HPSTR)&this->waveFormatEx, fmsize);
 	if (size != fmsize) {
-		OutputDebugStringEx("error mmioRead(fmt) size=%d\n", size);
+		OutputDebugStringEx(_T("error mmioRead(fmt) size=%d\n"), size);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}
@@ -61,10 +61,10 @@ bool WaveAudio::Load(const char* pFilePath) {
 
 	// データチャンク検索
 	MMCKINFO dataChunk;
-	dataChunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
+	dataChunk.ckid = mmioFOURCC(_T('d'), _T('a'), _T('t'), _T('a'));
 	mmRes = mmioDescend(this->hMmio, &dataChunk, &riffChunk, MMIO_FINDCHUNK);
 	if (mmRes != MMSYSERR_NOERROR) {
-		OutputDebugStringEx("error mmioDescend(data) ret=%d\n", mmRes);
+		OutputDebugStringEx(_T("error mmioDescend(data) ret=%d\n"), mmRes);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}

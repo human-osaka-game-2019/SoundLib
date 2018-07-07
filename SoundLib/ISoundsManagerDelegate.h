@@ -8,7 +8,7 @@ namespace SoundLib {
 class ISoundsManagerDelegate : public IAudioHandlerDelegate {
 public:
 	virtual ~ISoundsManagerDelegate() = 0;
-	virtual void OnPlayedToEnd(const char* pKey) = 0;
+	virtual void OnPlayedToEnd(const TCHAR* pKey) = 0;
 };
 }
 #endif

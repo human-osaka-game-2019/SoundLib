@@ -9,7 +9,7 @@ class WaveAudio : public IAudio {
 public:
 	WaveAudio();
 	~WaveAudio();
-	bool Load(const char* pFilePath);
+	bool Load(const TCHAR* pFilePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
 	const WAVEFORMATEX* GetWaveFormatEx();
 	void Reset();

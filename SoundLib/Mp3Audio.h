@@ -11,7 +11,7 @@ class Mp3Audio : public IAudio {
 public:
 	Mp3Audio();
 	~Mp3Audio();
-	bool Load(const char* pFilePath);
+	bool Load(const TCHAR* pFilePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
 	const WAVEFORMATEX* GetWaveFormatEx();
 	void Reset();

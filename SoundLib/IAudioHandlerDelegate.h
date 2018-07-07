@@ -7,7 +7,7 @@ class IAudioHandlerDelegate
 {
 public:
 	virtual ~IAudioHandlerDelegate() = 0;
-	virtual void OnPlayedToEnd(const char* name) = 0;
+	virtual void OnPlayedToEnd(const TCHAR* name) = 0;
 };
 }
 #endif

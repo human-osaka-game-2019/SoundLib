@@ -17,21 +17,22 @@ public:
 	SoundsManager();
 	~SoundsManager();
 	bool Initialize();
-	bool AddFile(const char* pFilePath, const char* pKey);
-	bool Start(const char* pKey, bool isLoopPlayback = false);
-	bool Start(const char* pKey, ISoundsManagerDelegate* pDelegate);
-	bool Start(const char* pKey, void(*onPlayedToEndCallback)(const char* pKey));
-	bool Stop(const char* pKey);
-	bool Pause(const char* pKey);
-	bool Resume(const char* pKey);
-	PlayingStatus GetStatus(const char* pKey);
+	bool AddFile(const TCHAR* pFilePath, const TCHAR* pKey);
+	bool Start(const TCHAR* pKey, bool isLoopPlayback = false);
+	bool Start(const TCHAR* pKey, ISoundsManagerDelegate* pDelegate);
+	bool Start(const TCHAR* pKey, void(*onPlayedToEndCallback)(const TCHAR* pKey));
+	bool Stop(const TCHAR* pKey);
+	bool Pause(const TCHAR* pKey);
+	bool Resume(const TCHAR* pKey);
+	PlayingStatus GetStatus(const TCHAR* pKey);
 
 private:
 	IAudio * pAudio;
-	std::unordered_map<const char*, AudioHandler*> audioMap;
+	std::unordered_map<const TCHAR*, AudioHandler*> audioMap;
 	IXAudio2* pXAudio2;
 
-	bool ExistsKey(const char* pKey);
+	bool ExistsKey(const TCHAR* pKey);
+	
 };
 }
 #endif

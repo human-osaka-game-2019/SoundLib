@@ -3,7 +3,7 @@
 
 
 namespace SoundLib {
-AudioHandler::AudioHandler(const char* pName, IAudio* pAudio) : 
+AudioHandler::AudioHandler(const TCHAR* pName, IAudio* pAudio) : 
 	pName(pName), 
 	pAudio(pAudio), 
 	pVoice(nullptr), 
@@ -46,7 +46,7 @@ bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
 										  // const XAUDIO2_EFFECT_CHAIN *pEffectChain = NULL
 	);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error CreateSourceVoice ret=%d\n", ret);
+		OutputDebugStringEx(_T("error CreateSourceVoice ret=%d\n"), ret);
 		return false;
 	}
 	return true;
@@ -59,11 +59,13 @@ void AudioHandler::Start(bool isLoopPlayback) {
 
 void AudioHandler::Start(IAudioHandlerDelegate* pDelegate) {
 	this->pDelegate = pDelegate;
+	this->isLoopPlayback = false;
 	Start();
 }
 
-void AudioHandler::Start(void(*onPlayedToEndCallback)(const char* pName)) {
+void AudioHandler::Start(void(*onPlayedToEndCallback)(const TCHAR* pName)) {
 	this->onPlayedToEndCallback = onPlayedToEndCallback;
+	this->isLoopPlayback = false;
 	Start();
 }
 
@@ -114,7 +116,7 @@ void AudioHandler::Push() {
 	this->xAudioBuffer.pAudioData = this->readBuffers[this->buf_cnt];
 	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error SubmitSourceBuffer ret=%d\n", ret);
+		OutputDebugStringEx(_T("error SubmitSourceBuffer ret=%d\n"), ret);
 		return;
 	}
 

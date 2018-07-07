@@ -20,7 +20,7 @@ enum PlayingStatus {
 
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
-	AudioHandler(const char* pName, IAudio* pAudio);
+	AudioHandler(const TCHAR* pName, IAudio* pAudio);
 	~AudioHandler();
 
 	PlayingStatus GetStatus();
@@ -28,7 +28,7 @@ public:
 	bool Prepare(IXAudio2* pXAudio2);
 	void Start(bool isLoopPlayback);
 	void Start(IAudioHandlerDelegate* pDelegate);
-	void Start(void(*onPlayedToEndCallback)(const char* pName));
+	void Start(void(*onPlayedToEndCallback)(const TCHAR* pName));
 	void Stop();
 	void Pause();
 	void Resume();
@@ -38,7 +38,7 @@ public:
 private:
 	const int BUF_LEN = 2;
 
-	const char* pName;
+	const TCHAR* pName;
 	IAudio * pAudio;
 	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pVoiceCallback;
@@ -48,7 +48,7 @@ private:
 	int buf_cnt;
 	bool isLoopPlayback;
 	IAudioHandlerDelegate* pDelegate;
-	void(*onPlayedToEndCallback)(const char* pName);
+	void(*onPlayedToEndCallback)(const TCHAR* pName);
 	PlayingStatus status;
 
 	void Push();
