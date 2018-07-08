@@ -4,6 +4,7 @@
 #include "Audio/WaveAudio.h"
 #include "Audio/Mp3Audio.h"
 #include "Audio/OggAudio.h"
+#include "Audio/AacAudio.h"
 
 
 namespace SoundLib {
@@ -69,8 +70,10 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 		pAudio = new Audio::WaveAudio();
 	} else if (pExtension != nullptr && strcmp(pExtension, _T(".ogg")) == 0) {
 		pAudio = new Audio::OggAudio();
-	} else {
+	} else if (pExtension != nullptr && strcmp(pExtension, _T(".mp3")) == 0) {
 		pAudio = new Audio::Mp3Audio();
+	} else {
+		pAudio = new Audio::AacAudio();
 	} 
 
 	int tryCount = 0;
@@ -83,6 +86,9 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 		} else if (typeid(*pAudio) == typeid(Audio::OggAudio)) {
 			delete pAudio;
 			pAudio = new Audio::WaveAudio();
+		} else if (typeid(*pAudio) == typeid(Audio::Mp3Audio)) {
+			delete pAudio;
+			pAudio = new Audio::AacAudio();
 		} else {
 			delete pAudio;
 			pAudio = new Audio::OggAudio();
@@ -101,6 +107,8 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 		formatName = (char*)"WAVE";
 	} else if (typeid(*pAudio) == typeid(Audio::OggAudio)) {
 		formatName = (char*)"OggVorbis";
+	} else if (typeid(*pAudio) == typeid(Audio::AacAudio)) {
+		formatName = (char*)"AAC";
 	} else {
 		formatName = (char*)"mp3";
 	}

@@ -36,6 +36,12 @@
     <ClCompile Include="Audio\WaveAudio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Audio\WmaAudio.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AacAudio.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Media Include="Resources\musicbox.mp3">
@@ -48,6 +54,8 @@
       <Filter>リソース ファイル</Filter>
     </Media>
     <Media Include="Resources\bgm_maoudamashii_fantasy10.ogg" />
+    <Media Include="Resources\s3.wma" />
+    <Media Include="Resources\Sample_BeeMoved_48kHz16bit.m4a" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IVoiceCallbackDelegate.h">
@@ -81,6 +89,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Audio\WaveAudio.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\WmaAudio.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AacAudio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
