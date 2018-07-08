@@ -16,6 +16,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	const TCHAR* filePath1 = _T("Resources\\toujyo.wav");
 	const TCHAR* filePath2 = _T("Resources\\musicbox.mp3");
 	const TCHAR* filePath3 = _T("Resources\\jump03.mp3");
+	const TCHAR* filePath4 = _T("Resources\\bgm_maoudamashii_fantasy10.ogg");
 
 	//SoundsManager soundsManager;
 	soundsManager.Initialize();
@@ -35,12 +36,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		return -1;
 	}
 
-	SoundLib::PlayingStatus status = soundsManager.GetStatus(_T("wav"));
-	OutputDebugStringEx(_T("Status of the wave is %d\n"), status);
+	// oggファイルオープン
+	if (!soundsManager.AddFile(filePath4, _T("ogg"))) {
+		return -1;
+	}
 
-	soundsManager.Start(_T("wav"), OnPlayedToEnd);
+	SoundLib::PlayingStatus status = soundsManager.GetStatus(_T("ogg"));
+	OutputDebugStringEx(_T("Status of the ogg is %d\n"), status);
+
+	soundsManager.Start(_T("ogg"), OnPlayedToEnd);
 	Sleep(1000);
-	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
+	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
 
 	for (int i = 0; i < 1; ++i) {
 		soundsManager.Start(_T("mp3SE"));
@@ -48,20 +54,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	//Sleep(1000);
-	soundsManager.Pause(_T("wav"));
-	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
+	soundsManager.Pause(_T("ogg"));
+	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
 	Sleep(1000);
 
 
-	soundsManager.Resume(_T("wav"));
-	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
+	soundsManager.Resume(_T("ogg"));
+	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
 	Sleep(1000);
 
 	//soundsManager.Stop(_T("wav"));
-	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
+	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
 
-	Sleep(5000);
-	OutputDebugStringEx(_T("Status of the wave is %d\n"), soundsManager.GetStatus(_T("wav")));
+	Sleep(10000);
+	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
 
 	return 0;
 }

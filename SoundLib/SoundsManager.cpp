@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "WaveAudio.h"
 #include "Mp3Audio.h"
+#include "OggAudio.h"
 
 
 namespace SoundLib {
@@ -66,34 +67,50 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 	IAudio* pAudio;
 	if (pExtension != nullptr && strcmp(pExtension, _T(".wav")) == 0) {
 		pAudio = new WaveAudio();
+	} else if (pExtension != nullptr && strcmp(pExtension, _T(".ogg")) == 0) {
+		pAudio = new OggAudio();
 	} else {
 		pAudio = new Mp3Audio();
 	} 
 
-	if (!pAudio->Load(pFilePath)) {
+	int tryCount = 0;
+	bool couldLoad = false;
+	while (!(couldLoad = pAudio->Load(pFilePath)) && ++tryCount < 3) {
 		// 他の形式で読めるか試してみる
 		if (typeid(*pAudio) == typeid(WaveAudio)) {
 			delete pAudio;
 			pAudio = new Mp3Audio();
-		} else {
+		} else if (typeid(*pAudio) == typeid(OggAudio)) {
 			delete pAudio;
 			pAudio = new WaveAudio();
-		}
-
-		if (!pAudio->Load(pFilePath)) {
-			OutputDebugStringEx(_T("%sはWAVE又MP3形式ではありません。\n"), pFilePath);
+		} else {
 			delete pAudio;
-			return false;
+			pAudio = new OggAudio();
 		}
 	}
 
+	if (!couldLoad) {
+		OutputDebugStringEx(_T("%sはWAVE, MP3, 又はOgg Vorbis形式ではありません。\n"), pFilePath);
+		delete pAudio;
+		return false;
+	}
+
 	const WAVEFORMATEX* pFormat = pAudio->GetWaveFormatEx();
+	char* formatName;
+	if (typeid(*pAudio) == typeid(WaveAudio)) {
+		formatName = (char*)"WAVE";
+	} else if (typeid(*pAudio) == typeid(OggAudio)) {
+		formatName = (char*)"OggVorbis";
+	} else {
+		formatName = (char*)"mp3";
+	}
 	OutputDebugStringEx(_T("-----------------キー%sのオーディオ情報--------------------\n"), pKey);
-	OutputDebugStringEx(_T("foramt    =%d\n"), pFormat->wFormatTag);
-	OutputDebugStringEx(_T("channel   =%d\n"), pFormat->nChannels);
-	OutputDebugStringEx(_T("sampling  =%dHz\n"), pFormat->nSamplesPerSec);
-	OutputDebugStringEx(_T("bit/sample=%d\n"), pFormat->wBitsPerSample);
-	OutputDebugStringEx(_T("byte/sec  =%d\n"), pFormat->nAvgBytesPerSec);
+	OutputDebugStringEx(_T("file foramt=%s\n"), formatName);
+	OutputDebugStringEx(_T("foramt     =%d\n"), pFormat->wFormatTag);
+	OutputDebugStringEx(_T("channel    =%d\n"), pFormat->nChannels);
+	OutputDebugStringEx(_T("sampling   =%dHz\n"), pFormat->nSamplesPerSec);
+	OutputDebugStringEx(_T("bit/sample =%d\n"), pFormat->wBitsPerSample);
+	OutputDebugStringEx(_T("byte/sec   =%d\n"), pFormat->nAvgBytesPerSec);
 	OutputDebugStringEx(_T("-----------------------------------------------------------\n"));
 
 	this->audioMap[pKey] = new AudioHandler(pKey, pAudio);

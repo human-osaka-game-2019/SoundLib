@@ -93,6 +93,7 @@ void AudioHandler::Push() {
 	}
 
 	// 音データ格納
+	memset(this->readBuffers[this->buf_cnt], 0, this->readLength);
 	long size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
 	if (size <= 0 && this->isLoopPlayback) {
 		this->pAudio->Reset();
