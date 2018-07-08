@@ -7,6 +7,8 @@
 
 
 namespace SoundLib {
+namespace Audio {
+
 class IAudio {
 public:
 	virtual ~IAudio() {};
@@ -15,6 +17,8 @@ public:
 	virtual const WAVEFORMATEX* GetWaveFormatEx() = 0;
 	virtual void Reset() = 0;
 };
+
+}
 }
 
 #endif

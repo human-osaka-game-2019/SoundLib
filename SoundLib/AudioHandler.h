@@ -6,7 +6,7 @@
 #include <mmreg.h>
 #include <xaudio2.h>
 #include "IVoiceCallbackDelegate.h"
-#include "IAudio.h"
+#include "Audio/IAudio.h"
 #include "VoiceCallback.h"
 #include "IAudioHandlerDelegate.h"
 
@@ -20,7 +20,7 @@ enum PlayingStatus {
 
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
-	AudioHandler(const TCHAR* pName, IAudio* pAudio);
+	AudioHandler(const TCHAR* pName,  Audio::IAudio* pAudio);
 	~AudioHandler();
 
 	PlayingStatus GetStatus();
@@ -39,7 +39,7 @@ private:
 	const int BUF_LEN = 2;
 
 	const TCHAR* pName;
-	IAudio * pAudio;
+	Audio::IAudio * pAudio;
 	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pVoiceCallback;
 	XAUDIO2_BUFFER xAudioBuffer;

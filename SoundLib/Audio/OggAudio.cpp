@@ -1,8 +1,10 @@
 ﻿#include "OggAudio.h"
-#include "Common.h"
+#include "../Common.h"
 
 
 namespace SoundLib {
+namespace Audio {
+
 OggAudio::OggAudio() : hasOpenedFile(false) {}
 
 OggAudio::~OggAudio() {
@@ -64,5 +66,7 @@ const WAVEFORMATEX* OggAudio::GetWaveFormatEx() {
 void OggAudio::Reset() {
 	// 読み込み位置を最初に戻す
 	ov_time_seek(&this->ovf, 0.0);
+}
+
 }
 }

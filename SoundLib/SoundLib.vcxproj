@@ -144,12 +144,12 @@
   <ItemGroup>
     <ClCompile Include="AudioHandler.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Mp3Audio.cpp" />
-    <ClCompile Include="OggAudio.cpp" />
-    <ClCompile Include="WaveAudio.cpp" />
+    <ClCompile Include="Audio\Mp3Audio.cpp" />
+    <ClCompile Include="Audio\OggAudio.cpp" />
+    <ClCompile Include="Audio\WaveAudio.cpp" />
     <ClCompile Include="SoundsManager.cpp" />
     <ClCompile Include="VoiceCallback.cpp" />
-    <ClInclude Include="OggAudio.h" />
+    <ClInclude Include="Audio\OggAudio.h" />
     <ClInclude Include="VoiceCallback.h" />
   </ItemGroup>
   <ItemGroup>
@@ -174,12 +174,12 @@
   <ItemGroup>
     <ClInclude Include="AudioHandler.h" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="IAudio.h" />
+    <ClInclude Include="Audio\IAudio.h" />
     <ClInclude Include="IAudioHandlerDelegate.h" />
     <ClInclude Include="ISoundsManagerDelegate.h" />
-    <ClInclude Include="Mp3Audio.h" />
+    <ClInclude Include="Audio\Mp3Audio.h" />
     <ClInclude Include="IVoiceCallbackDelegate.h" />
-    <ClInclude Include="WaveAudio.h" />
+    <ClInclude Include="Audio\WaveAudio.h" />
     <ClInclude Include="SoundsManager.h" />
   </ItemGroup>
   <ItemGroup>

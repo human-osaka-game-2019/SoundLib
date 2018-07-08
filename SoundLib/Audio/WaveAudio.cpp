@@ -1,11 +1,11 @@
 ﻿#include "WaveAudio.h"
-#include "Common.h"
+#include "../Common.h"
 
 
 namespace SoundLib{
-WaveAudio::WaveAudio() : hMmio(nullptr), pos(0) {
+namespace Audio {
 
-}
+WaveAudio::WaveAudio() : hMmio(nullptr), pos(0) {}
 
 WaveAudio::~WaveAudio() {
 	if (this->hMmio != nullptr) {
@@ -88,5 +88,7 @@ const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() {
 void WaveAudio::Reset() {
 	mmioSeek(this->hMmio, -this->pos, SEEK_CUR);
 	this->pos = 0;   // ファイルポインタを先頭に戻す
+}
+
 }
 }

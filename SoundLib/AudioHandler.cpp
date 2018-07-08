@@ -3,7 +3,7 @@
 
 
 namespace SoundLib {
-AudioHandler::AudioHandler(const TCHAR* pName, IAudio* pAudio) : 
+AudioHandler::AudioHandler(const TCHAR* pName, Audio::IAudio* pAudio) : 
 	pName(pName), 
 	pAudio(pAudio), 
 	pVoice(nullptr), 

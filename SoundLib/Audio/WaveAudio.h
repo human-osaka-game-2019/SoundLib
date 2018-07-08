@@ -1,24 +1,27 @@
-﻿#ifndef OGG_AUDIO_H
-#define OGG_AUDIO_H
+﻿#ifndef WAVE_AUDIO_H
+#define WAVE_AUDIO_H
 
 #include "IAudio.h"
-#include "vorbis/vorbisfile.h"
 
 
 namespace SoundLib {
-class OggAudio : public IAudio {
+namespace Audio {
+
+class WaveAudio : public IAudio {
 public:
-	OggAudio();
-	~OggAudio();
+	WaveAudio();
+	~WaveAudio();
 	bool Load(const TCHAR* pFilePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
 	const WAVEFORMATEX* GetWaveFormatEx();
 	void Reset();
 
 private:
-	OggVorbis_File ovf;
-	bool hasOpenedFile;
+	HMMIO hMmio;
 	WAVEFORMATEX waveFormatEx;
+	long pos;
 };
+
+}
 }
 #endif

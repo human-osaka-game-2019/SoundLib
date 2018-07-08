@@ -1,5 +1,5 @@
 ﻿#include "Mp3Audio.h"
-#include "Common.h"
+#include "../Common.h"
 
 
 namespace {
@@ -26,6 +26,8 @@ const WORD SAMPLE_RATE_TABLE[][4] = {
 }
 
 namespace SoundLib {
+namespace Audio {
+
 Mp3Audio::Mp3Audio() : hFile(nullptr), has(nullptr), pAsh(nullptr), pos(0) {}
 
 Mp3Audio::~Mp3Audio() {
@@ -248,5 +250,7 @@ WORD Mp3Audio::GetSampleRate(BYTE header[], int version) {
 	}
 
 	return SAMPLE_RATE_TABLE[index][(header[2] >> 2) & 0x03];
+}
+
 }
 }

@@ -27,12 +27,11 @@ public:
 	PlayingStatus GetStatus(const TCHAR* pKey);
 
 private:
-	IAudio * pAudio;
 	std::unordered_map<const TCHAR*, AudioHandler*> audioMap;
 	IXAudio2* pXAudio2;
 
 	bool ExistsKey(const TCHAR* pKey);
-	
 };
+
 }
 #endif
