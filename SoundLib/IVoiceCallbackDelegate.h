@@ -6,7 +6,7 @@ namespace SoundLib {
 class IVoiceCallbackDelegate {
 public:
 	virtual ~IVoiceCallbackDelegate() {}
-	virtual void BufferEndCallback(void) = 0;
+	virtual void BufferEndCallback() = 0;
 };
 }
 #endif

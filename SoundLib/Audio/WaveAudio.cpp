@@ -15,27 +15,27 @@ WaveAudio::~WaveAudio() {
 }
 
 
-const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() {
+const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
 
-TString WaveAudio::GetFormatName() {
+TString WaveAudio::GetFormatName() const {
 	return _T("WAVE");
 }
 
-int WaveAudio::GetChannelCount() {
+int WaveAudio::GetChannelCount() const {
 	return this->waveFormatEx.nChannels;
 }
 
-int WaveAudio::GetSamplingRate() {
+int WaveAudio::GetSamplingRate() const {
 	return this->waveFormatEx.nSamplesPerSec;
 }
 
-int WaveAudio::GetBitsPerSample() {
+int WaveAudio::GetBitsPerSample() const {
 	return this->waveFormatEx.wBitsPerSample;
 }
 
-bool WaveAudio::HasReadToEnd() {
+bool WaveAudio::HasReadToEnd() const {
 	return this->hasReadToEnd;
 }
 

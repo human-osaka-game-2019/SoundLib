@@ -34,27 +34,27 @@ CompressedAudio::~CompressedAudio() {
 }
 
 
-const WAVEFORMATEX* CompressedAudio::GetWaveFormatEx() {
+const WAVEFORMATEX* CompressedAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
 
-TString CompressedAudio::GetFormatName() {
+TString CompressedAudio::GetFormatName() const {
 	return TString(this->pCodecContext->codec->long_name);
 }
 
-int CompressedAudio::GetChannelCount() {
+int CompressedAudio::GetChannelCount() const {
 	return this->pCodecContext->channels;
 }
 
-int CompressedAudio::GetSamplingRate() {
+int CompressedAudio::GetSamplingRate() const {
 	return this->pCodecContext->sample_rate;
 }
 
-int CompressedAudio::GetBitsPerSample() {
+int CompressedAudio::GetBitsPerSample() const {
 	return this->pCodecContext->bits_per_coded_sample;
 }
 
-bool CompressedAudio::HasReadToEnd() {
+bool CompressedAudio::HasReadToEnd() const {
 	return this->hasReadToEnd;
 }
 

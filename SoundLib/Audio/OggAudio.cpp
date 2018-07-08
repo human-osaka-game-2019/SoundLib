@@ -15,28 +15,28 @@ OggAudio::~OggAudio() {
 }
 
 
-const WAVEFORMATEX* OggAudio::GetWaveFormatEx() {
+const WAVEFORMATEX* OggAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
 
-TString OggAudio::GetFormatName() {
+TString OggAudio::GetFormatName() const {
 	return _T("Ogg Vorbis");
 }
 
-int OggAudio::GetChannelCount() {
-	return ov_info(&this->ovf, -1)->channels;
+int OggAudio::GetChannelCount() const {
+	return ov_info(const_cast<OggVorbis_File*>(&this->ovf), -1)->channels;
 }
 
-int OggAudio::GetSamplingRate() {
-	return ov_info(&this->ovf, -1)->rate;
+int OggAudio::GetSamplingRate() const {
+	return ov_info(const_cast<OggVorbis_File*>(&this->ovf), -1)->rate;
 }
 
-int OggAudio::GetBitsPerSample() {
-	vorbis_info* pVorbisInfo = ov_info(&this->ovf, -1);
+int OggAudio::GetBitsPerSample() const {
+	vorbis_info* pVorbisInfo = ov_info(const_cast<OggVorbis_File*>(&this->ovf), -1);
 	return (pVorbisInfo->bitrate_nominal / pVorbisInfo->rate);
 }
 
-bool OggAudio::HasReadToEnd() {
+bool OggAudio::HasReadToEnd() const {
 	return this->hasReadToEnd;
 }
 

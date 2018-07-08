@@ -12,12 +12,12 @@ public:
 	WaveAudio();
 	~WaveAudio();
 
-	const WAVEFORMATEX* GetWaveFormatEx();
-	TString GetFormatName();
-	int GetChannelCount();
-	int GetSamplingRate();
-	int GetBitsPerSample();
-	bool HasReadToEnd();
+	const WAVEFORMATEX* GetWaveFormatEx() const;
+	TString GetFormatName() const;
+	int GetChannelCount() const;
+	int GetSamplingRate() const;
+	int GetBitsPerSample() const;
+	bool HasReadToEnd() const;
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);

@@ -14,12 +14,12 @@ class IAudio {
 public:
 	virtual ~IAudio() {};
 
-	virtual const WAVEFORMATEX* GetWaveFormatEx() = 0;
-	virtual TString GetFormatName() = 0;
-	virtual int GetChannelCount() = 0;
-	virtual int GetSamplingRate() = 0;
-	virtual int GetBitsPerSample() = 0;
-	virtual bool HasReadToEnd() = 0;
+	virtual const WAVEFORMATEX* GetWaveFormatEx() const = 0;
+	virtual TString GetFormatName() const = 0;
+	virtual int GetChannelCount() const = 0;
+	virtual int GetSamplingRate()const = 0;
+	virtual int GetBitsPerSample() const = 0;
+	virtual bool HasReadToEnd() const = 0;
 
 	virtual bool Load(TString filePath) = 0;
 	virtual long Read(BYTE* pBuffer, DWORD bufSize) = 0;

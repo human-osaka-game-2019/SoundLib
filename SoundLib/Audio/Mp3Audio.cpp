@@ -55,27 +55,27 @@ Mp3Audio::~Mp3Audio() {
 }
 
 
-const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() {
+const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
 
-TString Mp3Audio::GetFormatName() {
+TString Mp3Audio::GetFormatName() const {
 	return _T("mp3");
 }
 
-int Mp3Audio::GetChannelCount() {
+int Mp3Audio::GetChannelCount() const {
 	return this->channelCount;
 }
 
-int Mp3Audio::GetSamplingRate() {
+int Mp3Audio::GetSamplingRate() const {
 	return this->sampleRate;
 }
 
-int Mp3Audio::GetBitsPerSample() {
+int Mp3Audio::GetBitsPerSample() const {
 	return this->bitsPerSample;
 }
 
-bool Mp3Audio::HasReadToEnd() {
+bool Mp3Audio::HasReadToEnd() const {
 	return this->hasReadToEnd;
 }
 
@@ -99,24 +99,24 @@ bool Mp3Audio::Load(TString filePath) {
 	this->mp3DataSize = GetDataSize();
 
 	// フレームヘッダ確認
-	BYTE header[4];
+	BYTE pHeader[4];
 	DWORD readSize;
 
-	ReadFile(this->hFile, header, 4, &readSize, NULL);
-	if (!(header[0] == 0xFF && (header[1] & 0xE0) == 0xE0))
+	ReadFile(this->hFile, pHeader, 4, &readSize, NULL);
+	if (!(pHeader[0] == 0xFF && (pHeader[1] & 0xE0) == 0xE0))
 		return FALSE;
 
 	// MPWGバージョン取得
-	BYTE version = (header[1] >> 3) & 0x03;
+	BYTE version = (pHeader[1] >> 3) & 0x03;
 
 	//　ビットレート取得
-	WORD bitRatePerMilliSec = GetBitRate(header, version);
+	WORD bitRatePerMilliSec = GetBitRate(pHeader, version);
 
 	// サンプルレート取得
-	this->sampleRate = GetSampleRate(header, version);
+	this->sampleRate = GetSampleRate(pHeader, version);
 
-	BYTE padding = header[2] >> 1 & 0x01;
-	BYTE channel = header[3] >> 6;
+	BYTE padding = pHeader[2] >> 1 & 0x01;
+	BYTE channel = pHeader[3] >> 6;
 	this->channelCount = (channel == 3 ? 1 : 2);
 
 	// サイズ取得
@@ -245,9 +245,9 @@ DWORD Mp3Audio::GetDataSize() {
 }
 
 
-WORD Mp3Audio::GetBitRate(BYTE header[], int version) {
+WORD Mp3Audio::GetBitRate(BYTE* pHeader, int version) const {
 	//　レイヤー数取得
-	BYTE layer = (header[1] >> 1) & 0x03;
+	BYTE layer = (pHeader[1] >> 1) & 0x03;
 
 	INT index;
 	if (version == 3) {
@@ -259,10 +259,10 @@ WORD Mp3Audio::GetBitRate(BYTE header[], int version) {
 			index = 4;
 	}
 
-	return BIT_RATE_TABLE[index][header[2] >> 4];
+	return BIT_RATE_TABLE[index][pHeader[2] >> 4];
 }
 
-WORD Mp3Audio::GetSampleRate(BYTE header[], int version) {
+WORD Mp3Audio::GetSampleRate(BYTE* pHeader, int version) const {
 	int index;
 	switch (version) {
 	case 0:
@@ -276,7 +276,7 @@ WORD Mp3Audio::GetSampleRate(BYTE header[], int version) {
 		break;
 	}
 
-	return SAMPLE_RATE_TABLE[index][(header[2] >> 2) & 0x03];
+	return SAMPLE_RATE_TABLE[index][(pHeader[2] >> 2) & 0x03];
 }
 
 }

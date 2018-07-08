@@ -19,24 +19,24 @@ public:
 	SoundsManager();
 	~SoundsManager();
 
-	uint8_t GetVolume(const TCHAR pKey[]);
-	bool SetVolume(const TCHAR pKey[], uint8_t volume);
+	PlayingStatus GetStatus(const TCHAR* pKey) const;
+	uint8_t GetVolume(const TCHAR* pKey) const;
+	bool SetVolume(const TCHAR* pKey, uint8_t volume);
 
 	bool Initialize();
-	bool AddFile(const TCHAR* pilePath, const TCHAR* pKey);
+	bool AddFile(const TCHAR* pFilePath, const TCHAR* pKey);
 	bool Start(const TCHAR* pKey, bool isLoopPlayback = false);
 	bool Start(const TCHAR* pKey, ISoundsManagerDelegate* pDelegate);
 	bool Start(const TCHAR* pKey, void(*onPlayedToEndCallback)(const TCHAR* pKey));
 	bool Stop(const TCHAR* pKey);
 	bool Pause(const TCHAR* pKey);
 	bool Resume(const TCHAR* pKey);
-	PlayingStatus GetStatus(const TCHAR* pKey);
 
 private:
 	std::unordered_map<TString, AudioHandler*> audioMap;
 	IXAudio2* pXAudio2;
 
-	bool ExistsKey(TString key);
+	bool ExistsKey(TString key) const;
 };
 
 }

@@ -23,13 +23,22 @@ SoundsManager::~SoundsManager() {
 }
 
 
-uint8_t SoundsManager::GetVolume(const TCHAR pKey[]) {
+PlayingStatus SoundsManager::GetStatus(const TCHAR* pKey) const {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
+		throw std::invalid_argument(_T("キーが存在しません。"));
+	}
+
+	return this->audioMap.at(pKey)->GetStatus();
+}
+
+uint8_t SoundsManager::GetVolume(const TCHAR* pKey) const {
 	if (!ExistsKey(pKey)) {
 		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return 0;
 	}
 
-	float volume = this->audioMap[pKey]->GetVolume();
+	float volume = this->audioMap.at(pKey)->GetVolume();
 	if (volume < 0) {
 		// 位相反転は設定不可のため考慮しない
 		return 0;
@@ -42,7 +51,7 @@ uint8_t SoundsManager::GetVolume(const TCHAR pKey[]) {
 	}
 }
 
-bool SoundsManager::SetVolume(const TCHAR pKey[], uint8_t volume) {
+bool SoundsManager::SetVolume(const TCHAR* pKey, uint8_t volume) {
 	if (!ExistsKey(pKey)) {
 		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
 		return false;
@@ -151,7 +160,7 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 	OutputDebugStringEx(_T("-----------------------------------------------------------\n"));
 
 	this->audioMap[pKey] = new AudioHandler(pKey, pAudio);
-	return this->audioMap[pKey]->Prepare(this->pXAudio2);
+	return this->audioMap[pKey]->Prepare(*this->pXAudio2);
 }
 
 bool SoundsManager::Start(const TCHAR* pKey, bool isLoopPlayback) {
@@ -214,16 +223,7 @@ bool SoundsManager::Resume(const TCHAR* pKey) {
 	return true;
 }
 
-PlayingStatus SoundsManager::GetStatus(const TCHAR* pKey) {
-	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
-		throw std::invalid_argument(_T("キーが存在しません。"));
-	}
-	
-	return this->audioMap[pKey]->GetStatus();
-}
-
-bool SoundsManager::ExistsKey(TString key) {
+bool SoundsManager::ExistsKey(TString key) const {
 	auto itr = this->audioMap.find(key);
 	return (itr != this->audioMap.end());
 }

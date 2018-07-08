@@ -33,11 +33,11 @@ AudioHandler::~AudioHandler() {
 }
 
 
-PlayingStatus AudioHandler::GetStatus() {
+PlayingStatus AudioHandler::GetStatus() const{
 	return this->status;
 }
 
-float AudioHandler::GetVolume() {
+float AudioHandler::GetVolume() const {
 	float volume;
 	this->pVoice->GetVolume(&volume);
 	return volume;
@@ -53,8 +53,8 @@ bool AudioHandler::SetVolume(float volume) {
 }
 
 
-bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
-	HRESULT ret = pXAudio2->CreateSourceVoice(
+bool AudioHandler::Prepare(IXAudio2& rXAudio2) {
+	HRESULT ret = rXAudio2.CreateSourceVoice(
 		&this->pVoice,
 		this->pAudio->GetWaveFormatEx(),
 		0,                          // UINT32 Flags = 0,
@@ -143,7 +143,6 @@ void AudioHandler::Push() {
 				this->onPlayedToEndCallback(this->name.c_str());
 				this->onPlayedToEndCallback = nullptr;
 			}
-
 			return;
 		}
 	}
@@ -160,7 +159,6 @@ void AudioHandler::Push() {
 			// エラー発生による停止
 			this->Stop(true);
 		}
-
 		return;
 	}
 

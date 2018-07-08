@@ -14,12 +14,12 @@ public:
 	Mp3Audio();
 	~Mp3Audio();
 
-	const WAVEFORMATEX* GetWaveFormatEx();
-	TString GetFormatName();
-	int GetChannelCount();
-	int GetSamplingRate();
-	int GetBitsPerSample();
-	bool HasReadToEnd();
+	const WAVEFORMATEX* GetWaveFormatEx() const;
+	TString GetFormatName() const;
+	int GetChannelCount() const;
+	int GetSamplingRate() const;
+	int GetBitsPerSample() const;
+	bool HasReadToEnd() const;
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -38,8 +38,8 @@ private:
 	bool hasReadToEnd;
 
 	DWORD GetDataSize();
-	WORD GetBitRate(BYTE header[], int version);
-	WORD GetSampleRate(BYTE header[], int version);
+	WORD GetBitRate(BYTE* pHeader, int version) const;
+	WORD GetSampleRate(BYTE* pHeader, int version) const;
 };
 
 }
