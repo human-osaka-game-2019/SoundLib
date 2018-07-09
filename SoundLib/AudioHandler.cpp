@@ -53,34 +53,55 @@ bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
 }
 
 void AudioHandler::Start(bool isLoopPlayback) {
-	this->isLoopPlayback = isLoopPlayback;
-	Start();
+	if (this->status == PlayingStatus::Pausing) {
+		this->Stop(true);
+	}
+	if (this->status == PlayingStatus::Stopped) {
+		this->isLoopPlayback = isLoopPlayback;
+		Start();
+	}
 }
 
 void AudioHandler::Start(IAudioHandlerDelegate* pDelegate) {
-	this->pDelegate = pDelegate;
-	this->isLoopPlayback = false;
-	Start();
+	if(this->status == PlayingStatus::Pausing) {
+		this->Stop(true);
+	}
+	if (this->status == PlayingStatus::Stopped) {
+		this->pDelegate = pDelegate;
+		this->isLoopPlayback = false;
+		Start();
+	}
 }
 
 void AudioHandler::Start(void(*onPlayedToEndCallback)(const TCHAR* pName)) {
-	this->onPlayedToEndCallback = onPlayedToEndCallback;
-	this->isLoopPlayback = false;
-	Start();
+	if(this->status == PlayingStatus::Pausing) {
+		this->Stop(true);
+	}
+	if (this->status == PlayingStatus::Stopped) {
+		this->onPlayedToEndCallback = onPlayedToEndCallback;
+		this->isLoopPlayback = false;
+		Start();
+	}
 }
 
 void AudioHandler::Stop() {
-	Stop(true);
+	if (this->status == PlayingStatus::Playing) {
+		Stop(true);
+	}
 }
 
 void AudioHandler::Pause() {
-	this->pVoice->Stop();
-	this->status = PlayingStatus::Pausing;
+	if (this->status == PlayingStatus::Playing) {
+		this->pVoice->Stop();
+		this->status = PlayingStatus::Pausing;
+	}
 }
 
 void AudioHandler::Resume() {
-	this->status = PlayingStatus::Playing;
-	this->pVoice->Start();
+	if (this->status == PlayingStatus::Pausing) {
+		this->status = PlayingStatus::Playing;
+		this->pVoice->Start();
+	}
 }
 
 void AudioHandler::BufferEndCallback() {
