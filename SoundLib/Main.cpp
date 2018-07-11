@@ -49,25 +49,23 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	// wmaファイルオープン
-	/*
 	if (!soundsManager.AddFile(filePath6, _T("wma"))) {
 		return -1;
 	}
-	*/
 
-	SoundLib::PlayingStatus status = soundsManager.GetStatus(_T("aac"));
+	SoundLib::PlayingStatus status = soundsManager.GetStatus(_T("wma"));
 	OutputDebugStringEx(_T("Status of the aac is %d\n"), status);
 
-	soundsManager.Start(_T("aac"), false);
+	soundsManager.Start(_T("wma"), OnPlayedToEnd);
 	Sleep(1000);
-	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
+	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("wma")));
 
 	for (int i = 0; i < 1; ++i) {
 		soundsManager.Start(_T("mp3SE"));
 		Sleep(1500);
 	}
 
-	//Sleep(1000);
+	Sleep(1000);
 	soundsManager.Pause(_T("aac"));
 	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
 	Sleep(1000);

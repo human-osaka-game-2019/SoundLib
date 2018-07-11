@@ -29,10 +29,13 @@ public:
 private:
 	AVFormatContext* pFormatContext;
 	AVStream* pAudioStream;
+	AVCodec* pCodec;
 	AVCodecContext* pCodecContext;
 	SwrContext* pSwr;
 	WAVEFORMATEX waveFormatEx;
 	AVPacket* pPacket;
+
+	bool CreateCodecContext();
 };
 
 }

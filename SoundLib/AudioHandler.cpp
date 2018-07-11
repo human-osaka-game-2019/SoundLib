@@ -1,7 +1,6 @@
 ﻿#include "AudioHandler.h"
 #include <typeinfo>
 #include "Common.h"
-#include "Audio/WmaAudio.h"
 
 
 namespace SoundLib {
@@ -117,14 +116,7 @@ void AudioHandler::Push() {
 
 	// 音データ格納
 	memset(this->readBuffers[this->buf_cnt], 0, this->readLength);
-	long size;
-	XAUDIO2_BUFFER bufinfo;
-	XAUDIO2_BUFFER_WMA xbw;
-	if (typeid(*pAudio) == typeid(Audio::WmaAudio)) {
-		size = ((Audio::WmaAudio*)this->pAudio)->Read(this->readBuffers[this->buf_cnt], this->readLength, &bufinfo, &xbw);
-	} else {
-		size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
-	}
+	long size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
 
 	if (size <= 0 && this->isLoopPlayback) {
 		this->pAudio->Reset();
@@ -146,12 +138,7 @@ void AudioHandler::Push() {
 
 	this->xAudioBuffer.AudioBytes = size;
 	this->xAudioBuffer.pAudioData = this->readBuffers[this->buf_cnt];
-	HRESULT ret;
-	if (typeid(*pAudio) == typeid(Audio::WmaAudio)) {
-		ret = this->pVoice->SubmitSourceBuffer(&bufinfo, &xbw);
-	} else {
-		ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
-	}
+	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
 	if (FAILED(ret)) {
 		OutputDebugStringEx(_T("error SubmitSourceBuffer ret=%d\n"), ret);
 		return;

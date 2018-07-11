@@ -144,7 +144,6 @@
   <ItemGroup>
     <ClCompile Include="AudioHandler.cpp" />
     <ClCompile Include="Audio\CompressedAudio.cpp" />
-    <ClCompile Include="Audio\WmaAudio.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Audio\Mp3Audio.cpp" />
     <ClCompile Include="Audio\OggAudio.cpp" />
@@ -153,7 +152,6 @@
     <ClCompile Include="VoiceCallback.cpp" />
     <ClInclude Include="Audio\CompressedAudio.h" />
     <ClInclude Include="Audio\OggAudio.h" />
-    <ClInclude Include="Audio\WmaAudio.h" />
     <ClInclude Include="VoiceCallback.h" />
   </ItemGroup>
   <ItemGroup>

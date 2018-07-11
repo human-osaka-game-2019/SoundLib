@@ -7,7 +7,7 @@ extern "C" {
 namespace SoundLib {
 namespace Audio {
 
-CompressedAudio::CompressedAudio() : pFormatContext(nullptr), pAudioStream(nullptr), pCodecContext(nullptr), pSwr(nullptr), pPacket(nullptr) {}
+CompressedAudio::CompressedAudio() : pFormatContext(nullptr), pAudioStream(nullptr), pCodec(nullptr), pCodecContext(nullptr), pSwr(nullptr), pPacket(nullptr) {}
 
 CompressedAudio::~CompressedAudio() {
 	avformat_close_input(&this->pFormatContext);
@@ -64,26 +64,13 @@ bool CompressedAudio::Load(const TCHAR* pFilePath) {
 		return false;
 	}
 
-	AVCodec* pCodec = avcodec_find_decoder(this->pAudioStream->codecpar->codec_id);
-	if (pCodec == nullptr) {
+	this->pCodec = avcodec_find_decoder(this->pAudioStream->codecpar->codec_id);
+	if (this->pCodec == nullptr) {
 		OutputDebugStringEx(_T("avcodec_find_decoder codec not found. codec_id=%d\n"), this->pAudioStream->codecpar->codec_id);
 		return false;
 	}
 
-	this->pCodecContext = avcodec_alloc_context3(pCodec);
-	if (this->pCodecContext == nullptr) {
-		OutputDebugStringEx(_T("avcodec_alloc_context3 error.\n"));
-		return false;
-	}
-
-	if (avcodec_parameters_to_context(this->pCodecContext, this->pAudioStream->codecpar) < 0) {
-		return false;
-	}
-
-	ret = avcodec_open2(this->pCodecContext, pCodec, nullptr);
-	if (ret < 0) {
-		av_strerror(ret, errDescription, 500);
-		OutputDebugStringEx(_T("avcodec_open2 error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+	if (!CreateCodecContext()) {
 		return false;
 	}
 
@@ -91,6 +78,10 @@ bool CompressedAudio::Load(const TCHAR* pFilePath) {
 	if (pSwr == nullptr) {
 		OutputDebugStringEx("swr_alloc error.\n");
 		return false;
+	}
+
+	if (this->pCodecContext->channel_layout == 0) {
+		this->pCodecContext->channel_layout = av_get_default_channel_layout(this->pCodecContext->channels);
 	}
 	av_opt_set_int(this->pSwr, "in_channel_layout", this->pCodecContext->channel_layout, 0);
 	av_opt_set_int(this->pSwr, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
@@ -154,8 +145,8 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 			}
 		} else {
 			int convertableByteSize = pFrame->nb_samples * this->waveFormatEx.nChannels * (16 / 8);
-			int remainingBufferSize = bufSize - bufRead;
-			int convertSampleCount = (convertableByteSize > remainingBufferSize ? remainingBufferSize : convertableByteSize) / this->waveFormatEx.nChannels / (16 / 8);
+			int remainingBufSize = bufSize - bufRead;
+			int convertSampleCount = (convertableByteSize > remainingBufSize ? remainingBufSize : convertableByteSize) / this->waveFormatEx.nChannels / (16 / 8);
 			BYTE* pSwrBuf = new BYTE[convertableByteSize];
 			ret = swr_convert(this->pSwr, &pSwrBuf, convertSampleCount, (const uint8_t**)pFrame->extended_data, pFrame->nb_samples);
 			if (ret < 0) {
@@ -184,7 +175,36 @@ void CompressedAudio::Reset() {
 		av_strerror(result, errDescription, 500);
 		OutputDebugStringEx(_T("av_seek_frame error. ret=%08x description=%s\n"), AVERROR(result), errDescription);
 	}
-	avcodec_flush_buffers(this->pCodecContext);
+
+	// 下記のメソッドでコンテキストをクリアすることもできるが、作り直す方が安全という情報があるので作り直す。
+	// avcodec_flush_buffers(this->pCodecContext);
+	CreateCodecContext();
+}
+
+
+bool CompressedAudio::CreateCodecContext() {
+	char errDescription[500];
+	this->pCodecContext = avcodec_alloc_context3(this->pCodec);
+	if (this->pCodecContext == nullptr) {
+		OutputDebugStringEx(_T("avcodec_alloc_context3 error.\n"));
+		return false;
+	}
+
+	int ret = avcodec_parameters_to_context(this->pCodecContext, this->pAudioStream->codecpar);
+	if (ret < 0) {
+		av_strerror(ret, errDescription, 500);
+		OutputDebugStringEx(_T("avcodec_parameters_to_context error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+		return false;
+	}
+
+	ret = avcodec_open2(this->pCodecContext, this->pCodec, nullptr);
+	if (ret < 0) {
+		av_strerror(ret, errDescription, 500);
+		OutputDebugStringEx(_T("avcodec_open2 error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+		return false;
+	}
+
+	return true;
 }
 
 }

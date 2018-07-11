@@ -55,6 +55,10 @@ Mp3Audio::~Mp3Audio() {
 }
 
 
+const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() {
+	return &this->waveFormatEx;
+}
+
 const TCHAR* Mp3Audio::GetFormatName() {
 	return _T("mp3");
 }
@@ -170,7 +174,10 @@ long Mp3Audio::Read(BYTE* pBuffer, DWORD bufSize) {
 		// １ブロック分だけMP3データを読み込む
 		DWORD readSize;
 		ReadFile(this->hFile, this->pAsh->pbSrc, this->pAsh->cbSrcLength, &readSize, NULL);
-		acmStreamConvert(this->has, this->pAsh, ACM_STREAMCONVERTF_BLOCKALIGN);
+		UINT result = acmStreamConvert(this->has, this->pAsh, ACM_STREAMCONVERTF_BLOCKALIGN);
+		if (result != 0) {
+			return bufRead;
+		}
 		this->pos += readSize;
 
 		if (bufSize - bufRead > this->pAsh->cbDstLengthUsed) {
@@ -188,10 +195,6 @@ long Mp3Audio::Read(BYTE* pBuffer, DWORD bufSize) {
 	}
 
 	return bufRead;
-}
-
-const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() {
-	return &this->waveFormatEx;
 }
 
 void Mp3Audio::Reset() {
