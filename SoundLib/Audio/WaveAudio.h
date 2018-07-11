@@ -11,9 +11,15 @@ class WaveAudio : public IAudio {
 public:
 	WaveAudio();
 	~WaveAudio();
+
+	const WAVEFORMATEX* GetWaveFormatEx();
+	const TCHAR* GetFormatName();
+	int GetChannelCount();
+	int GetSamplingRate();
+	int GetBitsPerSample();
+
 	bool Load(const TCHAR* pFilePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
-	const WAVEFORMATEX* GetWaveFormatEx();
 	void Reset();
 
 private:

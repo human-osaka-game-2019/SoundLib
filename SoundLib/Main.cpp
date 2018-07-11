@@ -20,7 +20,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	const TCHAR* filePath5 = _T("Resources\\Sample_BeeMoved_48kHz16bit.m4a");
 	const TCHAR* filePath6 = _T("Resources\\s3.wma");
 
-	//SoundsManager soundsManager;
+
 	soundsManager.Initialize();
 	
 	// Waveファイルオープン

@@ -181,7 +181,7 @@ void AudioHandler::Start() {
 void AudioHandler::Stop(bool clearsCallback) {
 	this->pVoice->Stop();
 	this->status = PlayingStatus::Stopped;
-	this->pAudio->Reset();
+
 	if (this->readBuffers != nullptr) {
 		for (int i = 0; i < BUF_LEN; i++) {
 			delete[] this->readBuffers[i];
@@ -189,6 +189,8 @@ void AudioHandler::Stop(bool clearsCallback) {
 		delete this->readBuffers;
 		this->readBuffers = nullptr;
 	}
+
+	this->pAudio->Reset();
 
 	if (clearsCallback) {
 		this->pDelegate = nullptr;

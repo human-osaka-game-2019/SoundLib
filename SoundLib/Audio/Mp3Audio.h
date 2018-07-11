@@ -13,15 +13,24 @@ class Mp3Audio : public IAudio {
 public:
 	Mp3Audio();
 	~Mp3Audio();
+
+	const WAVEFORMATEX* GetWaveFormatEx();
+	const TCHAR* GetFormatName();
+	int GetChannelCount();
+	int GetSamplingRate();
+	int GetBitsPerSample();
+
 	bool Load(const TCHAR* pFilePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
-	const WAVEFORMATEX* GetWaveFormatEx();
 	void Reset();
 
 private:
 	HANDLE hFile;
 	DWORD offset; // MP3データの位置
 	DWORD mp3DataSize; // MP3データのサイズ
+	int channelCount;
+	int bitsPerSample;
+	WORD sampleRate;
 	WAVEFORMATEX waveFormatEx;
 	ACMSTREAMHEADER* pAsh;
 	HACMSTREAM has;

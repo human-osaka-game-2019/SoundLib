@@ -14,6 +14,28 @@ WaveAudio::~WaveAudio() {
 	}
 }
 
+
+const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() {
+	return &this->waveFormatEx;
+}
+
+const TCHAR* WaveAudio::GetFormatName() {
+	return _T("WAVE");
+}
+
+int WaveAudio::GetChannelCount() {
+	return this->waveFormatEx.nChannels;
+}
+
+int WaveAudio::GetSamplingRate() {
+	return this->waveFormatEx.nSamplesPerSec;
+}
+
+int WaveAudio::GetBitsPerSample() {
+	return this->waveFormatEx.wBitsPerSample;
+}
+
+
 bool WaveAudio::Load(const TCHAR* pFilePath) {
 	MMIOINFO mmioInfo;
 
@@ -79,10 +101,6 @@ long WaveAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	this->pos += size;   // ファイルポインタのオフセット値
 
 	return size;
-}
-
-const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() {
-	return &this->waveFormatEx;
 }
 
 void WaveAudio::Reset() {

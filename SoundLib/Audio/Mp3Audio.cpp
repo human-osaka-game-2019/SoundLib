@@ -54,6 +54,24 @@ Mp3Audio::~Mp3Audio() {
 	}
 }
 
+
+const TCHAR* Mp3Audio::GetFormatName() {
+	return _T("mp3");
+}
+
+int Mp3Audio::GetChannelCount() {
+	return this->channelCount;
+}
+
+int Mp3Audio::GetSamplingRate() {
+	return this->sampleRate;
+}
+
+int Mp3Audio::GetBitsPerSample() {
+	return this->bitsPerSample;
+}
+
+
 bool Mp3Audio::Load(const TCHAR* pFilePath) {
 	// ファイルを開く
 	this->hFile = CreateFile(
@@ -84,26 +102,28 @@ bool Mp3Audio::Load(const TCHAR* pFilePath) {
 	BYTE version = (header[1] >> 3) & 0x03;
 
 	//　ビットレート取得
-	WORD bitRate = GetBitRate(header, version);
+	WORD bitRatePerMilliSec = GetBitRate(header, version);
 
 	// サンプルレート取得
-	WORD sampleRate = GetSampleRate(header, version);
+	this->sampleRate = GetSampleRate(header, version);
 
 	BYTE padding = header[2] >> 1 & 0x01;
 	BYTE channel = header[3] >> 6;
+	this->channelCount = (channel == 3 ? 1 : 2);
 
 	// サイズ取得
-	WORD blockSize = ((144 * bitRate * 1000) / sampleRate) + padding;
+	WORD blockSize = ((144 * bitRatePerMilliSec * 1000) / this->sampleRate) + padding;
 
 	// フォーマット取得
 	MPEGLAYER3WAVEFORMAT mf;
 	mf.wfx.wFormatTag = WAVE_FORMAT_MPEGLAYER3;
-	mf.wfx.nChannels = channel == 3 ? 1 : 2;
-	mf.wfx.nSamplesPerSec = sampleRate;
-	mf.wfx.nAvgBytesPerSec = (bitRate * 1000) / 8;
+	mf.wfx.nChannels = this->channelCount;
+	mf.wfx.nSamplesPerSec = this->sampleRate;
+	mf.wfx.nAvgBytesPerSec = (bitRatePerMilliSec * 1000) / 8;
 	mf.wfx.nBlockAlign = 1;
 	mf.wfx.wBitsPerSample = 0;
 	mf.wfx.cbSize = MPEGLAYER3_WFX_EXTRA_BYTES;
+	this->bitsPerSample = (bitRatePerMilliSec * 1000) / this->sampleRate;
 
 	mf.wID = MPEGLAYER3_ID_MPEG;
 	mf.fdwFlags = padding ? MPEGLAYER3_FLAG_PADDING_ON : MPEGLAYER3_FLAG_PADDING_OFF;
@@ -217,6 +237,7 @@ DWORD Mp3Audio::GetDataSize() {
 
 	return ret;
 }
+
 
 WORD Mp3Audio::GetBitRate(BYTE header[], int version) {
 	//　レイヤー数取得

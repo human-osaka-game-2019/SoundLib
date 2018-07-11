@@ -14,6 +14,29 @@ OggAudio::~OggAudio() {
 	}
 }
 
+
+const WAVEFORMATEX* OggAudio::GetWaveFormatEx() {
+	return &this->waveFormatEx;
+}
+
+const TCHAR* OggAudio::GetFormatName() {
+	return _T("Ogg Vorbis");
+}
+
+int OggAudio::GetChannelCount() {
+	return ov_info(&this->ovf, -1)->channels;
+}
+
+int OggAudio::GetSamplingRate() {
+	return ov_info(&this->ovf, -1)->rate;
+}
+
+int OggAudio::GetBitsPerSample() {
+	vorbis_info* pVorbisInfo = ov_info(&this->ovf, -1);
+	return (pVorbisInfo->bitrate_nominal / pVorbisInfo->rate);
+}
+
+
 bool OggAudio::Load(const TCHAR* pFilePath) {
 	// ファイルを開く
 	int error = ov_fopen(pFilePath, &this->ovf);
@@ -57,10 +80,6 @@ long OggAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	}
 
 	return bufRead;
-}
-
-const WAVEFORMATEX* OggAudio::GetWaveFormatEx() {
-	return &this->waveFormatEx;
 }
 
 void OggAudio::Reset() {

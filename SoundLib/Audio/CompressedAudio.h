@@ -1,5 +1,5 @@
-﻿#ifndef AAC_AUDIO_H
-#define AAC_AUDIO_H
+﻿#ifndef COMPRESSED_AUDIO_H
+#define COMPRESSED_AUDIO_H
 
 #include "IAudio.h"
 extern "C" {
@@ -11,13 +11,19 @@ extern "C" {
 namespace SoundLib {
 namespace Audio {
 
-class AacAudio : public IAudio {
+class CompressedAudio : public IAudio {
 public:
-	AacAudio();
-	~AacAudio();
+	CompressedAudio();
+	~CompressedAudio();
+
+	const WAVEFORMATEX* GetWaveFormatEx();
+	const TCHAR* GetFormatName();
+	int GetChannelCount();
+	int GetSamplingRate();
+	int GetBitsPerSample();
+
 	bool Load(const TCHAR* pFilePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
-	const WAVEFORMATEX* GetWaveFormatEx();
 	void Reset();
 
 private:

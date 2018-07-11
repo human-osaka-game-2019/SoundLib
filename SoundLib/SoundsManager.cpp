@@ -4,7 +4,7 @@
 #include "Audio/WaveAudio.h"
 #include "Audio/Mp3Audio.h"
 #include "Audio/OggAudio.h"
-#include "Audio/AacAudio.h"
+#include "Audio/CompressedAudio.h"
 
 
 namespace SoundLib {
@@ -73,7 +73,7 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 	} else if (pExtension != nullptr && strcmp(pExtension, _T(".mp3")) == 0) {
 		pAudio = new Audio::Mp3Audio();
 	} else {
-		pAudio = new Audio::AacAudio();
+		pAudio = new Audio::CompressedAudio();
 	} 
 
 	int tryCount = 0;
@@ -88,7 +88,7 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 			pAudio = new Audio::WaveAudio();
 		} else if (typeid(*pAudio) == typeid(Audio::Mp3Audio)) {
 			delete pAudio;
-			pAudio = new Audio::AacAudio();
+			pAudio = new Audio::CompressedAudio();
 		} else {
 			delete pAudio;
 			pAudio = new Audio::OggAudio();
@@ -96,24 +96,19 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 	}
 
 	if (!couldLoad) {
-		OutputDebugStringEx(_T("%sはWAVE, MP3, 又はOgg Vorbis形式ではありません。\n"), pFilePath);
+		OutputDebugStringEx(_T("%sは再生可能な形式ではありません。\n"), pFilePath);
 		delete pAudio;
 		return false;
 	}
 
 	const WAVEFORMATEX* pFormat = pAudio->GetWaveFormatEx();
-	char* formatName;
-	if (typeid(*pAudio) == typeid(Audio::WaveAudio)) {
-		formatName = (char*)"WAVE";
-	} else if (typeid(*pAudio) == typeid(Audio::OggAudio)) {
-		formatName = (char*)"OggVorbis";
-	} else if (typeid(*pAudio) == typeid(Audio::AacAudio)) {
-		formatName = (char*)"AAC";
-	} else {
-		formatName = (char*)"mp3";
-	}
 	OutputDebugStringEx(_T("-----------------キー%sのオーディオ情報--------------------\n"), pKey);
-	OutputDebugStringEx(_T("file foramt=%s\n"), formatName);
+	OutputDebugStringEx(_T("file foramt=%s\n"), pAudio->GetFormatName());
+	OutputDebugStringEx(_T("**** デコード前 ****\n"));
+	OutputDebugStringEx(_T("channel    =%d\n"), pAudio->GetChannelCount());
+	OutputDebugStringEx(_T("sampling   =%dHz\n"), pAudio->GetSamplingRate());
+	OutputDebugStringEx(_T("bit/sample =%d\n"), pAudio->GetBitsPerSample());
+	OutputDebugStringEx(_T("**** デコード後 ****\n"));
 	OutputDebugStringEx(_T("foramt     =%d\n"), pFormat->wFormatTag);
 	OutputDebugStringEx(_T("channel    =%d\n"), pFormat->nChannels);
 	OutputDebugStringEx(_T("sampling   =%dHz\n"), pFormat->nSamplesPerSec);
