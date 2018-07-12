@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
+#include <string>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -20,5 +21,12 @@
 #else
 #    define OutputDebugStringEx( str, ... ) // 空実装
 #endif
+
+
+namespace SoundLib {
+
+typedef std::basic_string<TCHAR> TString;
+
+}
 
 #endif

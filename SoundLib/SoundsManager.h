@@ -6,6 +6,7 @@
 #include <mmsystem.h>
 #include <mmreg.h>
 #include <xaudio2.h>
+#include "Common.h"
 #include "AudioHandler.h"
 #include "ISoundsManagerDelegate.h"
 
@@ -27,7 +28,7 @@ public:
 	PlayingStatus GetStatus(const TCHAR* pKey);
 
 private:
-	std::unordered_map<const TCHAR*, AudioHandler*> audioMap;
+	std::unordered_map<TString, AudioHandler*> audioMap;
 	IXAudio2* pXAudio2;
 
 	bool ExistsKey(const TCHAR* pKey);
