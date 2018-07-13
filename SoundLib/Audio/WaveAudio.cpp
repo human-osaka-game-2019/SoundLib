@@ -19,7 +19,7 @@ const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() {
 	return &this->waveFormatEx;
 }
 
-const TCHAR* WaveAudio::GetFormatName() {
+TString WaveAudio::GetFormatName() {
 	return _T("WAVE");
 }
 
@@ -36,13 +36,13 @@ int WaveAudio::GetBitsPerSample() {
 }
 
 
-bool WaveAudio::Load(const TCHAR* pFilePath) {
+bool WaveAudio::Load(TString filePath) {
 	MMIOINFO mmioInfo;
 
 	// Waveファイルオープン
 	memset(&mmioInfo, 0, sizeof(MMIOINFO));
 
-	this->hMmio = mmioOpen(const_cast<TCHAR*>(pFilePath), &mmioInfo, MMIO_READ);
+	this->hMmio = mmioOpen(const_cast<TCHAR*>(filePath.c_str()), &mmioInfo, MMIO_READ);
 	if (!this->hMmio) {
 		// ファイルオープン失敗
 		OutputDebugStringEx(_T("error mmioOpen\n"));

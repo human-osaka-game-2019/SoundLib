@@ -20,7 +20,7 @@ enum PlayingStatus {
 
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
-	AudioHandler(const TCHAR* pName,  Audio::IAudio* pAudio);
+	AudioHandler(TString name,  Audio::IAudio* pAudio);
 	~AudioHandler();
 
 	PlayingStatus GetStatus();
@@ -38,7 +38,7 @@ public:
 private:
 	const int BUF_LEN = 2;
 
-	const TCHAR* pName;
+	TString name;
 	Audio::IAudio * pAudio;
 	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pVoiceCallback;

@@ -19,7 +19,7 @@ const WAVEFORMATEX* OggAudio::GetWaveFormatEx() {
 	return &this->waveFormatEx;
 }
 
-const TCHAR* OggAudio::GetFormatName() {
+TString OggAudio::GetFormatName() {
 	return _T("Ogg Vorbis");
 }
 
@@ -37,9 +37,9 @@ int OggAudio::GetBitsPerSample() {
 }
 
 
-bool OggAudio::Load(const TCHAR* pFilePath) {
+bool OggAudio::Load(TString filePath) {
 	// ファイルを開く
-	int error = ov_fopen(pFilePath, &this->ovf);
+	int error = ov_fopen(filePath.c_str(), &this->ovf);
 	if (error != 0) {
 		return false;
 	}

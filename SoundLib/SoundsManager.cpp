@@ -102,7 +102,7 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 
 	const WAVEFORMATEX* pFormat = pAudio->GetWaveFormatEx();
 	OutputDebugStringEx(_T("-----------------キー%sのオーディオ情報--------------------\n"), pKey);
-	OutputDebugStringEx(_T("file foramt=%s\n"), pAudio->GetFormatName());
+	OutputDebugStringEx(_T("file foramt=%s\n"), pAudio->GetFormatName().c_str());
 	OutputDebugStringEx(_T("**** デコード前 ****\n"));
 	OutputDebugStringEx(_T("channel    =%d\n"), pAudio->GetChannelCount());
 	OutputDebugStringEx(_T("sampling   =%dHz\n"), pAudio->GetSamplingRate());
@@ -188,8 +188,8 @@ PlayingStatus SoundsManager::GetStatus(const TCHAR* pKey) {
 	return this->audioMap[pKey]->GetStatus();
 }
 
-bool SoundsManager::ExistsKey(const TCHAR* pKey) {
-	auto itr = this->audioMap.find(pKey);
+bool SoundsManager::ExistsKey(TString key) {
+	auto itr = this->audioMap.find(key);
 	return (itr != this->audioMap.end());
 }
 }

@@ -4,8 +4,8 @@
 
 
 namespace SoundLib {
-AudioHandler::AudioHandler(const TCHAR* pName, Audio::IAudio* pAudio) : 
-	pName(pName), 
+AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) : 
+	name(name), 
 	pAudio(pAudio), 
 	pVoice(nullptr), 
 	readBuffers(nullptr), 
@@ -126,10 +126,10 @@ void AudioHandler::Push() {
 	if (size <= 0) {
 		this->Stop(false);
 		if (this->pDelegate != nullptr) {
-			this->pDelegate->OnPlayedToEnd(this->pName);
+			this->pDelegate->OnPlayedToEnd(this->name);
 			this->pDelegate = nullptr;
 		} else if (this->onPlayedToEndCallback != nullptr) {
-			this->onPlayedToEndCallback(this->pName);
+			this->onPlayedToEndCallback(this->name.c_str());
 			this->onPlayedToEndCallback = nullptr;
 		}
 

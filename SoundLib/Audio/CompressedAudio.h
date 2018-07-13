@@ -17,12 +17,12 @@ public:
 	~CompressedAudio();
 
 	const WAVEFORMATEX* GetWaveFormatEx();
-	const TCHAR* GetFormatName();
+	TString GetFormatName();
 	int GetChannelCount();
 	int GetSamplingRate();
 	int GetBitsPerSample();
 
-	bool Load(const TCHAR* pFilePath);
+	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
 	void Reset();
 

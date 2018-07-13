@@ -59,7 +59,7 @@ const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() {
 	return &this->waveFormatEx;
 }
 
-const TCHAR* Mp3Audio::GetFormatName() {
+TString Mp3Audio::GetFormatName() {
 	return _T("mp3");
 }
 
@@ -76,10 +76,10 @@ int Mp3Audio::GetBitsPerSample() {
 }
 
 
-bool Mp3Audio::Load(const TCHAR* pFilePath) {
+bool Mp3Audio::Load(TString filePath) {
 	// ファイルを開く
 	this->hFile = CreateFile(
-		pFilePath,
+		filePath.c_str(),
 		GENERIC_READ,
 		0,
 		NULL,

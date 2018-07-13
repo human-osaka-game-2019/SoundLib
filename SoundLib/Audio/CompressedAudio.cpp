@@ -20,8 +20,8 @@ const WAVEFORMATEX* CompressedAudio::GetWaveFormatEx() {
 	return &this->waveFormatEx;
 }
 
-const TCHAR* CompressedAudio::GetFormatName() {
-	return this->pCodecContext->codec->long_name;
+TString CompressedAudio::GetFormatName() {
+	return TString(this->pCodecContext->codec->long_name);
 }
 
 int CompressedAudio::GetChannelCount() {
@@ -37,12 +37,12 @@ int CompressedAudio::GetBitsPerSample() {
 }
 
 
-bool CompressedAudio::Load(const TCHAR* pFilePath) {
+bool CompressedAudio::Load(TString filePath) {
 	char errDescription[500];
-	int ret = avformat_open_input(&this->pFormatContext, pFilePath, nullptr, nullptr);
+	int ret = avformat_open_input(&this->pFormatContext, filePath.c_str(), nullptr, nullptr);
 	if (ret < 0) {
 		av_strerror(ret, errDescription, 500);
-		OutputDebugStringEx(_T("cannot open file. filename=%s, ret=%08x description=%s\n"), pFilePath, AVERROR(ret), errDescription);
+		OutputDebugStringEx(_T("cannot open file. filename=%s, ret=%08x description=%s\n"), filePath.c_str(), AVERROR(ret), errDescription);
 		return false;
 	}
 
@@ -60,7 +60,7 @@ bool CompressedAudio::Load(const TCHAR* pFilePath) {
 		}
 	}
 	if (this->pAudioStream == nullptr) {
-		OutputDebugStringEx(_T("stream not found. filename=%s\n"), pFilePath);
+		OutputDebugStringEx(_T("stream not found. filename=%s\n"), filePath.c_str());
 		return false;
 	}
 
@@ -76,7 +76,7 @@ bool CompressedAudio::Load(const TCHAR* pFilePath) {
 
 	this->pSwr = swr_alloc();
 	if (pSwr == nullptr) {
-		OutputDebugStringEx("swr_alloc error.\n");
+		OutputDebugStringEx(_T("swr_alloc error.\n"));
 		return false;
 	}
 

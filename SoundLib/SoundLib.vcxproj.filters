@@ -50,9 +50,15 @@
     <Media Include="Resources\toujyo.wav">
       <Filter>リソース ファイル</Filter>
     </Media>
-    <Media Include="Resources\bgm_maoudamashii_fantasy10.ogg" />
-    <Media Include="Resources\s3.wma" />
-    <Media Include="Resources\Sample_BeeMoved_48kHz16bit.m4a" />
+    <Media Include="Resources\bgm_maoudamashii_fantasy10.ogg">
+      <Filter>リソース ファイル</Filter>
+    </Media>
+    <Media Include="Resources\s3.wma">
+      <Filter>リソース ファイル</Filter>
+    </Media>
+    <Media Include="Resources\Sample_BeeMoved_48kHz16bit.m4a">
+      <Filter>リソース ファイル</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IVoiceCallbackDelegate.h">
