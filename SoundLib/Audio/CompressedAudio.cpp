@@ -7,9 +7,12 @@ extern "C" {
 namespace SoundLib {
 namespace Audio {
 
-CompressedAudio::CompressedAudio() : pFormatContext(nullptr), pAudioStream(nullptr), pCodec(nullptr), pCodecContext(nullptr), pSwr(nullptr), pPacket(nullptr), hasReadToEnd(false) {}
+CompressedAudio::CompressedAudio() : pFormatContext(nullptr), pAudioStream(nullptr), pCodec(nullptr), pCodecContext(nullptr), pSwr(nullptr), pPacket(nullptr), pFrame(nullptr), hasReadToEnd(false) {}
 
 CompressedAudio::~CompressedAudio() {
+	av_frame_free(&this->pFrame);
+	av_packet_free(&this->pPacket);
+	swr_free(&this->pSwr);
 	avformat_close_input(&this->pFormatContext);
 	avcodec_free_context(&this->pCodecContext);
 	avformat_free_context(this->pFormatContext);
@@ -101,6 +104,7 @@ bool CompressedAudio::Load(TString filePath) {
 	}
 
 	this->pPacket = av_packet_alloc();
+	this->pFrame = av_frame_alloc();
 
 	this->waveFormatEx = { 0 };
 	this->waveFormatEx.wFormatTag = WAVE_FORMAT_PCM;
@@ -117,16 +121,20 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	DWORD bufRead = 0;	// バッファを読み込んだサイズ
 	char errDescription[500];
 
-	while (bufSize > bufRead) {
+	while (bufSize > bufRead && !this->hasReadToEnd) {
 		int ret = av_read_frame(this->pFormatContext, this->pPacket);
 		if (ret < 0) {
 			if (ret == AVERROR_EOF) {
+				// flush decoder
+				if (ret = avcodec_send_packet(this->pCodecContext, NULL) != 0) {
+					av_strerror(ret, errDescription, 500);
+					OutputDebugStringEx(_T("avcodec_send_packet error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+				}
 				this->hasReadToEnd = true;
-				return bufRead;
 			} else {
 				av_strerror(ret, errDescription, 500);
 				OutputDebugStringEx(_T("av_read_frame eerror. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
-				return bufRead;
+				break;
 			}
 		}
 
@@ -136,28 +144,29 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 		}
 
 		// decode ES
-		if ((ret = avcodec_send_packet(this->pCodecContext, this->pPacket)) < 0) {
+		if (!this->hasReadToEnd && (ret = avcodec_send_packet(this->pCodecContext, this->pPacket)) < 0) {
 			av_strerror(ret, errDescription, 500);
 			OutputDebugStringEx(_T("avcodec_send_packet error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
-			return bufRead;
+			break;
 		}
-		AVFrame* pFrame = av_frame_alloc();
-		if ((ret = avcodec_receive_frame(this->pCodecContext, pFrame)) < 0) {
+		
+		if ((ret = avcodec_receive_frame(this->pCodecContext, this->pFrame)) < 0) {
 			if (ret != AVERROR(EAGAIN)) {
 				av_strerror(ret, errDescription, 500);
 				OutputDebugStringEx(_T("avcodec_receive_frame error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
-				return bufRead;
+				break;
 			}
 		} else {
-			int convertableByteSize = pFrame->nb_samples * this->waveFormatEx.nChannels * (16 / 8);
+			int convertableByteSize = this->pFrame->nb_samples * this->waveFormatEx.nChannels * (16 / 8);
 			int remainingBufSize = bufSize - bufRead;
 			int convertSampleCount = (convertableByteSize > remainingBufSize ? remainingBufSize : convertableByteSize) / this->waveFormatEx.nChannels / (16 / 8);
 			BYTE* pSwrBuf = new BYTE[convertableByteSize];
-			ret = swr_convert(this->pSwr, &pSwrBuf, convertSampleCount, (const uint8_t**)pFrame->extended_data, pFrame->nb_samples);
+			ret = swr_convert(this->pSwr, &pSwrBuf, convertSampleCount, (const uint8_t**)this->pFrame->extended_data, this->pFrame->nb_samples);
 			if (ret < 0) {
 				av_strerror(ret, errDescription, 500);
 				OutputDebugStringEx(_T("swr_convert error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
-				return bufRead;
+				delete[] pSwrBuf;
+				break;
 			}
 			int readSize = ret * this->waveFormatEx.nChannels * (16 / 8);
 			memcpy(pBuffer + bufRead, pSwrBuf, readSize);
@@ -166,8 +175,12 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 			delete[] pSwrBuf;
 		}
 		av_packet_unref(this->pPacket);
-		av_frame_free(&pFrame);
 	}
+
+	// avcodec_receive_frame()内でav_frame_unref()が呼ばれるので、ループ内では実行する必要がない
+	av_frame_unref(this->pFrame);
+
+	av_packet_unref(this->pPacket);
 	
 	return bufRead;
 }
@@ -191,6 +204,8 @@ void CompressedAudio::Reset() {
 
 bool CompressedAudio::CreateCodecContext() {
 	char errDescription[500];
+
+	avcodec_free_context(&this->pCodecContext);
 	this->pCodecContext = avcodec_alloc_context3(this->pCodec);
 	if (this->pCodecContext == nullptr) {
 		OutputDebugStringEx(_T("avcodec_alloc_context3 error.\n"));

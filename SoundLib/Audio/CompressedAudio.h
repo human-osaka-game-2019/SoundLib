@@ -35,7 +35,8 @@ private:
 	SwrContext* pSwr;
 	WAVEFORMATEX waveFormatEx;
 	AVPacket* pPacket;
-	bool hasReadToEnd;
+	AVFrame* pFrame;
+	bool hasReadToEnd;	
 
 	bool CreateCodecContext();
 };
