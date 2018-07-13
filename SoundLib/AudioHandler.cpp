@@ -176,6 +176,7 @@ void AudioHandler::Stop(bool clearsCallback) {
 		delete this->readBuffers;
 		this->readBuffers = nullptr;
 	}
+	this->pVoice->FlushSourceBuffers();
 
 	this->pAudio->Reset();
 
