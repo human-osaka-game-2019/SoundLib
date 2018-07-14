@@ -5,7 +5,7 @@
 namespace SoundLib{
 namespace Audio {
 
-WaveAudio::WaveAudio() : hMmio(nullptr), pos(0) {}
+WaveAudio::WaveAudio() : hMmio(nullptr), pos(0), hasReadToEnd(false) {}
 
 WaveAudio::~WaveAudio() {
 	if (this->hMmio != nullptr) {
@@ -33,6 +33,10 @@ int WaveAudio::GetSamplingRate() {
 
 int WaveAudio::GetBitsPerSample() {
 	return this->waveFormatEx.wBitsPerSample;
+}
+
+bool WaveAudio::HasReadToEnd() {
+	return this->hasReadToEnd;
 }
 
 
@@ -97,6 +101,9 @@ bool WaveAudio::Load(TString filePath) {
 long WaveAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	// データの部分格納
 	long size = mmioRead(this->hMmio, (HPSTR)pBuffer, bufSize);
+	if (size == 0) {
+		this->hasReadToEnd = true;
+	}
 
 	this->pos += size;   // ファイルポインタのオフセット値
 
@@ -106,6 +113,7 @@ long WaveAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 void WaveAudio::Reset() {
 	mmioSeek(this->hMmio, -this->pos, SEEK_CUR);
 	this->pos = 0;   // ファイルポインタを先頭に戻す
+	this->hasReadToEnd = false;
 }
 
 }

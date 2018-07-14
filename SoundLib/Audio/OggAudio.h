@@ -18,6 +18,7 @@ public:
 	int GetChannelCount();
 	int GetSamplingRate();
 	int GetBitsPerSample();
+	bool HasReadToEnd();
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -27,6 +28,7 @@ private:
 	OggVorbis_File ovf;
 	bool hasOpenedFile;
 	WAVEFORMATEX waveFormatEx;
+	bool hasReadToEnd;
 };
 
 }

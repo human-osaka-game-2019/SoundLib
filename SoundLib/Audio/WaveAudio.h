@@ -17,6 +17,7 @@ public:
 	int GetChannelCount();
 	int GetSamplingRate();
 	int GetBitsPerSample();
+	bool HasReadToEnd();
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -26,6 +27,7 @@ private:
 	HMMIO hMmio;
 	WAVEFORMATEX waveFormatEx;
 	long pos;
+	bool hasReadToEnd;
 };
 
 }

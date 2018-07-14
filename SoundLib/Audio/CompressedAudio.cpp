@@ -7,7 +7,7 @@ extern "C" {
 namespace SoundLib {
 namespace Audio {
 
-CompressedAudio::CompressedAudio() : pFormatContext(nullptr), pAudioStream(nullptr), pCodec(nullptr), pCodecContext(nullptr), pSwr(nullptr), pPacket(nullptr) {}
+CompressedAudio::CompressedAudio() : pFormatContext(nullptr), pAudioStream(nullptr), pCodec(nullptr), pCodecContext(nullptr), pSwr(nullptr), pPacket(nullptr), hasReadToEnd(false) {}
 
 CompressedAudio::~CompressedAudio() {
 	avformat_close_input(&this->pFormatContext);
@@ -34,6 +34,10 @@ int CompressedAudio::GetSamplingRate() {
 
 int CompressedAudio::GetBitsPerSample() {
 	return this->pCodecContext->bits_per_coded_sample;
+}
+
+bool CompressedAudio::HasReadToEnd() {
+	return this->hasReadToEnd;
 }
 
 
@@ -117,6 +121,7 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 		int ret = av_read_frame(this->pFormatContext, this->pPacket);
 		if (ret < 0) {
 			if (ret == AVERROR_EOF) {
+				this->hasReadToEnd = true;
 				return bufRead;
 			} else {
 				av_strerror(ret, errDescription, 500);
@@ -179,6 +184,8 @@ void CompressedAudio::Reset() {
 	// 下記のメソッドでコンテキストをクリアすることもできるが、作り直す方が安全という情報があるので作り直す。
 	// avcodec_flush_buffers(this->pCodecContext);
 	CreateCodecContext();
+
+	this->hasReadToEnd = false;
 }
 
 

@@ -19,6 +19,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	const TCHAR* filePath4 = _T("Resources\\bgm_maoudamashii_fantasy10.ogg");
 	const TCHAR* filePath5 = _T("Resources\\Sample_BeeMoved_48kHz16bit.m4a");
 	const TCHAR* filePath6 = _T("Resources\\s3.wma");
+	const TCHAR* filePath7 = _T("Resources\\musicbox_VBR.mp3");
 
 
 	soundsManager.Initialize();
@@ -50,6 +51,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	// wmaファイルオープン
 	if (!soundsManager.AddFile(filePath6, _T("wma"))) {
+		return -1;
+	}
+
+	// 可変ビットレートmp3ファイルオープン
+	if (!soundsManager.AddFile(filePath7, _T("mp3VBR"))) {
 		return -1;
 	}
 

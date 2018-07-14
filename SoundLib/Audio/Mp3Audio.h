@@ -19,6 +19,7 @@ public:
 	int GetChannelCount();
 	int GetSamplingRate();
 	int GetBitsPerSample();
+	bool HasReadToEnd();
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -35,6 +36,8 @@ private:
 	ACMSTREAMHEADER* pAsh;
 	HACMSTREAM has;
 	long pos;
+	bool hasReadToEnd;
+	DWORD mp3AvgBytesPerSec;
 
 	DWORD GetDataSize();
 	WORD GetBitRate(BYTE header[], int version);

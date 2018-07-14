@@ -59,6 +59,9 @@
     <Media Include="Resources\Sample_BeeMoved_48kHz16bit.m4a">
       <Filter>リソース ファイル</Filter>
     </Media>
+    <Media Include="Resources\musicbox_VBR.mp3">
+      <Filter>リソース ファイル</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IVoiceCallbackDelegate.h">

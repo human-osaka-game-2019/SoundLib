@@ -5,7 +5,7 @@
 namespace SoundLib {
 namespace Audio {
 
-OggAudio::OggAudio() : hasOpenedFile(false) {}
+OggAudio::OggAudio() : hasOpenedFile(false), hasReadToEnd(false) {}
 
 OggAudio::~OggAudio() {
 	if (this->hasOpenedFile) {
@@ -34,6 +34,10 @@ int OggAudio::GetSamplingRate() {
 int OggAudio::GetBitsPerSample() {
 	vorbis_info* pVorbisInfo = ov_info(&this->ovf, -1);
 	return (pVorbisInfo->bitrate_nominal / pVorbisInfo->rate);
+}
+
+bool OggAudio::HasReadToEnd() {
+	return this->hasReadToEnd;
 }
 
 
@@ -69,6 +73,7 @@ long OggAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	while (bufRead < bufSize) {
 		long readSize = ov_read(&this->ovf, (char*)(pBuffer + bufRead), requestSize, 0, 2, 1, nullptr);
 		if (readSize == 0) {
+			this->hasReadToEnd = true;
 			break;
 		}
 
@@ -85,6 +90,7 @@ long OggAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 void OggAudio::Reset() {
 	// 読み込み位置を最初に戻す
 	ov_time_seek(&this->ovf, 0.0);
+	this->hasReadToEnd = false;
 }
 
 }

@@ -114,23 +114,36 @@ void AudioHandler::Push() {
 		return;
 	}
 
+	if (this->pAudio->HasReadToEnd()) {
+		if (this->isLoopPlayback) {
+			this->pAudio->Reset();
+		} else {
+			this->Stop(false);
+			if (this->pDelegate != nullptr) {
+				this->pDelegate->OnPlayedToEnd(this->name);
+				this->pDelegate = nullptr;
+			} else if (this->onPlayedToEndCallback != nullptr) {
+				this->onPlayedToEndCallback(this->name.c_str());
+				this->onPlayedToEndCallback = nullptr;
+			}
+
+			return;
+		}
+	}
+
 	// 音データ格納
 	memset(this->readBuffers[this->buf_cnt], 0, this->readLength);
 	long size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
 
-	if (size <= 0 && this->isLoopPlayback) {
-		this->pAudio->Reset();
-		size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
-	}
-
 	if (size <= 0) {
-		this->Stop(false);
-		if (this->pDelegate != nullptr) {
-			this->pDelegate->OnPlayedToEnd(this->name);
-			this->pDelegate = nullptr;
-		} else if (this->onPlayedToEndCallback != nullptr) {
-			this->onPlayedToEndCallback(this->name.c_str());
-			this->onPlayedToEndCallback = nullptr;
+		if (!this->pAudio->HasReadToEnd()) {
+			// エラー発生による停止
+			this->Stop(true);
+		} 
+		else
+		{
+			// ファイル末尾まで再生した後の処理
+			Push();
 		}
 
 		return;

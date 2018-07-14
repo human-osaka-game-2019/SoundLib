@@ -21,6 +21,7 @@ public:
 	int GetChannelCount();
 	int GetSamplingRate();
 	int GetBitsPerSample();
+	bool HasReadToEnd();
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -34,6 +35,7 @@ private:
 	SwrContext* pSwr;
 	WAVEFORMATEX waveFormatEx;
 	AVPacket* pPacket;
+	bool hasReadToEnd;
 
 	bool CreateCodecContext();
 };

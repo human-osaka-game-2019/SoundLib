@@ -19,6 +19,7 @@ public:
 	virtual int GetChannelCount() = 0;
 	virtual int GetSamplingRate() = 0;
 	virtual int GetBitsPerSample() = 0;
+	virtual bool HasReadToEnd() = 0;
 
 	virtual bool Load(TString filePath) = 0;
 	virtual long Read(BYTE* pBuffer, DWORD bufSize) = 0;
