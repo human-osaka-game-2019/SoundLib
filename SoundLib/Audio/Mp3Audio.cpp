@@ -28,7 +28,7 @@ const WORD SAMPLE_RATE_TABLE[][4] = {
 namespace SoundLib {
 namespace Audio {
 
-Mp3Audio::Mp3Audio() : hFile(nullptr), has(nullptr), pAsh(nullptr), pos(0), hasReadToEnd(false) {}
+Mp3Audio::Mp3Audio() : hFile(nullptr), has(nullptr), pAsh(nullptr), hasReadToEnd(false) {}
 
 Mp3Audio::~Mp3Audio() {
 	// ACMの後始末
@@ -153,13 +153,14 @@ bool Mp3Audio::Load(TString filePath) {
 	acmStreamOpen(&this->has, NULL, &mf.wfx, &this->waveFormatEx, NULL, 0, 0, 0);
 
 	// WAV変換後サイズに対応する変換前サイズ取得
-	acmStreamSize(this->has, this->waveFormatEx.nAvgBytesPerSec, &this->mp3AvgBytesPerSec, ACM_STREAMSIZEF_DESTINATION);
+	DWORD mp3AvgBytesPerSec;
+	acmStreamSize(this->has, this->waveFormatEx.nAvgBytesPerSec, &mp3AvgBytesPerSec, ACM_STREAMSIZEF_DESTINATION);
 
 	this->pAsh = new ACMSTREAMHEADER();
 	*(this->pAsh) = { 0 };
 	this->pAsh->cbStruct = sizeof(ACMSTREAMHEADER);
-	this->pAsh->pbSrc = new BYTE[this->mp3AvgBytesPerSec];
-	this->pAsh->cbSrcLength = this->mp3AvgBytesPerSec;
+	this->pAsh->pbSrc = new BYTE[mp3AvgBytesPerSec];
+	this->pAsh->cbSrcLength = mp3AvgBytesPerSec;
 	this->pAsh->pbDst = new BYTE[this->waveFormatEx.nAvgBytesPerSec];
 	this->pAsh->cbDstLength = this->waveFormatEx.nAvgBytesPerSec;
 
@@ -170,27 +171,31 @@ bool Mp3Audio::Load(TString filePath) {
 }
 
 long Mp3Audio::Read(BYTE* pBuffer, DWORD bufSize) {
-	DWORD mp3Bytes = this->mp3AvgBytesPerSec;
-	if (bufSize < this->waveFormatEx.nAvgBytesPerSec) {
-		// WAV変換後サイズに対応する変換前サイズ取得
-		acmStreamSize(this->has, bufSize, &mp3Bytes, ACM_STREAMSIZEF_DESTINATION);
-	}
+	// WAV変換後サイズに対応する変換前サイズ取得
+	DWORD mp3Bytes;
+	acmStreamSize(this->has, bufSize, &mp3Bytes, ACM_STREAMSIZEF_DESTINATION);
 
+	// ファイル読み込み
 	DWORD readSize;
 	ReadFile(this->hFile, this->pAsh->pbSrc, mp3Bytes, &readSize, NULL);
-	UINT result = acmStreamConvert(this->has, this->pAsh, ACM_STREAMCONVERTF_BLOCKALIGN);
-	if (result != 0) {
-		return 0;
-	}
 	if (readSize == 0) {
 		this->hasReadToEnd = true;
 		return 0;
 	}
+	this->pAsh->cbSrcLength = readSize;
 
-	this->pos += readSize;
+	// デコード
+	MMRESULT result = acmStreamConvert(this->has, this->pAsh, ACM_STREAMCONVERTF_BLOCKALIGN);
+	if (result != 0) {
+		return 0;
+	}
 
-	// デコードしたWAVEデータを格納
-	CopyMemory(pBuffer, this->pAsh->pbDst, this->pAsh->cbDstLengthUsed);
+	if (this->pAsh->cbDstLengthUsed == 0) {
+		this->hasReadToEnd = true;
+	} else {
+		// デコードしたWAVEデータを格納
+		CopyMemory(pBuffer, this->pAsh->pbDst, this->pAsh->cbDstLengthUsed);
+	}
 
 	return this->pAsh->cbDstLengthUsed;
 }
@@ -198,7 +203,6 @@ long Mp3Audio::Read(BYTE* pBuffer, DWORD bufSize) {
 void Mp3Audio::Reset() {
 	// ファイルポインタをMP3データの開始位置に移動
 	SetFilePointer(this->hFile, this->offset, NULL, FILE_BEGIN);
-	this->pos = 0;
 	this->hasReadToEnd = false;
 }
 

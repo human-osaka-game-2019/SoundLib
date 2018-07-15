@@ -35,9 +35,7 @@ private:
 	WAVEFORMATEX waveFormatEx;
 	ACMSTREAMHEADER* pAsh;
 	HACMSTREAM has;
-	long pos;
 	bool hasReadToEnd;
-	DWORD mp3AvgBytesPerSec;
 
 	DWORD GetDataSize();
 	WORD GetBitRate(BYTE header[], int version);
