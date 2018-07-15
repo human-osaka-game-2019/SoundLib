@@ -60,11 +60,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	SoundLib::PlayingStatus status = soundsManager.GetStatus(_T("wma"));
-	OutputDebugStringEx(_T("Status of the aac is %d\n"), status);
+	OutputDebugStringEx(_T("Status of the wma is %d\n"), status);
 
-	soundsManager.Start(_T("wma"), OnPlayedToEnd);
+	soundsManager.Start(_T("ogg"), true);
 	Sleep(1000);
-	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("wma")));
+	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
+
+	const TCHAR* pChanginVolumeKey = _T("ogg");
+	for (int i = 100; i > 0; i-=5) {
+		soundsManager.SetVolume(pChanginVolumeKey, i);
+		OutputDebugStringEx(_T("Volume of the %s is %d\n"), pChanginVolumeKey, soundsManager.GetVolume(pChanginVolumeKey));
+		Sleep(100);
+	}
+
+	Sleep(1000);
+
+	for (int i = 5; i <= 100; i+=5) {
+		soundsManager.SetVolume(pChanginVolumeKey, i);
+		OutputDebugStringEx(_T("Volume of the %s is %d\n"), pChanginVolumeKey, soundsManager.GetVolume(pChanginVolumeKey));
+		Sleep(100);
+	}
 
 	for (int i = 0; i < 1; ++i) {
 		soundsManager.Start(_T("mp3SE"));
@@ -85,7 +100,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
 
 	Sleep(1000);
-	soundsManager.Start(_T("aac"), OnPlayedToEnd);
+	//soundsManager.Start(_T("aac"), OnPlayedToEnd);
 	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
 
 	Sleep(120000);

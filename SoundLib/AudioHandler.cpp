@@ -32,9 +32,26 @@ AudioHandler::~AudioHandler() {
 	delete this->pVoiceCallback;
 }
 
+
 PlayingStatus AudioHandler::GetStatus() {
 	return this->status;
 }
+
+float AudioHandler::GetVolume() {
+	float volume;
+	this->pVoice->GetVolume(&volume);
+	return volume;
+}
+
+bool AudioHandler::SetVolume(float volume) {
+	HRESULT result = this->pVoice->SetVolume(volume);
+	if (FAILED(result)) {
+		OutputDebugStringEx(_T("error SetVolume resule=%d\n"), result);
+		return false;
+	}
+	return true;
+}
+
 
 bool AudioHandler::Prepare(IXAudio2* pXAudio2) {
 	HRESULT ret = pXAudio2->CreateSourceVoice(

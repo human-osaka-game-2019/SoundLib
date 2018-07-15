@@ -24,7 +24,9 @@ public:
 	~AudioHandler();
 
 	PlayingStatus GetStatus();
-	
+	float GetVolume();
+	bool SetVolume(float volume);
+
 	bool Prepare(IXAudio2* pXAudio2);
 	void Start(bool isLoopPlayback);
 	void Start(IAudioHandlerDelegate* pDelegate);

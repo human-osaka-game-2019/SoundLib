@@ -22,6 +22,41 @@ SoundsManager::~SoundsManager() {
 	CoUninitialize();
 }
 
+
+uint8_t SoundsManager::GetVolume(const TCHAR pKey[]) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
+		return 0;
+	}
+
+	float volume = this->audioMap[pKey]->GetVolume();
+	if (volume < 0) {
+		// 位相反転は設定不可のため考慮しない
+		return 0;
+	} else {
+		if (volume > 1) {
+			// 音源以上の音量設定は設定不可のため考慮しない
+			volume = 1;
+		}
+		return (uint8_t)(volume * 100);
+	}
+}
+
+bool SoundsManager::SetVolume(const TCHAR pKey[], uint8_t volume) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
+		return false;
+	}
+
+	if (volume > 100.0) {
+		// 音源以上のボリューム設定は不可
+		volume = 100;
+	}
+	float centiVolume = volume / 100.0;
+	return this->audioMap[pKey]->SetVolume(centiVolume);
+}
+
+
 bool SoundsManager::Initialize() {
 	HRESULT ret = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	if (FAILED(ret)) {

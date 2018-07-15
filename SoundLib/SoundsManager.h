@@ -6,6 +6,7 @@
 #include <mmsystem.h>
 #include <mmreg.h>
 #include <xaudio2.h>
+#include <stdint.h>
 #include "Common.h"
 #include "AudioHandler.h"
 #include "ISoundsManagerDelegate.h"
@@ -17,6 +18,10 @@ class SoundsManager {
 public:
 	SoundsManager();
 	~SoundsManager();
+
+	uint8_t GetVolume(const TCHAR pKey[]);
+	bool SetVolume(const TCHAR pKey[], uint8_t volume);
+
 	bool Initialize();
 	bool AddFile(const TCHAR* pilePath, const TCHAR* pKey);
 	bool Start(const TCHAR* pKey, bool isLoopPlayback = false);
