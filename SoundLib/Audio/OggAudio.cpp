@@ -64,24 +64,17 @@ bool OggAudio::Load(TString filePath) {
 
 long OggAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	DWORD bufRead = 0;	// バッファを読み込んだサイズ
-	DWORD requestSize = 4096;
-
-	if (bufSize < requestSize) {
-		requestSize = bufSize;
-	}
 
 	while (bufRead < bufSize) {
-		long readSize = ov_read(&this->ovf, (char*)(pBuffer + bufRead), requestSize, 0, 2, 1, nullptr);
+		long readSize = ov_read(&this->ovf, (char*)(pBuffer + bufRead), bufSize - bufRead, 0, 2, 1, nullptr);
 		if (readSize == 0) {
 			this->hasReadToEnd = true;
+			break;
+		} else if (readSize < 0) {
 			break;
 		}
 
 		bufRead += readSize;
-
-		if (bufSize - bufRead < requestSize) {
-			requestSize = bufSize - bufRead;
-		}
 	}
 
 	return bufRead;
