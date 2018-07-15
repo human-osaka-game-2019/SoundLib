@@ -36,16 +36,16 @@ public:
 
 
 private:
-	const int BUF_LEN = 2;
+	const int BUF_COUNT = 2;
 
 	TString name;
 	Audio::IAudio * pAudio;
 	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pVoiceCallback;
 	XAUDIO2_BUFFER xAudioBuffer;
-	BYTE** readBuffers;
-	int readLength;
-	int buf_cnt;
+	BYTE** pReadBuffers;
+	int bufferSize;
+	int currentBufNum;
 	bool isLoopPlayback;
 	IAudioHandlerDelegate* pDelegate;
 	void(*onPlayedToEndCallback)(const TCHAR* pName);

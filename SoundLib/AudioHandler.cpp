@@ -8,7 +8,7 @@ AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) :
 	name(name), 
 	pAudio(pAudio), 
 	pVoice(nullptr), 
-	readBuffers(nullptr), 
+	pReadBuffers(nullptr), 
 	pDelegate(nullptr), 
 	onPlayedToEndCallback(nullptr), 
 	status(PlayingStatus::Stopped) {
@@ -110,7 +110,7 @@ void AudioHandler::BufferEndCallback() {
 }
 
 void AudioHandler::Push() {
-	if (this->readBuffers == nullptr) {
+	if (this->pReadBuffers == nullptr) {
 		return;
 	}
 
@@ -132,45 +132,43 @@ void AudioHandler::Push() {
 	}
 
 	// 音データ格納
-	memset(this->readBuffers[this->buf_cnt], 0, this->readLength);
-	long size = this->pAudio->Read(this->readBuffers[this->buf_cnt], this->readLength);
+	memset(this->pReadBuffers[this->currentBufNum], 0, this->bufferSize);
+	long size = this->pAudio->Read(this->pReadBuffers[this->currentBufNum], this->bufferSize);
 
 	if (size <= 0) {
-		if (!this->pAudio->HasReadToEnd()) {
-			// エラー発生による停止
-			this->Stop(true);
-		} 
-		else
-		{
+		if (this->pAudio->HasReadToEnd()) {
 			// ファイル末尾まで再生した後の処理
 			Push();
+		} else {
+			// エラー発生による停止
+			this->Stop(true);
 		}
 
 		return;
 	}
 
 	this->xAudioBuffer.AudioBytes = size;
-	this->xAudioBuffer.pAudioData = this->readBuffers[this->buf_cnt];
+	this->xAudioBuffer.pAudioData = this->pReadBuffers[this->currentBufNum];
 	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
 	if (FAILED(ret)) {
 		OutputDebugStringEx(_T("error SubmitSourceBuffer ret=%d\n"), ret);
 		return;
 	}
 
-	if (BUF_LEN <= ++this->buf_cnt) {
-		this->buf_cnt = 0;
+	if (BUF_COUNT <= ++this->currentBufNum) {
+		this->currentBufNum = 0;
 	}
 }
 
 void AudioHandler::Start() {
 	this->xAudioBuffer = { 0 };
-	this->readBuffers = new BYTE*[BUF_LEN];
-	this->readLength = this->pAudio->GetWaveFormatEx()->nAvgBytesPerSec;
-	for (int i = 0; i < BUF_LEN; ++i) {
-		this->readBuffers[i] = new BYTE[this->readLength];
+	this->pReadBuffers = new BYTE*[BUF_COUNT];
+	this->bufferSize = this->pAudio->GetWaveFormatEx()->nAvgBytesPerSec;
+	for (int i = 0; i < BUF_COUNT; ++i) {
+		this->pReadBuffers[i] = new BYTE[this->bufferSize];
 	}
 
-	this->buf_cnt = 0;
+	this->currentBufNum = 0;
 
 	this->Push();
 
@@ -182,12 +180,12 @@ void AudioHandler::Stop(bool clearsCallback) {
 	this->pVoice->Stop();
 	this->status = PlayingStatus::Stopped;
 
-	if (this->readBuffers != nullptr) {
-		for (int i = 0; i < BUF_LEN; i++) {
-			delete[] this->readBuffers[i];
+	if (this->pReadBuffers != nullptr) {
+		for (int i = 0; i < BUF_COUNT; i++) {
+			delete[] this->pReadBuffers[i];
 		}
-		delete this->readBuffers;
-		this->readBuffers = nullptr;
+		delete this->pReadBuffers;
+		this->pReadBuffers = nullptr;
 	}
 	this->pVoice->FlushSourceBuffers();
 
