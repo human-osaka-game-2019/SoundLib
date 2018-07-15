@@ -5,7 +5,7 @@
 namespace SoundLib{
 namespace Audio {
 
-WaveAudio::WaveAudio() : hMmio(nullptr), pos(0), hasReadToEnd(false) {}
+WaveAudio::WaveAudio() : hMmio(nullptr), offset(0), dataSize(0), restSize(0), hasReadToEnd(false) {}
 
 WaveAudio::~WaveAudio() {
 	if (this->hMmio != nullptr) {
@@ -41,12 +41,8 @@ bool WaveAudio::HasReadToEnd() {
 
 
 bool WaveAudio::Load(TString filePath) {
-	MMIOINFO mmioInfo;
-
 	// Waveファイルオープン
-	memset(&mmioInfo, 0, sizeof(MMIOINFO));
-
-	this->hMmio = mmioOpen(const_cast<TCHAR*>(filePath.c_str()), &mmioInfo, MMIO_READ);
+	this->hMmio = mmioOpen(const_cast<TCHAR*>(filePath.c_str()), nullptr, MMIO_READ);
 	if (!this->hMmio) {
 		// ファイルオープン失敗
 		OutputDebugStringEx(_T("error mmioOpen\n"));
@@ -95,24 +91,38 @@ bool WaveAudio::Load(TString filePath) {
 		return false;
 	}
 
+	// データチャンクの先頭までの位置をシークし直してオフセットとして保持する
+	this->offset = mmioSeek(this->hMmio, 0, SEEK_CUR);
+	this->dataSize = dataChunk.cksize;
+	this->restSize = this->dataSize;
+
 	return true;
 }
 
 long WaveAudio::Read(BYTE* pBuffer, DWORD bufSize) {
-	// データの部分格納
-	long size = mmioRead(this->hMmio, (HPSTR)pBuffer, bufSize);
-	if (size == 0) {
+	long readSize = 0;
+	/*
+	 * バッファサイズとファイルの残りサイズのうち小さい方を読み出しサイズとして設定する。
+	 * ファイルの残りサイズより大きな値を設定してもファイル末尾までしか読み込みは行われないが、
+	 * ファイルの音声データサイズが奇数の場合は末尾に1バイトのNULL文字が格納されており
+	 * これも読み込んでしまうとノイズとなるので、音声データのみを読み込むようにする。
+	 */
+	long readableSize = bufSize > this->restSize ? this->restSize: bufSize;
+
+	if (readableSize == 0) {
 		this->hasReadToEnd = true;
+	} else {
+		// データの部分格納
+		readSize = mmioRead(this->hMmio, (HPSTR)pBuffer, readableSize);
+		this->restSize -= readSize;
 	}
-
-	this->pos += size;   // ファイルポインタのオフセット値
-
-	return size;
+	return readSize;
 }
 
 void WaveAudio::Reset() {
-	mmioSeek(this->hMmio, -this->pos, SEEK_CUR);
-	this->pos = 0;   // ファイルポインタを先頭に戻す
+	// ファイルポインタを先頭に戻す
+	mmioSeek(this->hMmio, this->offset, SEEK_SET);
+	this->restSize = this->dataSize;
 	this->hasReadToEnd = false;
 }
 

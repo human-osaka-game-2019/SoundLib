@@ -26,7 +26,9 @@ public:
 private:
 	HMMIO hMmio;
 	WAVEFORMATEX waveFormatEx;
-	long pos;
+	long offset;
+	long dataSize;
+	long restSize;
 	bool hasReadToEnd;
 };
 
