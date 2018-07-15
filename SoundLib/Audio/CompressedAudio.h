@@ -36,9 +36,12 @@ private:
 	WAVEFORMATEX waveFormatEx;
 	AVPacket* pPacket;
 	AVFrame* pFrame;
-	bool hasReadToEnd;	
+	bool hasReadToEnd;
+	BYTE* pRemainingConvertedBuf;
+	int remainingConvertedBufSize;
 
 	bool CreateCodecContext();
+	int ConvertPcmFormat(BYTE* pBuffer, DWORD bufSize);
 };
 
 }

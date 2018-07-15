@@ -1,15 +1,30 @@
 ﻿#include "CompressedAudio.h"
-#include "../Common.h"
 extern "C" {
 #include <libavutil/opt.h>
 }
+#include "../Common.h"
+
 
 namespace SoundLib {
 namespace Audio {
 
-CompressedAudio::CompressedAudio() : pFormatContext(nullptr), pAudioStream(nullptr), pCodec(nullptr), pCodecContext(nullptr), pSwr(nullptr), pPacket(nullptr), pFrame(nullptr), hasReadToEnd(false) {}
+CompressedAudio::CompressedAudio() : pFormatContext(nullptr), 
+									 pAudioStream(nullptr), 
+									 pCodec(nullptr), 
+									 pCodecContext(nullptr),
+									 pSwr(nullptr), 
+									 pPacket(nullptr), 
+									 pFrame(nullptr), 
+									 hasReadToEnd(false), 
+									 pRemainingConvertedBuf(nullptr),
+									 remainingConvertedBufSize(0) {}
 
 CompressedAudio::~CompressedAudio() {
+	if (this->remainingConvertedBufSize > 0) {
+		delete[] this->pRemainingConvertedBuf;
+		this->remainingConvertedBufSize = 0;
+	}
+
 	av_frame_free(&this->pFrame);
 	av_packet_free(&this->pPacket);
 	swr_free(&this->pSwr);
@@ -121,12 +136,20 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	DWORD bufRead = 0;	// バッファを読み込んだサイズ
 	char errDescription[500];
 
+	// 前回バッファに詰め切れなかった分をまず移送
+	if (this->remainingConvertedBufSize > 0) {
+		memcpy(pBuffer, this->pRemainingConvertedBuf, this->remainingConvertedBufSize);
+		bufRead += this->remainingConvertedBufSize;
+		this->remainingConvertedBufSize = 0;
+		delete[] this->pRemainingConvertedBuf;
+	}
+
 	while (bufSize > bufRead && !this->hasReadToEnd) {
 		int ret = av_read_frame(this->pFormatContext, this->pPacket);
 		if (ret < 0) {
 			if (ret == AVERROR_EOF) {
 				// flush decoder
-				if (ret = avcodec_send_packet(this->pCodecContext, NULL) != 0) {
+				if (ret = avcodec_send_packet(this->pCodecContext, nullptr) != 0) {
 					av_strerror(ret, errDescription, 500);
 					OutputDebugStringEx(_T("avcodec_send_packet error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
 				}
@@ -149,35 +172,26 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 			OutputDebugStringEx(_T("avcodec_send_packet error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
 			break;
 		}
-		
-		if ((ret = avcodec_receive_frame(this->pCodecContext, this->pFrame)) < 0) {
-			if (ret != AVERROR(EAGAIN)) {
-				av_strerror(ret, errDescription, 500);
-				OutputDebugStringEx(_T("avcodec_receive_frame error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
-				break;
-			}
-		} else {
-			int convertableByteSize = this->pFrame->nb_samples * this->waveFormatEx.nChannels * (16 / 8);
-			int remainingBufSize = bufSize - bufRead;
-			int convertSampleCount = (convertableByteSize > remainingBufSize ? remainingBufSize : convertableByteSize) / this->waveFormatEx.nChannels / (16 / 8);
-			BYTE* pSwrBuf = new BYTE[convertableByteSize];
-			ret = swr_convert(this->pSwr, &pSwrBuf, convertSampleCount, (const uint8_t**)this->pFrame->extended_data, this->pFrame->nb_samples);
-			if (ret < 0) {
-				av_strerror(ret, errDescription, 500);
-				OutputDebugStringEx(_T("swr_convert error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
-				delete[] pSwrBuf;
-				break;
-			}
-			int readSize = ret * this->waveFormatEx.nChannels * (16 / 8);
-			memcpy(pBuffer + bufRead, pSwrBuf, readSize);
-			bufRead += readSize;
 
-			delete[] pSwrBuf;
-		}
+		do {
+			ret = avcodec_receive_frame(this->pCodecContext, this->pFrame);
+			if (ret < 0) {
+				if (ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+					av_strerror(ret, errDescription, 500);
+					OutputDebugStringEx(_T("avcodec_receive_frame error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+				}
+				break;
+			}
+
+			// fltp PCMデータをs16 PCMデータに変換
+			int readSize = ConvertPcmFormat(pBuffer + bufRead, bufSize - bufRead);
+			bufRead += readSize;
+		} while (bufSize > bufRead);
+
 		av_packet_unref(this->pPacket);
 	}
 
-	// avcodec_receive_frame()内でav_frame_unref()が呼ばれるので、ループ内では実行する必要がない
+	// avcodec_receive_frame()内でav_frame_unref()が呼ばれるので、av_frame_unref()はループを抜けてからのみの呼び出しでOK
 	av_frame_unref(this->pFrame);
 
 	av_packet_unref(this->pPacket);
@@ -192,6 +206,11 @@ void CompressedAudio::Reset() {
 		char errDescription[500];
 		av_strerror(result, errDescription, 500);
 		OutputDebugStringEx(_T("av_seek_frame error. ret=%08x description=%s\n"), AVERROR(result), errDescription);
+	}
+
+	if (this->remainingConvertedBufSize > 0) {
+		this->remainingConvertedBufSize = 0;
+		delete this->pRemainingConvertedBuf;
 	}
 
 	// 下記のメソッドでコンテキストをクリアすることもできるが、作り直す方が安全という情報があるので作り直す。
@@ -227,6 +246,33 @@ bool CompressedAudio::CreateCodecContext() {
 	}
 
 	return true;
+}
+
+int CompressedAudio::ConvertPcmFormat(BYTE* pBuffer, DWORD bufSize) {
+	int copyableSize = 0;
+	char errDescription[500];
+
+	int convertableByteSize = this->pFrame->nb_samples * this->waveFormatEx.nChannels * (16 / 8);
+	BYTE* pSwrBuf = new BYTE[convertableByteSize];
+	int readCount = swr_convert(this->pSwr, &pSwrBuf, this->pFrame->nb_samples, (const uint8_t**)this->pFrame->extended_data, this->pFrame->nb_samples);
+	if (readCount < 0) {
+		av_strerror(readCount, errDescription, 500);
+		OutputDebugStringEx(_T("swr_convert error. ret=%08x description=%s\n"), AVERROR(readCount), errDescription);
+	} else {
+		int readSize = readCount * this->waveFormatEx.nChannels * (16 / 8);
+		copyableSize = bufSize > readSize ? readSize : bufSize;
+		memcpy(pBuffer, pSwrBuf, copyableSize);
+
+		if (copyableSize < readSize) {
+			// バッファに詰め切れないデータを次回用に保持しておく
+			this->remainingConvertedBufSize = readSize - copyableSize;
+			this->pRemainingConvertedBuf = new BYTE[this->remainingConvertedBufSize];
+			memcpy(this->pRemainingConvertedBuf, pSwrBuf + copyableSize, this->remainingConvertedBufSize);
+		}
+	}
+
+	delete[] pSwrBuf;
+	return copyableSize;
 }
 
 }
