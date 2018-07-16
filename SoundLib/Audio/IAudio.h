@@ -12,7 +12,7 @@ namespace Audio {
 
 class IAudio {
 public:
-	virtual ~IAudio() {};
+	virtual ~IAudio() = default;
 
 	virtual const WAVEFORMATEX* GetWaveFormatEx() const = 0;
 	virtual TString GetFormatName() const = 0;

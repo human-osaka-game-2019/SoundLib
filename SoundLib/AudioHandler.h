@@ -21,11 +21,14 @@ enum PlayingStatus {
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
 	AudioHandler(TString name, Audio::IAudio* pAudio);
+	AudioHandler(AudioHandler&&) = default;
 	~AudioHandler();
 
 	PlayingStatus GetStatus() const;
 	float GetVolume() const;
 	bool SetVolume(float volume);
+
+	AudioHandler& operator=(AudioHandler&&) = default;
 
 	bool Prepare(IXAudio2& rXAudio2);
 	void Start(bool isLoopPlayback);
@@ -52,6 +55,9 @@ private:
 	IAudioHandlerDelegate* pDelegate;
 	void(*onPlayedToEndCallback)(const TCHAR* pName);
 	PlayingStatus status;
+
+	AudioHandler(const AudioHandler&) = delete;
+	AudioHandler& operator=(const AudioHandler&) = delete;
 
 	void Push();
 	void Start();

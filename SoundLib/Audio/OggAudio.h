@@ -11,6 +11,7 @@ namespace Audio {
 class OggAudio : public IAudio {
 public:
 	OggAudio();
+	OggAudio(OggAudio&&) = default;
 	~OggAudio();
 
 	const WAVEFORMATEX* GetWaveFormatEx() const;
@@ -19,6 +20,8 @@ public:
 	int GetSamplingRate() const;
 	int GetBitsPerSample() const;
 	bool HasReadToEnd() const;
+
+	OggAudio& operator=(OggAudio&&) = default;
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -29,6 +32,9 @@ private:
 	bool hasOpenedFile;
 	WAVEFORMATEX waveFormatEx;
 	bool hasReadToEnd;
+
+	OggAudio(const OggAudio&) = delete;
+	OggAudio& operator=(const OggAudio&) = delete;
 };
 
 }

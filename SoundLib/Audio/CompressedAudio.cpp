@@ -75,7 +75,7 @@ bool CompressedAudio::Load(TString filePath) {
 		return false;
 	}
 
-	for (unsigned int i = 0; i < this->pFormatContext->nb_streams; ++i) {
+	for (uint32_t i = 0; i < this->pFormatContext->nb_streams; ++i) {
 		if (this->pFormatContext->streams[i]->codecpar->codec_type == AVMediaType::AVMEDIA_TYPE_AUDIO) {
 			this->pAudioStream = this->pFormatContext->streams[i];
 			break;

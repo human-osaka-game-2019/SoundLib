@@ -14,6 +14,7 @@ namespace Audio {
 class CompressedAudio : public IAudio {
 public:
 	CompressedAudio();
+	CompressedAudio(CompressedAudio&&) = default;
 	~CompressedAudio();
 
 	const WAVEFORMATEX* GetWaveFormatEx() const;
@@ -22,6 +23,8 @@ public:
 	int GetSamplingRate() const;
 	int GetBitsPerSample() const;
 	bool HasReadToEnd() const;
+
+	CompressedAudio& operator=(CompressedAudio&&) = default;
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -39,6 +42,9 @@ private:
 	bool hasReadToEnd;
 	BYTE* pRemainingConvertedBuf;
 	int remainingConvertedBufSize;
+
+	CompressedAudio(const CompressedAudio&) = delete;
+	CompressedAudio& operator=(const CompressedAudio&) = delete;
 
 	bool CreateCodecContext();
 	int ConvertPcmFormat(BYTE* pBuffer, DWORD bufSize);

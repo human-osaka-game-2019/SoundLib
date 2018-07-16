@@ -6,7 +6,7 @@ namespace SoundLib {
 class IAudioHandlerDelegate
 {
 public:
-	virtual ~IAudioHandlerDelegate() = 0;
+	virtual ~IAudioHandlerDelegate() = default;
 	virtual void OnPlayedToEnd(TString name) = 0;
 };
 }

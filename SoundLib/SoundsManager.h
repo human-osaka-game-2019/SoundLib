@@ -17,11 +17,14 @@ namespace SoundLib {
 class SoundsManager {
 public:
 	SoundsManager();
+	SoundsManager(SoundsManager&&) = default;
 	~SoundsManager();
 
 	PlayingStatus GetStatus(const TCHAR* pKey) const;
 	uint8_t GetVolume(const TCHAR* pKey) const;
 	bool SetVolume(const TCHAR* pKey, uint8_t volume);
+
+	SoundsManager& operator=(SoundsManager&&) = default;
 
 	bool Initialize();
 	bool AddFile(const TCHAR* pFilePath, const TCHAR* pKey);
@@ -35,6 +38,9 @@ public:
 private:
 	std::unordered_map<TString, AudioHandler*> audioMap;
 	IXAudio2* pXAudio2;
+
+	SoundsManager(const SoundsManager&) = delete;
+	SoundsManager& operator=(const SoundsManager&) = delete;
 
 	bool ExistsKey(TString key) const;
 };

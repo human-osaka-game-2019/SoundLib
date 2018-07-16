@@ -10,6 +10,7 @@ namespace Audio {
 class WaveAudio : public IAudio {
 public:
 	WaveAudio();
+	WaveAudio(WaveAudio&&) = default;
 	~WaveAudio();
 
 	const WAVEFORMATEX* GetWaveFormatEx() const;
@@ -18,6 +19,8 @@ public:
 	int GetSamplingRate() const;
 	int GetBitsPerSample() const;
 	bool HasReadToEnd() const;
+
+	WaveAudio& operator=(WaveAudio&&) = default;
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -30,6 +33,9 @@ private:
 	long dataSize;
 	long restSize;
 	bool hasReadToEnd;
+
+	WaveAudio(const WaveAudio&) = delete;
+	WaveAudio& operator=(const WaveAudio&) = delete;
 };
 
 }

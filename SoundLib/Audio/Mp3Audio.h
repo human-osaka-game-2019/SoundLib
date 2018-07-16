@@ -12,6 +12,7 @@ namespace Audio {
 class Mp3Audio : public IAudio {
 public:
 	Mp3Audio();
+	Mp3Audio(Mp3Audio&&) = default;
 	~Mp3Audio();
 
 	const WAVEFORMATEX* GetWaveFormatEx() const;
@@ -20,6 +21,8 @@ public:
 	int GetSamplingRate() const;
 	int GetBitsPerSample() const;
 	bool HasReadToEnd() const;
+
+	Mp3Audio& operator=(Mp3Audio&&) = default;
 
 	bool Load(TString filePath);
 	long Read(BYTE* pBuffer, DWORD bufSize);
@@ -36,6 +39,9 @@ private:
 	ACMSTREAMHEADER* pAsh;
 	HACMSTREAM has;
 	bool hasReadToEnd;
+
+	Mp3Audio(const Mp3Audio&) = delete;
+	Mp3Audio& operator=(const Mp3Audio&) = delete;
 
 	DWORD GetDataSize();
 	WORD GetBitRate(BYTE* pHeader, int version) const;

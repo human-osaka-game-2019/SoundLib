@@ -10,7 +10,8 @@ class VoiceCallback : public IXAudio2VoiceCallback
 {
 public:
 	explicit VoiceCallback(IVoiceCallbackDelegate* pDelegate);
-	~VoiceCallback() {}
+	VoiceCallback(VoiceCallback&&) = default;
+	~VoiceCallback() = default;
 
 	void STDMETHODCALLTYPE OnStreamEnd();
 	void STDMETHODCALLTYPE OnVoiceProcessingPassEnd() {}
@@ -21,8 +22,9 @@ public:
 	void STDMETHODCALLTYPE OnVoiceError(void* pBufferContext, HRESULT Error);
 
 private:
-	VoiceCallback();
-	VoiceCallback(const VoiceCallback&);
+	VoiceCallback() = delete;
+	VoiceCallback(const VoiceCallback&) = delete;
+	VoiceCallback& operator=(const VoiceCallback&) = delete;
 
 	IVoiceCallbackDelegate* pDelegate;
 };
