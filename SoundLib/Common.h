@@ -1,4 +1,9 @@
-﻿#ifndef COMMON_H
+﻿//----------------------------------------------------------
+// <filename>Common.h</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#ifndef COMMON_H
 #define COMMON_H
 
 #include <stdio.h>
@@ -19,12 +24,15 @@
         OutputDebugString( c ); \
       }
 #else
-#    define OutputDebugStringEx( str, ... ) // 空実装
+#define OutputDebugStringEx( str, ... ) // 空実装
 #endif
 
 
 namespace SoundLib {
 
+/// <summary>
+/// TCHAR格納用Stringクラス
+/// </summary>
 typedef std::basic_string<TCHAR> TString;
 
 }

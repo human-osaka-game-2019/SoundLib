@@ -1,10 +1,15 @@
-﻿#include "OggAudio.h"
+﻿//----------------------------------------------------------
+// <filename>OggAudio.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#include "OggAudio.h"
 #include "../Common.h"
 
 
 namespace SoundLib {
 namespace Audio {
-
+/* Constructor / Destructor ------------------------------------------------------------------------- */
 OggAudio::OggAudio() : hasOpenedFile(false), hasReadToEnd(false) {}
 
 OggAudio::~OggAudio() {
@@ -15,6 +20,7 @@ OggAudio::~OggAudio() {
 }
 
 
+/* Getters / Setters -------------------------------------------------------------------------------- */
 const WAVEFORMATEX* OggAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
@@ -41,6 +47,7 @@ bool OggAudio::HasReadToEnd() const {
 }
 
 
+/* Public Functions  -------------------------------------------------------------------------------- */
 bool OggAudio::Load(TString filePath) {
 	// ファイルを開く
 	int error = ov_fopen(filePath.c_str(), &this->ovf);

@@ -1,5 +1,10 @@
-﻿#include <typeinfo>
+﻿//----------------------------------------------------------
+// <filename>SoundsManager.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
 #include "SoundsManager.h"
+#include <typeinfo>
 #include "Audio/WaveAudio.h"
 #include "Audio/Mp3Audio.h"
 #include "Audio/OggAudio.h"
@@ -7,6 +12,7 @@
 
 
 namespace SoundLib {
+/* Constructor / Destructor ------------------------------------------------------------------------- */
 SoundsManager::SoundsManager() : pXAudio2(nullptr) {}
 
 SoundsManager::~SoundsManager() {
@@ -23,6 +29,7 @@ SoundsManager::~SoundsManager() {
 }
 
 
+/* Getters / Setters -------------------------------------------------------------------------------- */
 PlayingStatus SoundsManager::GetStatus(const TCHAR* pKey) const {
 	if (!ExistsKey(pKey)) {
 		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
@@ -66,32 +73,22 @@ bool SoundsManager::SetVolume(const TCHAR* pKey, uint8_t volume) {
 }
 
 
+/* Public Functions  -------------------------------------------------------------------------------- */
 bool SoundsManager::Initialize() {
-	HRESULT ret = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	HRESULT ret = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if (FAILED(ret)) {
 		OutputDebugStringEx(_T("error CoInitializeEx ret=%d\n"), ret);
 		return false;
 	}
 
-	ret = XAudio2Create(
-		&this->pXAudio2
-		// UINT32 Flags = 0,
-		// XAUDIO2_PROCESSOR XAudio2Processor = XAUDIO2_DEFAULT_PROCESSOR
-	);
+	ret = XAudio2Create(&this->pXAudio2);
 	if (FAILED(ret)) {
 		OutputDebugStringEx(_T("error XAudio2Create ret=%d\n"), ret);
 		return false;
 	}
 
-	IXAudio2MasteringVoice* master = NULL;
-	ret = this->pXAudio2->CreateMasteringVoice(
-		&master
-		// UINT32 InputChannels = XAUDIO2_DEFAULT_CHANNELS,
-		// UINT32 InputSampleRate = XAUDIO2_DEFAULT_SAMPLERATE,
-		// UINT32 Flags = 0,
-		// UINT32 DeviceIndex = 0,
-		// const XAUDIO2_EFFECT_CHAIN *pEffectChain = NULL
-	);
+	IXAudio2MasteringVoice* master = nullptr;
+	ret = this->pXAudio2->CreateMasteringVoice(&master);
 	if (FAILED(ret)) {
 		OutputDebugStringEx(_T("error CreateMasteringVoice ret=%d\n"), ret);
 		return false;
@@ -112,7 +109,7 @@ bool SoundsManager::AddFile(const TCHAR* pFilePath, const TCHAR* pKey) {
 	if (pExtension != nullptr && strcmp(pExtension, _T(".wav")) == 0) {
 		pAudio = new Audio::WaveAudio();
 	} else if (pExtension != nullptr && strcmp(pExtension, _T(".ogg")) == 0) {
-		pAudio = new Audio::OggAudio();
+		pAudio = new Audio::CompressedAudio();
 	} else if (pExtension != nullptr && strcmp(pExtension, _T(".mp3")) == 0) {
 		pAudio = new Audio::Mp3Audio();
 	} else {
@@ -223,6 +220,8 @@ bool SoundsManager::Resume(const TCHAR* pKey) {
 	return true;
 }
 
+
+/* Private Functions  ------------------------------------------------------------------------------- */
 bool SoundsManager::ExistsKey(TString key) const {
 	auto itr = this->audioMap.find(key);
 	return (itr != this->audioMap.end());

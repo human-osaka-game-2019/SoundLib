@@ -1,10 +1,18 @@
-﻿#include "VoiceCallback.h"
+﻿//----------------------------------------------------------
+// <filename>VoiceCallback.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#include "VoiceCallback.h"
 #include "Common.h"
 
 
 namespace SoundLib {
+/* Constructor / Destructor ------------------------------------------------------------------------- */
 VoiceCallback::VoiceCallback(IVoiceCallbackDelegate* pDelegate) : pDelegate(pDelegate) {}
 
+
+/* Public Functions  -------------------------------------------------------------------------------- */
 void STDMETHODCALLTYPE VoiceCallback::OnStreamEnd() {
 	OutputDebugStringEx(_T("%s\n"), __func__);
 }

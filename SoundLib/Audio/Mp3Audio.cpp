@@ -1,4 +1,9 @@
-﻿#include "Mp3Audio.h"
+﻿//----------------------------------------------------------
+// <filename>Mp3Audio.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#include "Mp3Audio.h"
 #include "../Common.h"
 
 
@@ -27,7 +32,7 @@ const int SAMPLE_RATE_TABLE[][4] = {
 
 namespace SoundLib {
 namespace Audio {
-
+/* Constructor / Destructor ------------------------------------------------------------------------- */
 Mp3Audio::Mp3Audio() : hFile(nullptr), has(nullptr), pAsh(nullptr), hasReadToEnd(false) {}
 
 Mp3Audio::~Mp3Audio() {
@@ -55,6 +60,7 @@ Mp3Audio::~Mp3Audio() {
 }
 
 
+/* Getters / Setters -------------------------------------------------------------------------------- */
 const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
@@ -80,6 +86,7 @@ bool Mp3Audio::HasReadToEnd() const {
 }
 
 
+/* Public Functions  -------------------------------------------------------------------------------- */
 bool Mp3Audio::Load(TString filePath) {
 	// ファイルを開く
 	this->hFile = CreateFile(
@@ -206,6 +213,8 @@ void Mp3Audio::Reset() {
 	this->hasReadToEnd = false;
 }
 
+
+/* Private Functions  ------------------------------------------------------------------------------- */
 DWORD Mp3Audio::GetDataSize() {
 	DWORD ret;
 	DWORD fileSize = GetFileSize(this->hFile, NULL);

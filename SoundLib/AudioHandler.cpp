@@ -1,9 +1,15 @@
-﻿#include "AudioHandler.h"
+﻿//----------------------------------------------------------
+// <filename>AudioHandler.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#include "AudioHandler.h"
 #include <typeinfo>
 #include "Common.h"
 
 
 namespace SoundLib {
+/* Constructor / Destructor ------------------------------------------------------------------------- */
 AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) : 
 	name(name), 
 	pAudio(pAudio), 
@@ -33,6 +39,7 @@ AudioHandler::~AudioHandler() {
 }
 
 
+/* Getters / Setters -------------------------------------------------------------------------------- */
 PlayingStatus AudioHandler::GetStatus() const{
 	return this->status;
 }
@@ -53,16 +60,9 @@ bool AudioHandler::SetVolume(float volume) {
 }
 
 
+/* Public Functions  -------------------------------------------------------------------------------- */
 bool AudioHandler::Prepare(IXAudio2& rXAudio2) {
-	HRESULT ret = rXAudio2.CreateSourceVoice(
-		&this->pVoice,
-		this->pAudio->GetWaveFormatEx(),
-		0,                          // UINT32 Flags = 0,
-		XAUDIO2_DEFAULT_FREQ_RATIO, // float MaxFrequencyRatio = XAUDIO2_DEFAULT_FREQ_RATIO,
-		this->pVoiceCallback                   // IXAudio2VoiceCallback *pCallback = NULL,
-										  // const XAUDIO2_VOICE_SENDS *pSendList = NULL,
-										  // const XAUDIO2_EFFECT_CHAIN *pEffectChain = NULL
-	);
+	HRESULT ret = rXAudio2.CreateSourceVoice(&this->pVoice, this->pAudio->GetWaveFormatEx(), 0, XAUDIO2_DEFAULT_FREQ_RATIO, this->pVoiceCallback);
 	if (FAILED(ret)) {
 		OutputDebugStringEx(_T("error CreateSourceVoice ret=%d\n"), ret);
 		return false;
@@ -126,6 +126,8 @@ void AudioHandler::BufferEndCallback() {
 	Push();
 }
 
+
+/* Private Functions  ------------------------------------------------------------------------------- */
 void AudioHandler::Push() {
 	if (this->pReadBuffers == nullptr) {
 		return;

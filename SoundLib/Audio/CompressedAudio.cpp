@@ -1,4 +1,9 @@
-﻿#include "CompressedAudio.h"
+﻿//----------------------------------------------------------
+// <filename>CompressedAudio.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#include "CompressedAudio.h"
 extern "C" {
 #include <libavutil/opt.h>
 }
@@ -7,7 +12,7 @@ extern "C" {
 
 namespace SoundLib {
 namespace Audio {
-
+/* Constructor / Destructor ------------------------------------------------------------------------- */
 CompressedAudio::CompressedAudio() : pFormatContext(nullptr), 
 									 pAudioStream(nullptr), 
 									 pCodec(nullptr), 
@@ -34,6 +39,7 @@ CompressedAudio::~CompressedAudio() {
 }
 
 
+/* Getters / Setters -------------------------------------------------------------------------------- */
 const WAVEFORMATEX* CompressedAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
@@ -59,6 +65,7 @@ bool CompressedAudio::HasReadToEnd() const {
 }
 
 
+/* Public Functions  -------------------------------------------------------------------------------- */
 bool CompressedAudio::Load(TString filePath) {
 	char pErrDescription[500];
 	int result = avformat_open_input(&this->pFormatContext, filePath.c_str(), nullptr, nullptr);
@@ -248,6 +255,8 @@ bool CompressedAudio::CreateCodecContext() {
 	return true;
 }
 
+
+/* Private Functions  ------------------------------------------------------------------------------- */
 long CompressedAudio::ConvertPcmFormat(BYTE* pBuffer, long bufSize) {
 	long copyableSize = 0;
 	char pErrDescription[500];

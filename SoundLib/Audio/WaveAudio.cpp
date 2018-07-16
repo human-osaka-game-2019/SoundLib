@@ -1,10 +1,15 @@
-﻿#include "WaveAudio.h"
+﻿//----------------------------------------------------------
+// <filename>WaveAudio.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#include "WaveAudio.h"
 #include "../Common.h"
 
 
 namespace SoundLib{
 namespace Audio {
-
+/* Constructor / Destructor ------------------------------------------------------------------------- */
 WaveAudio::WaveAudio() : hMmio(nullptr), offset(0), dataSize(0), restSize(0), hasReadToEnd(false) {}
 
 WaveAudio::~WaveAudio() {
@@ -15,6 +20,7 @@ WaveAudio::~WaveAudio() {
 }
 
 
+/* Getters / Setters -------------------------------------------------------------------------------- */
 const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
@@ -40,6 +46,7 @@ bool WaveAudio::HasReadToEnd() const {
 }
 
 
+/* Public Functions  -------------------------------------------------------------------------------- */
 bool WaveAudio::Load(TString filePath) {
 	// Waveファイルオープン
 	this->hMmio = mmioOpen(const_cast<TCHAR*>(filePath.c_str()), nullptr, MMIO_READ);
