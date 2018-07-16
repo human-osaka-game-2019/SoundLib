@@ -16,7 +16,7 @@ AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) :
 }
 
 AudioHandler::~AudioHandler() {
-	this->Stop();
+	Stop();
 
 	if (this->pVoice != nullptr) {
 		this->pVoice->Stop();
@@ -135,7 +135,7 @@ void AudioHandler::Push() {
 		if (this->isLoopPlayback) {
 			this->pAudio->Reset();
 		} else {
-			this->Stop(false);
+			Stop(false);
 			if (this->pDelegate != nullptr) {
 				this->pDelegate->OnPlayedToEnd(this->name);
 				this->pDelegate = nullptr;
@@ -204,10 +204,12 @@ void AudioHandler::Stop(bool clearsCallback) {
 		delete this->pReadBuffers;
 		this->pReadBuffers = nullptr;
 	}
-	this->pVoice->FlushSourceBuffers();
+
+	if (!this->pAudio->HasReadToEnd()) {
+		this->pVoice->FlushSourceBuffers();
+	}
 
 	this->pAudio->Reset();
-
 	if (clearsCallback) {
 		this->pDelegate = nullptr;
 		this->onPlayedToEndCallback = nullptr;
