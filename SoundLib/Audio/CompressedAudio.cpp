@@ -60,18 +60,18 @@ bool CompressedAudio::HasReadToEnd() const {
 
 
 bool CompressedAudio::Load(TString filePath) {
-	char errDescription[500];
-	int ret = avformat_open_input(&this->pFormatContext, filePath.c_str(), nullptr, nullptr);
-	if (ret < 0) {
-		av_strerror(ret, errDescription, 500);
-		OutputDebugStringEx(_T("cannot open file. filename=%s, ret=%08x description=%s\n"), filePath.c_str(), AVERROR(ret), errDescription);
+	char pErrDescription[500];
+	int result = avformat_open_input(&this->pFormatContext, filePath.c_str(), nullptr, nullptr);
+	if (result < 0) {
+		av_strerror(result, pErrDescription, 500);
+		OutputDebugStringEx(_T("cannot open file. filename=%s, result=%08x description=%s\n"), filePath.c_str(), AVERROR(result), pErrDescription);
 		return false;
 	}
 
-	ret = avformat_find_stream_info(this->pFormatContext, nullptr);
-	if (ret < 0) {
-		av_strerror(ret, errDescription, 500);
-		OutputDebugStringEx(_T("avformat_find_stream_info error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+	result = avformat_find_stream_info(this->pFormatContext, nullptr);
+	if (result < 0) {
+		av_strerror(result, pErrDescription, 500);
+		OutputDebugStringEx(_T("avformat_find_stream_info error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 		return false;
 	}
 
@@ -111,10 +111,10 @@ bool CompressedAudio::Load(TString filePath) {
 	av_opt_set_int(this->pSwr, "out_sample_rate", 44100, 0);
 	av_opt_set_sample_fmt(this->pSwr, "in_sample_fmt", (AVSampleFormat)this->pAudioStream->codecpar->format, 0);
 	av_opt_set_sample_fmt(this->pSwr, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
-	ret = swr_init(this->pSwr);
-	if (ret < 0) {
-		av_strerror(ret, errDescription, 500);
-		OutputDebugStringEx(_T("swr_init error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+	result = swr_init(this->pSwr);
+	if (result < 0) {
+		av_strerror(result, pErrDescription, 500);
+		OutputDebugStringEx(_T("swr_init error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 		return false;
 	}
 
@@ -132,9 +132,9 @@ bool CompressedAudio::Load(TString filePath) {
 	return true;
 }
 
-long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
-	DWORD bufRead = 0;	// バッファを読み込んだサイズ
-	char errDescription[500];
+long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
+	long bufRead = 0;	// バッファを読み込んだサイズ
+	char pErrDescription[500];
 
 	// 前回バッファに詰め切れなかった分をまず移送
 	if (this->remainingConvertedBufSize > 0) {
@@ -145,18 +145,18 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 	}
 
 	while (bufSize > bufRead && !this->hasReadToEnd) {
-		int ret = av_read_frame(this->pFormatContext, this->pPacket);
-		if (ret < 0) {
-			if (ret == AVERROR_EOF) {
+		int result = av_read_frame(this->pFormatContext, this->pPacket);
+		if (result < 0) {
+			if (result == AVERROR_EOF) {
 				// flush decoder
-				if (ret = avcodec_send_packet(this->pCodecContext, nullptr) != 0) {
-					av_strerror(ret, errDescription, 500);
-					OutputDebugStringEx(_T("avcodec_send_packet error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+				if (result = avcodec_send_packet(this->pCodecContext, nullptr) != 0) {
+					av_strerror(result, pErrDescription, 500);
+					OutputDebugStringEx(_T("avcodec_send_packet error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 				}
 				this->hasReadToEnd = true;
 			} else {
-				av_strerror(ret, errDescription, 500);
-				OutputDebugStringEx(_T("av_read_frame eerror. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+				av_strerror(result, pErrDescription, 500);
+				OutputDebugStringEx(_T("av_read_frame eerror. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 				break;
 			}
 		}
@@ -167,24 +167,24 @@ long CompressedAudio::Read(BYTE* pBuffer, DWORD bufSize) {
 		}
 
 		// decode ES
-		if (!this->hasReadToEnd && (ret = avcodec_send_packet(this->pCodecContext, this->pPacket)) < 0) {
-			av_strerror(ret, errDescription, 500);
-			OutputDebugStringEx(_T("avcodec_send_packet error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+		if (!this->hasReadToEnd && (result = avcodec_send_packet(this->pCodecContext, this->pPacket)) < 0) {
+			av_strerror(result, pErrDescription, 500);
+			OutputDebugStringEx(_T("avcodec_send_packet error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 			break;
 		}
 
 		do {
-			ret = avcodec_receive_frame(this->pCodecContext, this->pFrame);
-			if (ret < 0) {
-				if (ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
-					av_strerror(ret, errDescription, 500);
-					OutputDebugStringEx(_T("avcodec_receive_frame error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+			result = avcodec_receive_frame(this->pCodecContext, this->pFrame);
+			if (result < 0) {
+				if (result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
+					av_strerror(result, pErrDescription, 500);
+					OutputDebugStringEx(_T("avcodec_receive_frame error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 				}
 				break;
 			}
 
 			// fltp PCMデータをs16 PCMデータに変換
-			int readSize = ConvertPcmFormat(pBuffer + bufRead, bufSize - bufRead);
+			long readSize = ConvertPcmFormat(pBuffer + bufRead, bufSize - bufRead);
 			bufRead += readSize;
 		} while (bufSize > bufRead);
 
@@ -203,9 +203,9 @@ void CompressedAudio::Reset() {
 	// 読み込み位置を最初に戻す
 	int result = av_seek_frame(this->pFormatContext, this->pAudioStream->index, 0, AVSEEK_FLAG_BACKWARD);
 	if (result < 0) {
-		char errDescription[500];
-		av_strerror(result, errDescription, 500);
-		OutputDebugStringEx(_T("av_seek_frame error. ret=%08x description=%s\n"), AVERROR(result), errDescription);
+		char pErrDescription[500];
+		av_strerror(result, pErrDescription, 500);
+		OutputDebugStringEx(_T("av_seek_frame error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 	}
 
 	if (this->remainingConvertedBufSize > 0) {
@@ -222,7 +222,7 @@ void CompressedAudio::Reset() {
 
 
 bool CompressedAudio::CreateCodecContext() {
-	char errDescription[500];
+	char pErrDescription[500];
 
 	avcodec_free_context(&this->pCodecContext);
 	this->pCodecContext = avcodec_alloc_context3(this->pCodec);
@@ -231,35 +231,35 @@ bool CompressedAudio::CreateCodecContext() {
 		return false;
 	}
 
-	int ret = avcodec_parameters_to_context(this->pCodecContext, this->pAudioStream->codecpar);
-	if (ret < 0) {
-		av_strerror(ret, errDescription, 500);
-		OutputDebugStringEx(_T("avcodec_parameters_to_context error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+	int result = avcodec_parameters_to_context(this->pCodecContext, this->pAudioStream->codecpar);
+	if (result < 0) {
+		av_strerror(result, pErrDescription, 500);
+		OutputDebugStringEx(_T("avcodec_parameters_to_context error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 		return false;
 	}
 
-	ret = avcodec_open2(this->pCodecContext, this->pCodec, nullptr);
-	if (ret < 0) {
-		av_strerror(ret, errDescription, 500);
-		OutputDebugStringEx(_T("avcodec_open2 error. ret=%08x description=%s\n"), AVERROR(ret), errDescription);
+	result = avcodec_open2(this->pCodecContext, this->pCodec, nullptr);
+	if (result < 0) {
+		av_strerror(result, pErrDescription, 500);
+		OutputDebugStringEx(_T("avcodec_open2 error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
 		return false;
 	}
 
 	return true;
 }
 
-int CompressedAudio::ConvertPcmFormat(BYTE* pBuffer, DWORD bufSize) {
-	int copyableSize = 0;
-	char errDescription[500];
+long CompressedAudio::ConvertPcmFormat(BYTE* pBuffer, long bufSize) {
+	long copyableSize = 0;
+	char pErrDescription[500];
 
 	int convertableByteSize = this->pFrame->nb_samples * this->waveFormatEx.nChannels * (16 / 8);
 	BYTE* pSwrBuf = new BYTE[convertableByteSize];
 	int readCount = swr_convert(this->pSwr, &pSwrBuf, this->pFrame->nb_samples, (const uint8_t**)this->pFrame->extended_data, this->pFrame->nb_samples);
 	if (readCount < 0) {
-		av_strerror(readCount, errDescription, 500);
-		OutputDebugStringEx(_T("swr_convert error. ret=%08x description=%s\n"), AVERROR(readCount), errDescription);
+		av_strerror(readCount, pErrDescription, 500);
+		OutputDebugStringEx(_T("swr_convert error. result=%08x description=%s\n"), AVERROR(readCount), pErrDescription);
 	} else {
-		int readSize = readCount * this->waveFormatEx.nChannels * (16 / 8);
+		long readSize = readCount * this->waveFormatEx.nChannels * (16 / 8);
 		copyableSize = bufSize > readSize ? readSize : bufSize;
 		memcpy(pBuffer, pSwrBuf, copyableSize);
 

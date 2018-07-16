@@ -57,11 +57,11 @@ bool SoundsManager::SetVolume(const TCHAR* pKey, uint8_t volume) {
 		return false;
 	}
 
-	if (volume > 100.0) {
+	if (volume > 100) {
 		// 音源以上のボリューム設定は不可
 		volume = 100;
 	}
-	float centiVolume = volume / 100.0;
+	float centiVolume = volume / 100.0f;
 	return this->audioMap[pKey]->SetVolume(centiVolume);
 }
 

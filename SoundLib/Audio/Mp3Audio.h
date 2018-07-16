@@ -25,7 +25,7 @@ public:
 	Mp3Audio& operator=(Mp3Audio&&) = default;
 
 	bool Load(TString filePath);
-	long Read(BYTE* pBuffer, DWORD bufSize);
+	long Read(BYTE* pBuffer, long bufSize);
 	void Reset();
 
 private:

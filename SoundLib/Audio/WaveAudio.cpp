@@ -99,7 +99,7 @@ bool WaveAudio::Load(TString filePath) {
 	return true;
 }
 
-long WaveAudio::Read(BYTE* pBuffer, DWORD bufSize) {
+long WaveAudio::Read(BYTE* pBuffer, long bufSize) {
 	long readSize = 0;
 	/*
 	 * バッファサイズとファイルの残りサイズのうち小さい方を読み出しサイズとして設定する。

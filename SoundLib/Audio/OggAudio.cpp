@@ -62,8 +62,8 @@ bool OggAudio::Load(TString filePath) {
 	return true;
 }
 
-long OggAudio::Read(BYTE* pBuffer, DWORD bufSize) {
-	DWORD bufRead = 0;	// バッファを読み込んだサイズ
+long OggAudio::Read(BYTE* pBuffer, long bufSize) {
+	long bufRead = 0;	// バッファを読み込んだサイズ
 
 	while (bufRead < bufSize) {
 		long readSize = ov_read(&this->ovf, (char*)(pBuffer + bufRead), bufSize - bufRead, 0, 2, 1, nullptr);

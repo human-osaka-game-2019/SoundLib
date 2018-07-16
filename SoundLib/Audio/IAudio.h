@@ -22,7 +22,7 @@ public:
 	virtual bool HasReadToEnd() const = 0;
 
 	virtual bool Load(TString filePath) = 0;
-	virtual long Read(BYTE* pBuffer, DWORD bufSize) = 0;
+	virtual long Read(BYTE* pBuffer, long bufSize) = 0;
 	virtual void Reset() = 0;
 };
 

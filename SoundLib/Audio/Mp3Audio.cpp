@@ -4,7 +4,7 @@
 
 namespace {
 // ビットレートのテーブル
-const WORD BIT_RATE_TABLE[][16] = {
+const int BIT_RATE_TABLE[][16] = {
 	// MPEG1, Layer1
 	{ 0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,-1 },
 	// MPEG1, Layer2
@@ -18,7 +18,7 @@ const WORD BIT_RATE_TABLE[][16] = {
 };
 
 // サンプリングレートのテーブル
-const WORD SAMPLE_RATE_TABLE[][4] = {
+const int SAMPLE_RATE_TABLE[][4] = {
 	{ 44100, 48000, 32000, -1 }, // MPEG1
 	{ 22050, 24000, 16000, -1 }, // MPEG2
 	{ 11025, 12000, 8000, -1 } // MPEG2.5
@@ -170,7 +170,7 @@ bool Mp3Audio::Load(TString filePath) {
 	return true;
 }
 
-long Mp3Audio::Read(BYTE* pBuffer, DWORD bufSize) {
+long Mp3Audio::Read(BYTE* pBuffer, long bufSize) {
 	// WAV変換後サイズに対応する変換前サイズ取得
 	DWORD mp3Bytes;
 	acmStreamSize(this->has, bufSize, &mp3Bytes, ACM_STREAMSIZEF_DESTINATION);

@@ -27,7 +27,7 @@ public:
 	CompressedAudio& operator=(CompressedAudio&&) = default;
 
 	bool Load(TString filePath);
-	long Read(BYTE* pBuffer, DWORD bufSize);
+	long Read(BYTE* pBuffer, long bufSize);
 	void Reset();
 
 private:
@@ -47,7 +47,7 @@ private:
 	CompressedAudio& operator=(const CompressedAudio&) = delete;
 
 	bool CreateCodecContext();
-	int ConvertPcmFormat(BYTE* pBuffer, DWORD bufSize);
+	long ConvertPcmFormat(BYTE* pBuffer, long bufSize);
 };
 
 }
