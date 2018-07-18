@@ -12,7 +12,7 @@ static void OnPlayedToEnd(const TCHAR* pKey);
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
 	// メモリリークチェック
 	::_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
-	
+
 	const TCHAR* filePath1 = _T("Resources\\toujyo.wav");
 	const TCHAR* filePath2 = _T("Resources\\musicbox.mp3");
 	const TCHAR* filePath3 = _T("Resources\\jump03.mp3");
@@ -23,7 +23,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 
 	soundsManager.Initialize();
-	
+
 	// Waveファイルオープン
 	if (!soundsManager.AddFile(filePath1, _T("wav"))) {
 		return -1;
@@ -67,7 +67,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
 
 	const TCHAR* pChanginVolumeKey = _T("ogg");
-	for (int i = 100; i > 0; i-=5) {
+	for (int i = 100; i > 0; i -= 5) {
 		soundsManager.SetVolume(pChanginVolumeKey, i);
 		OutputDebugStringEx(_T("Volume of the %s is %d\n"), pChanginVolumeKey, soundsManager.GetVolume(pChanginVolumeKey));
 		Sleep(100);
@@ -75,7 +75,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	Sleep(1000);
 
-	for (int i = 5; i <= 100; i+=5) {
+	for (int i = 5; i <= 100; i += 5) {
 		soundsManager.SetVolume(pChanginVolumeKey, i);
 		OutputDebugStringEx(_T("Volume of the %s is %d\n"), pChanginVolumeKey, soundsManager.GetVolume(pChanginVolumeKey));
 		Sleep(100);
@@ -85,6 +85,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		soundsManager.Start(_T("mp3SE"));
 		Sleep(1500);
 	}
+
+	soundsManager.SetFrequencyRatio(pChanginVolumeKey, 0.5f);
+	Sleep(1000);
+	OutputDebugStringEx(_T("FrequencyRatio of the %s is %f\n"), pChanginVolumeKey, soundsManager.GetFrequencyRatio(pChanginVolumeKey));
+	Sleep(1000);
+
+	soundsManager.SetFrequencyRatio(pChanginVolumeKey, 2.0f);
+	Sleep(1000);
+	OutputDebugStringEx(_T("FrequencyRatio of the %s is %f\n"), pChanginVolumeKey, soundsManager.GetFrequencyRatio(pChanginVolumeKey));
+	Sleep(1000);
 
 	Sleep(1000);
 	soundsManager.Pause(_T("aac"));
@@ -103,7 +113,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//soundsManager.Start(_T("aac"), OnPlayedToEnd);
 	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
 
-	Sleep(120000);
+	while (true){
+		Sleep(120000);
+	}
 
 	return 0;
 }

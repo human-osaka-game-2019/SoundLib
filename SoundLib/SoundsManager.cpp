@@ -72,6 +72,23 @@ bool SoundsManager::SetVolume(const TCHAR* pKey, uint8_t volume) {
 	return this->audioMap[pKey]->SetVolume(centiVolume);
 }
 
+float SoundsManager::GetFrequencyRatio(const TCHAR* pKey) const {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
+		return 0;
+	}
+
+	return this->audioMap.at(pKey)->GetFrequencyRatio();
+}
+
+bool SoundsManager::SetFrequencyRatio(const TCHAR* pKey, float ratio) {
+	if (!ExistsKey(pKey)) {
+		OutputDebugStringEx(_T("キー%sは存在しません。\n"), pKey);
+		return 0;
+	}
+
+	return this->audioMap[pKey]->SetFrequencyRatio(ratio);
+}
 
 /* Public Functions  -------------------------------------------------------------------------------- */
 bool SoundsManager::Initialize() {

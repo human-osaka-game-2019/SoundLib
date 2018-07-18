@@ -63,6 +63,36 @@ public:
 	/// <returns>成否</returns>
 	bool SetVolume(const TCHAR* pKey, uint8_t volume);
 
+	/// <summary>
+	/// 再生速度とピッチの変化率を取得する。
+	/// </summary>
+	/// <param name="pKey">音声ファイルを識別するキー</param>
+	/// <returns>音源からの変化率</returns>
+	/// <remarks>
+	/// 1.0の場合、音源から変化なし。
+	/// 2.0の場合、再生速度2倍で1オクターブ高音。
+	/// 0.5の場合、再生速度1/2で1オクターブ低音。
+	/// </remarks>
+	/// <seealso cref="IXAudio2SourceVoice::GetFrequencyRatio()"/>
+	float GetFrequencyRatio(const TCHAR* pKey) const;
+
+	/// <summary>
+	/// 再生速度とピッチの変化率を設定する。
+	/// </summary>
+	/// <param name="pKey">音声ファイルを識別するキー</param>
+	/// <param name="ratio">音源からの変化率</param>
+	/// <returns>成否</returns>
+	/// <remarks>
+	/// <para>
+	/// 1.0の場合、音源から変化なし。
+	/// 2.0の場合、再生速度2倍で1オクターブ高音。
+	/// 0.5の場合、再生速度1/2で1オクターブ低音。
+	/// </para>
+	/// <para>設定可能最大値は<see cref="AudioHandler::MAX_FREQENCY_RATIO"/>。</para>
+	/// </remarks>
+	/// <seealso cref="IXAudio2SourceVoice::SetFrequencyRatio(float, UINT32)"/>
+	bool SetFrequencyRatio(const TCHAR* pKey, float ratio);
+
 	/* Operator Overloads ------------------------------------------------------------------------------- */
 	/// <summary>
 	/// ムーブ代入演算子のオーバーロード

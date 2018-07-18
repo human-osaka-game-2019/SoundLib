@@ -74,11 +74,39 @@ public:
 	/// <returns>成否</returns>
 	bool SetVolume(float volume);
 
+	/// <summary>
+	/// 再生速度とピッチの変化率を取得する。
+	/// </summary>
+	/// <returns>音源からの変化率</returns>
+	/// <remarks>
+	/// 1.0の場合、音源から変化なし。
+	/// 2.0の場合、再生速度2倍で1オクターブ高音。
+	/// 0.5の場合、再生速度1/2で1オクターブ低音。
+	/// </remarks>
+	/// <seealso cref="IXAudio2SourceVoice::GetFrequencyRatio()"/>
+	float GetFrequencyRatio() const;
+
+	/// <summary>
+	/// 再生速度とピッチの変化率を設定する。
+	/// </summary>
+	/// <param name="ratio">音源からの変化率</param>
+	/// <returns>成否</returns>
+	/// <remarks>
+	/// <para>
+	/// 1.0の場合、音源から変化なし。
+	/// 2.0の場合、再生速度2倍で1オクターブ高音。
+	/// 0.5の場合、再生速度1/2で1オクターブ低音。
+	/// </para>
+	/// <para>設定可能最大値は<see cref="MAX_FREQENCY_RATIO"/>。</para>
+	/// </remarks>
+	/// <seealso cref="IXAudio2SourceVoice::SetFrequencyRatio(float, UINT32)"/>
+	bool SetFrequencyRatio(float ratio);
+
 	/* Operator Overloads ------------------------------------------------------------------------------- */
 	/// <summary>
 	/// ムーブ代入演算子のオーバーロード
 	/// </summary>
-	/// <param name="obj">ムーブ対象おオブジェクト</param>
+	/// <param name="obj">ムーブ対象オブジェクト</param>
 	/// <returns>ムーブ後のオブジェクト</returns>
 	AudioHandler& operator=(AudioHandler&& obj) = default;
 
@@ -133,6 +161,9 @@ public:
 private:
 	/* Constants ---------------------------------------------------------------------------------------- */
 	static const int BUF_COUNT = 2;
+
+	/// <summary><see cref="SetFrequencyRatio(float)"/>で設定可能な最大比率</summary>
+	static const int MAX_FREQENCY_RATIO = 4;
 
 	/* Variables ---------------------------------------------------------------------------------------- */
 	TString name;

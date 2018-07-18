@@ -59,10 +59,25 @@ bool AudioHandler::SetVolume(float volume) {
 	return true;
 }
 
+float AudioHandler::GetFrequencyRatio() const {
+	float ratio;
+	this->pVoice->GetFrequencyRatio(&ratio);
+	return ratio;
+}
+
+bool AudioHandler::SetFrequencyRatio(float ratio) {
+	HRESULT result = this->pVoice->SetFrequencyRatio(ratio);
+	if (FAILED(result)) {
+		OutputDebugStringEx(_T("error SetFrequencyRatio resule=%d\n"), result);
+		return false;
+	}
+	return true;
+}
+
 
 /* Public Functions  -------------------------------------------------------------------------------- */
 bool AudioHandler::Prepare(IXAudio2& rXAudio2) {
-	HRESULT ret = rXAudio2.CreateSourceVoice(&this->pVoice, this->pAudio->GetWaveFormatEx(), 0, XAUDIO2_DEFAULT_FREQ_RATIO, this->pVoiceCallback);
+	HRESULT ret = rXAudio2.CreateSourceVoice(&this->pVoice, this->pAudio->GetWaveFormatEx(), 0, static_cast<float>(MAX_FREQENCY_RATIO), this->pVoiceCallback);
 	if (FAILED(ret)) {
 		OutputDebugStringEx(_T("error CreateSourceVoice ret=%d\n"), ret);
 		return false;
