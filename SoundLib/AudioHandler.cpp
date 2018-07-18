@@ -159,7 +159,11 @@ void AudioHandler::Push() {
 			Push();
 		} else {
 			// エラー発生による停止
-			this->Stop(true);
+			//this->Stop(true);
+
+			// ファイル形式によりデコード不要なデータをデコードしてエラーとなるパターンがあるので
+			// エラーが発生した場合も続きから読み込み直す
+			Push();
 		}
 		return;
 	}
