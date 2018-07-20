@@ -25,10 +25,9 @@ CompressedAudio::CompressedAudio() : pFormatContext(nullptr),
 									 remainingConvertedBufSize(0) {}
 
 CompressedAudio::~CompressedAudio() {
-	if (this->remainingConvertedBufSize > 0) {
-		delete[] this->pRemainingConvertedBuf;
-		this->remainingConvertedBufSize = 0;
-	}
+	delete[] this->pRemainingConvertedBuf;
+	this->pRemainingConvertedBuf = nullptr;
+	this->remainingConvertedBufSize = 0;
 
 	av_frame_free(&this->pFrame);
 	av_packet_free(&this->pPacket);
@@ -140,18 +139,18 @@ bool CompressedAudio::Load(TString filePath) {
 }
 
 long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
-	long bufRead = 0;	// バッファを読み込んだサイズ
+	long filledLength = 0;
 	char pErrDescription[500];
 
 	// 前回バッファに詰め切れなかった分をまず移送
 	if (this->remainingConvertedBufSize > 0) {
 		memcpy(pBuffer, this->pRemainingConvertedBuf, this->remainingConvertedBufSize);
-		bufRead += this->remainingConvertedBufSize;
+		filledLength += this->remainingConvertedBufSize;
 		this->remainingConvertedBufSize = 0;
 		delete[] this->pRemainingConvertedBuf;
 	}
 
-	while (bufSize > bufRead && !this->hasReadToEnd) {
+	while (bufSize > filledLength && !this->hasReadToEnd) {
 		int result = av_read_frame(this->pFormatContext, this->pPacket);
 		if (result < 0) {
 			if (result == AVERROR_EOF) {
@@ -191,9 +190,9 @@ long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
 			}
 
 			// fltp PCMデータをs16 PCMデータに変換
-			long readSize = ConvertPcmFormat(pBuffer + bufRead, bufSize - bufRead);
-			bufRead += readSize;
-		} while (bufSize > bufRead);
+			long readSize = ConvertPcmFormat(pBuffer + filledLength, bufSize - filledLength);
+			filledLength += readSize;
+		} while (bufSize > filledLength);
 
 		av_packet_unref(this->pPacket);
 	}
@@ -203,7 +202,7 @@ long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
 
 	av_packet_unref(this->pPacket);
 	
-	return bufRead;
+	return filledLength;
 }
 
 void CompressedAudio::Reset() {
@@ -228,6 +227,7 @@ void CompressedAudio::Reset() {
 }
 
 
+/* Private Functions  ------------------------------------------------------------------------------- */
 bool CompressedAudio::CreateCodecContext() {
 	char pErrDescription[500];
 
@@ -255,8 +255,6 @@ bool CompressedAudio::CreateCodecContext() {
 	return true;
 }
 
-
-/* Private Functions  ------------------------------------------------------------------------------- */
 long CompressedAudio::ConvertPcmFormat(BYTE* pBuffer, long bufSize) {
 	long copyableSize = 0;
 	char pErrDescription[500];

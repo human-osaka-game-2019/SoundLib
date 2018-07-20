@@ -18,6 +18,7 @@ SoundsManager::SoundsManager() : pXAudio2(nullptr) {}
 SoundsManager::~SoundsManager() {
 	for (auto& rAudioPair : this->audioMap) {
 		delete rAudioPair.second;
+		rAudioPair.second = nullptr;
 	}
 	this->audioMap.clear();
 

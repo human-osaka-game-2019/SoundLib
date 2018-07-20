@@ -115,7 +115,7 @@ private:
 	int bitsPerSample;
 	WORD sampleRate;
 	WAVEFORMATEX waveFormatEx;
-	ACMSTREAMHEADER* pAsh;
+	ACMSTREAMHEADER ash;
 	HACMSTREAM has;
 	bool hasReadToEnd;
 

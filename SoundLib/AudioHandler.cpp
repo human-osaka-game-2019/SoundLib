@@ -14,7 +14,6 @@ AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) :
 	name(name), 
 	pAudio(pAudio), 
 	pVoice(nullptr), 
-	pReadBuffers(nullptr), 
 	pDelegate(nullptr), 
 	onPlayedToEndCallback(nullptr), 
 	status(PlayingStatus::Stopped) {
@@ -26,23 +25,19 @@ AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) :
 AudioHandler::~AudioHandler() {
 	Stop();
 
-	if (this->pReadBuffers != nullptr) {
-		delete[] this->pReadBuffers;
-		this->pReadBuffers = nullptr;
-	}
-
 	if (this->pVoice != nullptr) {
-		this->pVoice->Stop();
 		this->pVoice->DestroyVoice();
 		this->pVoice = nullptr;
 	}
 
-	if (this->pAudio != nullptr) {
-		delete this->pAudio;
-		this->pAudio = nullptr;
-	}
+	delete this->pAudio;
+	this->pAudio = nullptr;
 
 	delete this->pVoiceCallback;
+	this->pVoiceCallback = nullptr;
+
+	delete[] this->pReadBuffers;
+	this->pReadBuffers = nullptr;
 }
 
 
@@ -221,10 +216,8 @@ void AudioHandler::Stop(bool clearsCallback) {
 	this->status = PlayingStatus::Stopped;
 
 	for (int i = 0; i < BUF_COUNT; i++) {
-		if (this->pReadBuffers[i] != nullptr) {
-			delete[] this->pReadBuffers[i];
-			this->pReadBuffers[i] = nullptr;
-		}
+		delete[] this->pReadBuffers[i];
+		this->pReadBuffers[i] = nullptr;
 	}
 
 	if (!this->pAudio->HasReadToEnd()) {
