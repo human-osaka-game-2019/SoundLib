@@ -66,8 +66,8 @@ const WAVEFORMATEX* Mp3Audio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
 
-TString Mp3Audio::GetFormatName() const {
-	return _T("mp3");
+std::string Mp3Audio::GetFormatName() const {
+	return "mp3";
 }
 
 int Mp3Audio::GetChannelCount() const {
@@ -88,9 +88,9 @@ bool Mp3Audio::HasReadToEnd() const {
 
 
 /* Public Functions  -------------------------------------------------------------------------------- */
-bool Mp3Audio::Load(TString filePath) {
+bool Mp3Audio::Load(std::string filePath) {
 	// ファイルを開く
-	this->hFile = CreateFile(
+	this->hFile = CreateFileA(
 		filePath.c_str(),
 		GENERIC_READ,
 		0,

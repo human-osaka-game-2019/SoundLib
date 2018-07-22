@@ -33,6 +33,7 @@ enum PlayingStatus {
 /// <summary>
 /// オーディオデータ操作クラス
 /// </summary>
+template <typename T>
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
 	/* Constructor / Destructor ------------------------------------------------------------------------- */
@@ -41,13 +42,13 @@ public:
 	/// </summary>
 	/// <param name="name">音声データの識別に使用する名前</param>
 	/// <param name="pAudio">オーディオファイルデコードクラスのインスタンス</param>
-	AudioHandler(TString name, Audio::IAudio* pAudio);
+	AudioHandler(std::basic_string<T> name, Audio::IAudio* pAudio);
 
 	/// <summary>
 	/// ムーブコンストラクタ
 	/// </summary>
 	/// <param name="obj">ムーブ対象オブジェクト</param>
-	AudioHandler(AudioHandler&& obj) = default;
+	AudioHandler(AudioHandler<T>&& obj) = default;
 
 	/// <summary>
 	/// デストラクタ
@@ -108,7 +109,7 @@ public:
 	/// </summary>
 	/// <param name="obj">ムーブ対象オブジェクト</param>
 	/// <returns>ムーブ後のオブジェクト</returns>
-	AudioHandler& operator=(AudioHandler&& obj) = default;
+	AudioHandler<T>& operator=(AudioHandler<T>&& obj) = default;
 
 	/* Functions ---------------------------------------------------------------------------------------- */
 	/// <summary>
@@ -129,14 +130,14 @@ public:
 	/// </summary>
 	/// <param name="pDelegate">最後まで再生完了後に呼び出すコールバック関数を定義したオブジェクト</param>
 	/// <remarks>C++から設定する場合用</remarks>
-	void Start(IAudioHandlerDelegate* pDelegate);
+	void Start(IAudioHandlerDelegate<T>* pDelegate);
 
 	/// <summary>
 	/// ファイルの先頭から再生を行う。
 	/// </summary>
 	/// <param name="onPlayedToEndCallback">最後まで再生完了後に呼び出すコールバック関数</param>
 	/// <remarks>C言語から設定する場合用</remarks>
-	void Start(void(*onPlayedToEndCallback)(const TCHAR* pName));
+	void Start(void(*onPlayedToEndCallback)(const T* pName));
 
 	/// <summary>
 	/// 再生を停止する。
@@ -166,8 +167,8 @@ private:
 	static const int MAX_FREQENCY_RATIO = 4;
 
 	/* Variables ---------------------------------------------------------------------------------------- */
-	TString name;
-	Audio::IAudio * pAudio;
+	std::basic_string<T> name;
+	Audio::IAudio* pAudio;
 	IXAudio2SourceVoice* pVoice;
 	VoiceCallback* pVoiceCallback;
 	XAUDIO2_BUFFER xAudioBuffer;
@@ -175,15 +176,15 @@ private:
 	int bufferSize;
 	int currentBufNum;
 	bool isLoopPlayback;
-	IAudioHandlerDelegate* pDelegate;
-	void(*onPlayedToEndCallback)(const TCHAR* pName);
+	IAudioHandlerDelegate<T>* pDelegate;
+	void(*onPlayedToEndCallback)(const T* pName);
 	PlayingStatus status;
 
 	/* Constructor / Destructor ------------------------------------------------------------------------- */
-	AudioHandler(const AudioHandler&) = delete;
+	AudioHandler(const AudioHandler<T>&) = delete;
 
 	/* Operator Overloads ------------------------------------------------------------------------------- */
-	AudioHandler& operator=(const AudioHandler&) = delete;
+	AudioHandler<T>& operator=(const AudioHandler<T>&) = delete;
 
 	/* Functions ---------------------------------------------------------------------------------------- */
 	void Push();

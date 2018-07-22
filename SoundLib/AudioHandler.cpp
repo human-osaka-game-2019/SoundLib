@@ -10,7 +10,8 @@
 
 namespace SoundLib {
 /* Constructor / Destructor ------------------------------------------------------------------------- */
-AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) : 
+template <typename T>
+AudioHandler<T>::AudioHandler(std::basic_string<T> name, Audio::IAudio* pAudio) :
 	name(name), 
 	pAudio(pAudio), 
 	pVoice(nullptr), 
@@ -22,7 +23,8 @@ AudioHandler::AudioHandler(TString name, Audio::IAudio* pAudio) :
 		this->pReadBuffers = new BYTE*[BUF_COUNT];
 }
 
-AudioHandler::~AudioHandler() {
+template <typename T>
+AudioHandler<T>::~AudioHandler() {
 	Stop();
 
 	if (this->pVoice != nullptr) {
@@ -40,54 +42,59 @@ AudioHandler::~AudioHandler() {
 	this->pReadBuffers = nullptr;
 }
 
-
 /* Getters / Setters -------------------------------------------------------------------------------- */
-PlayingStatus AudioHandler::GetStatus() const{
+template <typename T>
+PlayingStatus AudioHandler<T>::GetStatus() const{
 	return this->status;
 }
 
-float AudioHandler::GetVolume() const {
+template <typename T>
+float AudioHandler<T>::GetVolume() const {
 	float volume;
 	this->pVoice->GetVolume(&volume);
 	return volume;
 }
 
-bool AudioHandler::SetVolume(float volume) {
+template <typename T>
+bool AudioHandler<T>::SetVolume(float volume) {
 	HRESULT result = this->pVoice->SetVolume(volume);
 	if (FAILED(result)) {
-		OutputDebugStringEx(_T("error SetVolume resule=%d\n"), result);
+		OutputDebugStringEx("error SetVolume resule=%d\n", result);
 		return false;
 	}
 	return true;
 }
 
-float AudioHandler::GetFrequencyRatio() const {
+template <typename T>
+float AudioHandler<T>::GetFrequencyRatio() const {
 	float ratio;
 	this->pVoice->GetFrequencyRatio(&ratio);
 	return ratio;
 }
 
-bool AudioHandler::SetFrequencyRatio(float ratio) {
+template <typename T>
+bool AudioHandler<T>::SetFrequencyRatio(float ratio) {
 	HRESULT result = this->pVoice->SetFrequencyRatio(ratio);
 	if (FAILED(result)) {
-		OutputDebugStringEx(_T("error SetFrequencyRatio resule=%d\n"), result);
+		OutputDebugStringEx("error SetFrequencyRatio resule=%d\n", result);
 		return false;
 	}
 	return true;
 }
-
 
 /* Public Functions  -------------------------------------------------------------------------------- */
-bool AudioHandler::Prepare(IXAudio2& rXAudio2) {
+template <typename T>
+bool AudioHandler<T>::Prepare(IXAudio2& rXAudio2) {
 	HRESULT ret = rXAudio2.CreateSourceVoice(&this->pVoice, this->pAudio->GetWaveFormatEx(), 0, static_cast<float>(MAX_FREQENCY_RATIO), this->pVoiceCallback);
 	if (FAILED(ret)) {
-		OutputDebugStringEx(_T("error CreateSourceVoice ret=%d\n"), ret);
+		OutputDebugStringEx("error CreateSourceVoice ret=%d\n", ret);
 		return false;
 	}
 	return true;
 }
 
-void AudioHandler::Start(bool isLoopPlayback) {
+template <typename T>
+void AudioHandler<T>::Start(bool isLoopPlayback) {
 	if (this->status == PlayingStatus::Pausing) {
 		Stop(true);
 	}
@@ -97,7 +104,8 @@ void AudioHandler::Start(bool isLoopPlayback) {
 	}
 }
 
-void AudioHandler::Start(IAudioHandlerDelegate* pDelegate) {
+template <typename T>
+void AudioHandler<T>::Start(IAudioHandlerDelegate<T>* pDelegate) {
 	if(this->status == PlayingStatus::Pausing) {
 		Stop(true);
 	}
@@ -108,7 +116,8 @@ void AudioHandler::Start(IAudioHandlerDelegate* pDelegate) {
 	}
 }
 
-void AudioHandler::Start(void(*onPlayedToEndCallback)(const TCHAR* pName)) {
+template <typename T>
+void AudioHandler<T>::Start(void(*onPlayedToEndCallback)(const T* pName)) {
 	if(this->status == PlayingStatus::Pausing) {
 		Stop(true);
 	}
@@ -119,33 +128,37 @@ void AudioHandler::Start(void(*onPlayedToEndCallback)(const TCHAR* pName)) {
 	}
 }
 
-void AudioHandler::Stop() {
+template <typename T>
+void AudioHandler<T>::Stop() {
 	if (this->status == PlayingStatus::Playing) {
 		Stop(true);
 	}
 }
 
-void AudioHandler::Pause() {
+template <typename T>
+void AudioHandler<T>::Pause() {
 	if (this->status == PlayingStatus::Playing) {
 		this->pVoice->Stop();
 		this->status = PlayingStatus::Pausing;
 	}
 }
 
-void AudioHandler::Resume() {
+template <typename T>
+void AudioHandler<T>::Resume() {
 	if (this->status == PlayingStatus::Pausing) {
 		this->status = PlayingStatus::Playing;
 		this->pVoice->Start();
 	}
 }
 
-void AudioHandler::BufferEndCallback() {
+template <typename T>
+void AudioHandler<T>::BufferEndCallback() {
 	Push();
 }
 
-
 /* Private Functions  ------------------------------------------------------------------------------- */
-void AudioHandler::Push() {
+template <typename T>
+void AudioHandler<T>::Push() {
 	if (this->status == PlayingStatus::Stopped) {
 		return;
 	}
@@ -189,7 +202,7 @@ void AudioHandler::Push() {
 	this->xAudioBuffer.pAudioData = this->pReadBuffers[this->currentBufNum];
 	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
 	if (FAILED(ret)) {
-		OutputDebugStringEx(_T("error SubmitSourceBuffer HRESULT=%d\n"), ret);
+		OutputDebugStringEx("error SubmitSourceBuffer HRESULT=%d\n", ret);
 		return;
 	}
 
@@ -198,7 +211,8 @@ void AudioHandler::Push() {
 	}
 }
 
-void AudioHandler::Start() {
+template <typename T>
+void AudioHandler<T>::Start() {
 	this->xAudioBuffer.Flags = 0;
 	this->bufferSize = this->pAudio->GetWaveFormatEx()->nAvgBytesPerSec;
 	for (int i = 0; i < BUF_COUNT; ++i) {
@@ -211,7 +225,8 @@ void AudioHandler::Start() {
 	this->pVoice->Start();
 }
 
-void AudioHandler::Stop(bool clearsCallback) {
+template <typename T>
+void AudioHandler<T>::Stop(bool clearsCallback) {
 	this->pVoice->Stop();
 	this->status = PlayingStatus::Stopped;
 
@@ -230,4 +245,8 @@ void AudioHandler::Stop(bool clearsCallback) {
 		this->onPlayedToEndCallback = nullptr;
 	}
 }
+
+template class AudioHandler<char>;
+template class AudioHandler<wchar_t>;
+
 }

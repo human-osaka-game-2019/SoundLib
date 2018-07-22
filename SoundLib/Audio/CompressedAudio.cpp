@@ -43,8 +43,8 @@ const WAVEFORMATEX* CompressedAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
 
-TString CompressedAudio::GetFormatName() const {
-	return TString(this->pCodecContext->codec->long_name);
+std::string CompressedAudio::GetFormatName() const {
+	return this->pCodecContext->codec->long_name;
 }
 
 int CompressedAudio::GetChannelCount() const {
@@ -65,19 +65,19 @@ bool CompressedAudio::HasReadToEnd() const {
 
 
 /* Public Functions  -------------------------------------------------------------------------------- */
-bool CompressedAudio::Load(TString filePath) {
+bool CompressedAudio::Load(std::string filePath) {
 	char pErrDescription[500];
 	int result = avformat_open_input(&this->pFormatContext, filePath.c_str(), nullptr, nullptr);
 	if (result < 0) {
 		av_strerror(result, pErrDescription, 500);
-		OutputDebugStringEx(_T("cannot open file. filename=%s, result=%08x description=%s\n"), filePath.c_str(), AVERROR(result), pErrDescription);
+		OutputDebugStringEx("cannot open file. filename=%s, result=%08x description=%s\n", filePath.c_str(), AVERROR(result), pErrDescription);
 		return false;
 	}
 
 	result = avformat_find_stream_info(this->pFormatContext, nullptr);
 	if (result < 0) {
 		av_strerror(result, pErrDescription, 500);
-		OutputDebugStringEx(_T("avformat_find_stream_info error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+		OutputDebugStringEx("avformat_find_stream_info error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 		return false;
 	}
 
@@ -88,13 +88,13 @@ bool CompressedAudio::Load(TString filePath) {
 		}
 	}
 	if (this->pAudioStream == nullptr) {
-		OutputDebugStringEx(_T("stream not found. filename=%s\n"), filePath.c_str());
+		OutputDebugStringEx("stream not found. filename=%s\n", filePath.c_str());
 		return false;
 	}
 
 	this->pCodec = avcodec_find_decoder(this->pAudioStream->codecpar->codec_id);
 	if (this->pCodec == nullptr) {
-		OutputDebugStringEx(_T("avcodec_find_decoder codec not found. codec_id=%d\n"), this->pAudioStream->codecpar->codec_id);
+		OutputDebugStringEx("avcodec_find_decoder codec not found. codec_id=%d\n", this->pAudioStream->codecpar->codec_id);
 		return false;
 	}
 
@@ -104,7 +104,7 @@ bool CompressedAudio::Load(TString filePath) {
 
 	this->pSwr = swr_alloc();
 	if (pSwr == nullptr) {
-		OutputDebugStringEx(_T("swr_alloc error.\n"));
+		OutputDebugStringEx("swr_alloc error.\n");
 		return false;
 	}
 
@@ -120,7 +120,7 @@ bool CompressedAudio::Load(TString filePath) {
 	result = swr_init(this->pSwr);
 	if (result < 0) {
 		av_strerror(result, pErrDescription, 500);
-		OutputDebugStringEx(_T("swr_init error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+		OutputDebugStringEx("swr_init error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 		return false;
 	}
 
@@ -157,12 +157,12 @@ long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
 				// flush decoder
 				if (result = avcodec_send_packet(this->pCodecContext, nullptr) != 0) {
 					av_strerror(result, pErrDescription, 500);
-					OutputDebugStringEx(_T("avcodec_send_packet error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+					OutputDebugStringEx("avcodec_send_packet error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 				}
 				this->hasReadToEnd = true;
 			} else {
 				av_strerror(result, pErrDescription, 500);
-				OutputDebugStringEx(_T("av_read_frame eerror. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+				OutputDebugStringEx("av_read_frame eerror. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 				break;
 			}
 		}
@@ -175,7 +175,7 @@ long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
 		// decode ES
 		if (!this->hasReadToEnd && (result = avcodec_send_packet(this->pCodecContext, this->pPacket)) < 0) {
 			av_strerror(result, pErrDescription, 500);
-			OutputDebugStringEx(_T("avcodec_send_packet error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+			OutputDebugStringEx("avcodec_send_packet error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 			break;
 		}
 
@@ -184,7 +184,7 @@ long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
 			if (result < 0) {
 				if (result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
 					av_strerror(result, pErrDescription, 500);
-					OutputDebugStringEx(_T("avcodec_receive_frame error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+					OutputDebugStringEx("avcodec_receive_frame error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 				}
 				break;
 			}
@@ -211,7 +211,7 @@ void CompressedAudio::Reset() {
 	if (result < 0) {
 		char pErrDescription[500];
 		av_strerror(result, pErrDescription, 500);
-		OutputDebugStringEx(_T("av_seek_frame error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+		OutputDebugStringEx("av_seek_frame error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 	}
 
 	if (this->remainingConvertedBufSize > 0) {
@@ -234,21 +234,21 @@ bool CompressedAudio::CreateCodecContext() {
 	avcodec_free_context(&this->pCodecContext);
 	this->pCodecContext = avcodec_alloc_context3(this->pCodec);
 	if (this->pCodecContext == nullptr) {
-		OutputDebugStringEx(_T("avcodec_alloc_context3 error.\n"));
+		OutputDebugStringEx("avcodec_alloc_context3 error.\n");
 		return false;
 	}
 
 	int result = avcodec_parameters_to_context(this->pCodecContext, this->pAudioStream->codecpar);
 	if (result < 0) {
 		av_strerror(result, pErrDescription, 500);
-		OutputDebugStringEx(_T("avcodec_parameters_to_context error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+		OutputDebugStringEx("avcodec_parameters_to_context error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 		return false;
 	}
 
 	result = avcodec_open2(this->pCodecContext, this->pCodec, nullptr);
 	if (result < 0) {
 		av_strerror(result, pErrDescription, 500);
-		OutputDebugStringEx(_T("avcodec_open2 error. result=%08x description=%s\n"), AVERROR(result), pErrDescription);
+		OutputDebugStringEx("avcodec_open2 error. result=%08x description=%s\n", AVERROR(result), pErrDescription);
 		return false;
 	}
 
@@ -264,7 +264,7 @@ long CompressedAudio::ConvertPcmFormat(BYTE* pBuffer, long bufSize) {
 	int readCount = swr_convert(this->pSwr, &pSwrBuf, this->pFrame->nb_samples, (const uint8_t**)this->pFrame->extended_data, this->pFrame->nb_samples);
 	if (readCount < 0) {
 		av_strerror(readCount, pErrDescription, 500);
-		OutputDebugStringEx(_T("swr_convert error. result=%08x description=%s\n"), AVERROR(readCount), pErrDescription);
+		OutputDebugStringEx("swr_convert error. result=%08x description=%s\n", AVERROR(readCount), pErrDescription);
 	} else {
 		long readSize = readCount * this->waveFormatEx.nChannels * (16 / 8);
 		copyableSize = bufSize > readSize ? readSize : bufSize;

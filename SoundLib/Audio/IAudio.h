@@ -37,7 +37,7 @@ public:
 	/// ファイルフォーマットを示す文字列を取得する。
 	/// </summary>
 	/// <returns>ファイルフォーマット</returns>
-	virtual TString GetFormatName() const = 0;
+	virtual std::string GetFormatName() const = 0;
 
 	/// <summary>
 	/// デコード前のチャンネル数を取得する。
@@ -74,7 +74,7 @@ public:
 	/// </summary>
 	/// <param name="filePath">ファイルパス</param>
 	/// <returns>成否</returns>
-	virtual bool Load(TString filePath) = 0;
+	virtual bool Load(std::string filePath) = 0;
 
 	/// <summary>
 	/// ファイルを順次読み込み、デコードした値を格納する。

@@ -60,16 +60,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	SoundLib::PlayingStatus status = soundsManager.GetStatus(_T("wma"));
-	OutputDebugStringEx(_T("Status of the wma is %d\n"), status);
+	OutputDebugStringEx("Status of the wma is %d\n", status);
 
-	soundsManager.Start(_T("ogg"), true);
+	soundsManager.Start(_T("wma"), OnPlayedToEnd);
 	Sleep(1000);
-	OutputDebugStringEx(_T("Status of the ogg is %d\n"), soundsManager.GetStatus(_T("ogg")));
+	OutputDebugStringEx("Status of the ogg is %d\n", soundsManager.GetStatus(_T("ogg")));
 
-	const TCHAR* pChanginVolumeKey = _T("ogg");
+	const TCHAR* pChanginVolumeKey = _T("wma");
 	for (int i = 100; i > 0; i -= 5) {
 		soundsManager.SetVolume(pChanginVolumeKey, i);
-		OutputDebugStringEx(_T("Volume of the %s is %d\n"), pChanginVolumeKey, soundsManager.GetVolume(pChanginVolumeKey));
+		OutputDebugStringEx("Volume is %d\n", soundsManager.GetVolume(pChanginVolumeKey));
 		Sleep(100);
 	}
 
@@ -77,7 +77,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	for (int i = 5; i <= 100; i += 5) {
 		soundsManager.SetVolume(pChanginVolumeKey, i);
-		OutputDebugStringEx(_T("Volume of the %s is %d\n"), pChanginVolumeKey, soundsManager.GetVolume(pChanginVolumeKey));
+		OutputDebugStringEx("Volume is %d\n", soundsManager.GetVolume(pChanginVolumeKey));
 		Sleep(100);
 	}
 
@@ -88,30 +88,30 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	soundsManager.SetFrequencyRatio(pChanginVolumeKey, 0.5f);
 	Sleep(1000);
-	OutputDebugStringEx(_T("FrequencyRatio of the %s is %f\n"), pChanginVolumeKey, soundsManager.GetFrequencyRatio(pChanginVolumeKey));
+	OutputDebugStringEx("FrequencyRatio is %f\n", soundsManager.GetFrequencyRatio(pChanginVolumeKey));
 	Sleep(1000);
 
 	soundsManager.SetFrequencyRatio(pChanginVolumeKey, 2.0f);
 	Sleep(1000);
-	OutputDebugStringEx(_T("FrequencyRatio of the %s is %f\n"), pChanginVolumeKey, soundsManager.GetFrequencyRatio(pChanginVolumeKey));
+	OutputDebugStringEx("FrequencyRatio is %f\n", soundsManager.GetFrequencyRatio(pChanginVolumeKey));
 	Sleep(1000);
 
 	Sleep(1000);
 	soundsManager.Pause(_T("aac"));
-	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
+	OutputDebugStringEx("Status of the aac is %d\n", soundsManager.GetStatus(_T("aac")));
 	Sleep(1000);
 
 
 	soundsManager.Resume(_T("aac"));
-	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
+	OutputDebugStringEx("Status of the aac is %d\n", soundsManager.GetStatus(_T("aac")));
 	Sleep(20000);
 
 	soundsManager.Stop(_T("aac"));
-	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
+	OutputDebugStringEx("Status of the aac is %d\n", soundsManager.GetStatus(_T("aac")));
 
 	Sleep(1000);
 	//soundsManager.Start(_T("aac"), OnPlayedToEnd);
-	OutputDebugStringEx(_T("Status of the aac is %d\n"), soundsManager.GetStatus(_T("aac")));
+	OutputDebugStringEx("Status of the aac is %d\n", soundsManager.GetStatus(_T("aac")));
 
 	while (true){
 		Sleep(120000);

@@ -13,7 +13,8 @@ namespace SoundLib {
 /// <summary>
 /// <see cref="SoundsManager"/>のコールバック定義用インターフェース
 /// </summary>
-class ISoundsManagerDelegate : public IAudioHandlerDelegate {
+template <typename T>
+class ISoundsManagerDelegate : public IAudioHandlerDelegate<T> {
 public:
 	/* Constructor / Destructor ------------------------------------------------------------------------- */
 	/// <summary>
@@ -26,7 +27,7 @@ public:
 	/// 音声ファイルの最後まで再生完了した後に呼び出すコールバック関数
 	/// </summary>
 	/// <param name="key">音声ファイルを識別するキー</param>
-	virtual void OnPlayedToEnd(TString key) = 0;
+	virtual void OnPlayedToEnd(std::basic_string<T> key) = 0;
 };
 }
 #endif

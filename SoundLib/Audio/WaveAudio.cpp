@@ -25,8 +25,8 @@ const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() const {
 	return &this->waveFormatEx;
 }
 
-TString WaveAudio::GetFormatName() const {
-	return _T("WAVE");
+std::string WaveAudio::GetFormatName() const {
+	return "WAVE";
 }
 
 int WaveAudio::GetChannelCount() const {
@@ -47,29 +47,29 @@ bool WaveAudio::HasReadToEnd() const {
 
 
 /* Public Functions  -------------------------------------------------------------------------------- */
-bool WaveAudio::Load(TString filePath) {
+bool WaveAudio::Load(std::string filePath) {
 	// Waveファイルオープン
-	this->hMmio = mmioOpen(const_cast<TCHAR*>(filePath.c_str()), nullptr, MMIO_READ);
+	this->hMmio = mmioOpenA(const_cast<char*>(filePath.c_str()), nullptr, MMIO_READ);
 	if (!this->hMmio) {
 		// ファイルオープン失敗
-		OutputDebugStringEx(_T("error mmioOpen\n"));
+		OutputDebugStringEx("error mmioOpen\n");
 		return false;
 	}
 
 	// RIFFチャンク検索
 	MMRESULT mmRes;
 	MMCKINFO riffChunk;
-	riffChunk.fccType = mmioFOURCC(_T('W'), _T('A'), _T('V'), _T('E'));
+	riffChunk.fccType = mmioFOURCC('W', 'A', 'V', 'E');
 	mmRes = mmioDescend(this->hMmio, &riffChunk, NULL, MMIO_FINDRIFF);
 	if (mmRes != MMSYSERR_NOERROR) {
-		OutputDebugStringEx(_T("error mmioDescend(wave) ret=%d\n"), mmRes);
+		OutputDebugStringEx("error mmioDescend(wave) ret=%d\n", mmRes);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}
 
 	// フォーマットチャンク検索
 	MMCKINFO formatChunk;
-	formatChunk.ckid = mmioFOURCC(_T('f'), _T('m'), _T('t'), _T(' '));
+	formatChunk.ckid = mmioFOURCC('f', 'm', 't', ' ');
 	mmRes = mmioDescend(this->hMmio, &formatChunk, &riffChunk, MMIO_FINDCHUNK);
 	if (mmRes != MMSYSERR_NOERROR) {
 		mmioClose(this->hMmio, 0);
@@ -80,7 +80,7 @@ bool WaveAudio::Load(TString filePath) {
 	DWORD fmsize = formatChunk.cksize;
 	DWORD size = mmioRead(this->hMmio, (HPSTR)&this->waveFormatEx, fmsize);
 	if (size != fmsize) {
-		OutputDebugStringEx(_T("error mmioRead(fmt) size=%d\n"), size);
+		OutputDebugStringEx("error mmioRead(fmt) size=%d\n", size);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}
@@ -90,10 +90,10 @@ bool WaveAudio::Load(TString filePath) {
 
 	// データチャンク検索
 	MMCKINFO dataChunk;
-	dataChunk.ckid = mmioFOURCC(_T('d'), _T('a'), _T('t'), _T('a'));
+	dataChunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
 	mmRes = mmioDescend(this->hMmio, &dataChunk, &riffChunk, MMIO_FINDCHUNK);
 	if (mmRes != MMSYSERR_NOERROR) {
-		OutputDebugStringEx(_T("error mmioDescend(data) ret=%d\n"), mmRes);
+		OutputDebugStringEx("error mmioDescend(data) ret=%d\n", mmRes);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}

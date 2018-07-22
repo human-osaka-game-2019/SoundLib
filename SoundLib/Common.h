@@ -17,11 +17,11 @@
 #endif
 
 #ifdef _DEBUG
-#define OutputDebugStringEx( str, ... ) \
+#define OutputDebugStringEx(str, ...) \
       { \
-        TCHAR c[256]; \
-        _stprintf_s( c, str, __VA_ARGS__ ); \
-        OutputDebugString( c ); \
+        char c[256]; \
+        sprintf_s(c, str, __VA_ARGS__); \
+        OutputDebugStringA(c); \
       }
 #else
 #define OutputDebugStringEx( str, ... ) // 空実装
@@ -29,12 +29,11 @@
 
 
 namespace SoundLib {
-
-/// <summary>
-/// TCHAR格納用Stringクラス
-/// </summary>
-typedef std::basic_string<TCHAR> TString;
-
+class Common {
+public:
+	/* Functions ---------------------------------------------------------------------------------------- */
+	static const char* ToChar(const wchar_t* pSrc);
+};
 }
 
 #endif
