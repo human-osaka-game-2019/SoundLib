@@ -24,8 +24,7 @@ SoundsManagerTmpl<T>::~SoundsManagerTmpl() {
 template <typename T>
 PlayingStatus SoundsManagerTmpl<T>::GetStatus(const T* pKey) const {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
-		throw std::invalid_argument("キーが存在しません。");
+		return PlayingStatus::Stopped;
 	}
 
 	return this->audioMap.at(pKey)->GetStatus();
@@ -34,7 +33,6 @@ PlayingStatus SoundsManagerTmpl<T>::GetStatus(const T* pKey) const {
 template <typename T>
 uint8_t SoundsManagerTmpl<T>::GetVolume(const T* pKey) const {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return 0;
 	}
 
@@ -54,7 +52,6 @@ uint8_t SoundsManagerTmpl<T>::GetVolume(const T* pKey) const {
 template <typename T>
 bool SoundsManagerTmpl<T>::SetVolume(const T* pKey, uint8_t volume) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return false;
 	}
 
@@ -69,7 +66,6 @@ bool SoundsManagerTmpl<T>::SetVolume(const T* pKey, uint8_t volume) {
 template <typename T>
 float SoundsManagerTmpl<T>::GetFrequencyRatio(const T* pKey) const {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return 0;
 	}
 
@@ -79,8 +75,7 @@ float SoundsManagerTmpl<T>::GetFrequencyRatio(const T* pKey) const {
 template <typename T>
 bool SoundsManagerTmpl<T>::SetFrequencyRatio(const T* pKey, float ratio) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
-		return 0;
+		return false;
 	}
 
 	return this->audioMap[pKey]->SetFrequencyRatio(ratio);
@@ -91,20 +86,20 @@ template <typename T>
 bool SoundsManagerTmpl<T>::Initialize() {
 	HRESULT ret = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error CoInitializeEx ret=%d\n", ret);
+		Common::OutputDebugString("error CoInitializeEx ret=%d\n", ret);
 		return false;
 	}
 
 	ret = XAudio2Create(&this->pXAudio2);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error XAudio2Create ret=%d\n", ret);
+		Common::OutputDebugString("error XAudio2Create ret=%d\n", ret);
 		return false;
 	}
 
 	IXAudio2MasteringVoice* master = nullptr;
 	ret = this->pXAudio2->CreateMasteringVoice(&master);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error CreateMasteringVoice ret=%d\n", ret);
+		Common::OutputDebugString("error CreateMasteringVoice ret=%d\n", ret);
 		return false;
 	}
 
@@ -114,8 +109,8 @@ bool SoundsManagerTmpl<T>::Initialize() {
 bool SoundsManagerTmpl<wchar_t>::AddFile(const wchar_t* pFilePath, const wchar_t* pKey) {
 	const char* pCharKey = Common::ToChar(pKey);
 
-	if (ExistsKey(pKey)) {
-		OutputDebugStringEx("既に登録済みのキー%sが指定されました。\n", pCharKey);
+	if (ExistsKey(pKey), false) {
+		Common::OutputDebugString("既に登録済みのキー%sが指定されました。\n", pCharKey);
 		return false;
 	}
 	
@@ -133,8 +128,8 @@ bool SoundsManagerTmpl<wchar_t>::AddFile(const wchar_t* pFilePath, const wchar_t
 }
 
 bool SoundsManagerTmpl<char>::AddFile(const char* pFilePath, const char* pKey) {
-	if (ExistsKey(pKey)) {
-		OutputDebugStringEx("既に登録済みのキー%sが指定されました。\n", pKey);
+	if (ExistsKey(pKey), false) {
+		Common::OutputDebugString("既に登録済みのキー%sが指定されました。\n", pKey);
 		return false;
 	}
 
@@ -151,7 +146,6 @@ bool SoundsManagerTmpl<char>::AddFile(const char* pFilePath, const char* pKey) {
 template <typename T>
 bool SoundsManagerTmpl<T>::Start(const T* pKey, bool isLoopPlayback) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return false;
 	}
 
@@ -162,7 +156,6 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, bool isLoopPlayback) {
 template <typename T>
 bool SoundsManagerTmpl<T>::Start(const T* pKey, ISoundsManagerDelegate<T>* pDelegate) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return false;
 	}
 
@@ -173,7 +166,6 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, ISoundsManagerDelegate<T>* pDele
 template <typename T>
 bool SoundsManagerTmpl<T>::Start(const T* pKey, void(*onPlayedToEndCallback)(const T* pKey)) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return false;
 	}
 
@@ -184,7 +176,6 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, void(*onPlayedToEndCallback)(con
 template <typename T>
 bool SoundsManagerTmpl<T>::Stop(const T* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return false;
 	}
 
@@ -195,7 +186,6 @@ bool SoundsManagerTmpl<T>::Stop(const T* pKey) {
 template <typename T>
 bool SoundsManagerTmpl<T>::Pause(const T* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return false;
 	}
 
@@ -206,7 +196,6 @@ bool SoundsManagerTmpl<T>::Pause(const T* pKey) {
 template <typename T>
 bool SoundsManagerTmpl<T>::Resume(const T* pKey) {
 	if (!ExistsKey(pKey)) {
-		OutputDebugStringEx("キーが存在しません。\n");
 		return false;
 	}
 
@@ -216,9 +205,13 @@ bool SoundsManagerTmpl<T>::Resume(const T* pKey) {
 
 /* Private Functions  ------------------------------------------------------------------------------- */
 template <typename T>
-bool SoundsManagerTmpl<T>::ExistsKey(const T* pKey) const {
+bool SoundsManagerTmpl<T>::ExistsKey(const T* pKey, bool isErrWhenNotExists) const {
 	auto itr = this->audioMap.find(pKey);
-	return (itr != this->audioMap.end());
+	bool ret = (itr != this->audioMap.end());
+	if (!ret) {
+		OutputStrWithKey("キー%sは存在しません。\n", pKey);
+	}
+	return ret;
 }
 
 template <typename T>
@@ -251,7 +244,7 @@ bool SoundsManagerTmpl<T>::JudgeAudio(const char* pFilePath, Audio::IAudio** ppA
 	}
 
 	if (!couldLoad) {
-		OutputDebugStringEx("再生可能な形式ではありません。\n");
+		Common::OutputDebugString("%s は再生可能な形式ではありません。\n", pFilePath);
 		delete *ppAudio;
 		*ppAudio = nullptr;
 	}
@@ -262,19 +255,19 @@ bool SoundsManagerTmpl<T>::JudgeAudio(const char* pFilePath, Audio::IAudio** ppA
 template <typename T>
 void SoundsManagerTmpl<T>::OutputAudioInfo(Audio::IAudio* pAudio, const char* pKey) const {
 	const WAVEFORMATEX* pFormat = pAudio->GetWaveFormatEx();
-	OutputDebugStringEx("-----------------キー%sのオーディオ情報--------------------\n", pKey);
-	OutputDebugStringEx("file foramt=%s\n", pAudio->GetFormatName().c_str());
-	OutputDebugStringEx("**** デコード前 ****\n");
-	OutputDebugStringEx("channel    =%d\n", pAudio->GetChannelCount());
-	OutputDebugStringEx("sampling   =%dHz\n", pAudio->GetSamplingRate());
-	OutputDebugStringEx("bit/sample =%d\n", pAudio->GetBitsPerSample());
-	OutputDebugStringEx("**** デコード後 ****\n");
-	OutputDebugStringEx("foramt     =%d\n", pFormat->wFormatTag);
-	OutputDebugStringEx("channel    =%d\n", pFormat->nChannels);
-	OutputDebugStringEx("sampling   =%dHz\n", pFormat->nSamplesPerSec);
-	OutputDebugStringEx("bit/sample =%d\n", pFormat->wBitsPerSample);
-	OutputDebugStringEx("byte/sec   =%d\n", pFormat->nAvgBytesPerSec);
-	OutputDebugStringEx("-----------------------------------------------------------\n");
+	Common::OutputDebugString("-----------------キー%sのオーディオ情報--------------------\n", pKey);
+	Common::OutputDebugString("file foramt=%s\n", pAudio->GetFormatName().c_str());
+	Common::OutputDebugString("**** デコード前 ****\n");
+	Common::OutputDebugString("channel    =%d\n", pAudio->GetChannelCount());
+	Common::OutputDebugString("sampling   =%dHz\n", pAudio->GetSamplingRate());
+	Common::OutputDebugString("bit/sample =%d\n", pAudio->GetBitsPerSample());
+	Common::OutputDebugString("**** デコード後 ****\n");
+	Common::OutputDebugString("foramt     =%d\n", pFormat->wFormatTag);
+	Common::OutputDebugString("channel    =%d\n", pFormat->nChannels);
+	Common::OutputDebugString("sampling   =%dHz\n", pFormat->nSamplesPerSec);
+	Common::OutputDebugString("bit/sample =%d\n", pFormat->wBitsPerSample);
+	Common::OutputDebugString("byte/sec   =%d\n", pFormat->nAvgBytesPerSec);
+	Common::OutputDebugString("-----------------------------------------------------------\n");
 }
 
 template <typename T>
@@ -283,6 +276,17 @@ bool SoundsManagerTmpl<T>::AddToMap(Audio::IAudio* pAudio, const T* pKey) {
 	this->audioMap[key] = new AudioHandler<T>(key, pAudio);
 	return this->audioMap[key]->Prepare(*this->pXAudio2);
 }
+
+void SoundsManagerTmpl<char>::OutputStrWithKey(const char* pStr, const char* pKey) const {
+	Common::OutputDebugString(pStr, pKey);
+}
+
+void SoundsManagerTmpl<wchar_t>::OutputStrWithKey(const char* pStr, const wchar_t* pKey) const {
+	const char* pCharKey = Common::ToChar(pKey);
+	Common::OutputDebugString(pStr, pCharKey);
+	delete[] pCharKey;
+}
+
 
 template class SoundsManagerTmpl<char>;
 template class SoundsManagerTmpl<wchar_t>;

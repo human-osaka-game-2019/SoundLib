@@ -59,7 +59,7 @@ template <typename T>
 bool AudioHandler<T>::SetVolume(float volume) {
 	HRESULT result = this->pVoice->SetVolume(volume);
 	if (FAILED(result)) {
-		OutputDebugStringEx("error SetVolume resule=%d\n", result);
+		Common::OutputDebugString("error SetVolume resule=%d\n", result);
 		return false;
 	}
 	return true;
@@ -76,7 +76,7 @@ template <typename T>
 bool AudioHandler<T>::SetFrequencyRatio(float ratio) {
 	HRESULT result = this->pVoice->SetFrequencyRatio(ratio);
 	if (FAILED(result)) {
-		OutputDebugStringEx("error SetFrequencyRatio resule=%d\n", result);
+		Common::OutputDebugString("error SetFrequencyRatio resule=%d\n", result);
 		return false;
 	}
 	return true;
@@ -87,7 +87,7 @@ template <typename T>
 bool AudioHandler<T>::Prepare(IXAudio2& rXAudio2) {
 	HRESULT ret = rXAudio2.CreateSourceVoice(&this->pVoice, this->pAudio->GetWaveFormatEx(), 0, static_cast<float>(MAX_FREQENCY_RATIO), this->pVoiceCallback);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error CreateSourceVoice ret=%d\n", ret);
+		Common::OutputDebugString("error CreateSourceVoice ret=%d\n", ret);
 		return false;
 	}
 	return true;
@@ -202,7 +202,7 @@ void AudioHandler<T>::Push() {
 	this->xAudioBuffer.pAudioData = this->pReadBuffers[this->currentBufNum];
 	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
 	if (FAILED(ret)) {
-		OutputDebugStringEx("error SubmitSourceBuffer HRESULT=%d\n", ret);
+		Common::OutputDebugString("error SubmitSourceBuffer HRESULT=%d\n", ret);
 		return;
 	}
 

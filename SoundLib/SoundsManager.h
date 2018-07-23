@@ -21,8 +21,6 @@
 
 
 namespace SoundLib {
-
-
 /// <summary>
 /// サウンド統括クラス
 /// </summary>
@@ -185,10 +183,11 @@ private:
 	SoundsManagerTmpl<T>& operator=(const SoundsManagerTmpl<T>&) = delete;
 
 	/* Functions ---------------------------------------------------------------------------------------- */
-	bool ExistsKey(const T* pKey) const;
+	bool ExistsKey(const T* pKey, bool isErrWhenNotExists = true) const;
 	bool JudgeAudio(const char* pFilePath, Audio::IAudio** ppAudio) const;
 	void OutputAudioInfo(Audio::IAudio* pAudio, const char* pKey) const;
 	bool AddToMap(Audio::IAudio* pAudio, const T* pKey);
+	void OutputStrWithKey(const char* pStr, const T* pKey) const;
 };
 
 #ifdef UNICODE

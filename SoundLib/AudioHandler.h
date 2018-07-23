@@ -36,6 +36,10 @@ enum PlayingStatus {
 template <typename T>
 class AudioHandler : public IVoiceCallbackDelegate {
 public:
+	/* Constants ---------------------------------------------------------------------------------------- */
+	/// /// <summary><see cref="SetFrequencyRatio(float)"/>で設定可能な最大比率</summary>
+	static const int MAX_FREQENCY_RATIO = 4;
+
 	/* Constructor / Destructor ------------------------------------------------------------------------- */
 	/// <summary>
 	/// コンストラクタ
@@ -162,9 +166,6 @@ public:
 private:
 	/* Constants ---------------------------------------------------------------------------------------- */
 	static const int BUF_COUNT = 2;
-
-	/// <summary><see cref="SetFrequencyRatio(float)"/>で設定可能な最大比率</summary>
-	static const int MAX_FREQENCY_RATIO = 4;
 
 	/* Variables ---------------------------------------------------------------------------------------- */
 	std::basic_string<T> name;

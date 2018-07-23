@@ -52,7 +52,7 @@ bool WaveAudio::Load(std::string filePath) {
 	this->hMmio = mmioOpenA(const_cast<char*>(filePath.c_str()), nullptr, MMIO_READ);
 	if (!this->hMmio) {
 		// ファイルオープン失敗
-		OutputDebugStringEx("error mmioOpen\n");
+		Common::OutputDebugString("error mmioOpen\n");
 		return false;
 	}
 
@@ -62,7 +62,7 @@ bool WaveAudio::Load(std::string filePath) {
 	riffChunk.fccType = mmioFOURCC('W', 'A', 'V', 'E');
 	mmRes = mmioDescend(this->hMmio, &riffChunk, NULL, MMIO_FINDRIFF);
 	if (mmRes != MMSYSERR_NOERROR) {
-		OutputDebugStringEx("error mmioDescend(wave) ret=%d\n", mmRes);
+		Common::OutputDebugString("error mmioDescend(wave) ret=%d\n", mmRes);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}
@@ -80,7 +80,7 @@ bool WaveAudio::Load(std::string filePath) {
 	DWORD fmsize = formatChunk.cksize;
 	DWORD size = mmioRead(this->hMmio, (HPSTR)&this->waveFormatEx, fmsize);
 	if (size != fmsize) {
-		OutputDebugStringEx("error mmioRead(fmt) size=%d\n", size);
+		Common::OutputDebugString("error mmioRead(fmt) size=%d\n", size);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}
@@ -93,7 +93,7 @@ bool WaveAudio::Load(std::string filePath) {
 	dataChunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
 	mmRes = mmioDescend(this->hMmio, &dataChunk, &riffChunk, MMIO_FINDCHUNK);
 	if (mmRes != MMSYSERR_NOERROR) {
-		OutputDebugStringEx("error mmioDescend(data) ret=%d\n", mmRes);
+		Common::OutputDebugString("error mmioDescend(data) ret=%d\n", mmRes);
 		mmioClose(this->hMmio, 0);
 		return false;
 	}
