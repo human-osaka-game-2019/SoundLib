@@ -10,7 +10,7 @@ const char* Common::ToChar(const wchar_t* pSrc) {
 	char* pCharStr = new char[charStrLength];
 
 	// 変換
-	WideCharToMultiByte(CP_THREAD_ACP, 0, pSrc, wcslen(pSrc) + 1, pCharStr, charStrLength, NULL, NULL);
+	WideCharToMultiByte(CP_THREAD_ACP, 0, pSrc, int(wcslen(pSrc)) + 1, pCharStr, charStrLength, NULL, NULL);
 
 	return	pCharStr;
 }

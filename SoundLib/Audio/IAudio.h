@@ -7,6 +7,7 @@
 #define IAUDIO_H
 
 #include <windows.h>
+#include <string>
 #include <mmsystem.h>
 #include <mmreg.h>
 #include "../Common.h"

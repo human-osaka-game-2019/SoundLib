@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="リソース ファイル\x86">
+      <UniqueIdentifier>{39546345-5532-4107-9c93-5739b152f82f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -97,5 +100,31 @@
     <ClInclude Include="Audio\CompressedAudio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="dll\x86\swscale-5.dll">
+      <Filter>リソース ファイル\x86</Filter>
+    </Library>
+    <Library Include="dll\x86\avcodec-58.dll">
+      <Filter>リソース ファイル\x86</Filter>
+    </Library>
+    <Library Include="dll\x86\avdevice-58.dll">
+      <Filter>リソース ファイル\x86</Filter>
+    </Library>
+    <Library Include="dll\x86\avformat-58.dll">
+      <Filter>リソース ファイル\x86</Filter>
+    </Library>
+    <Library Include="dll\x86\avutil-56.dll">
+      <Filter>リソース ファイル\x86</Filter>
+    </Library>
+    <Library Include="dll\x86\swresample-3.dll">
+      <Filter>リソース ファイル\x86</Filter>
+    </Library>
+    <Library Include="dll\x64\avcodec-58.dll" />
+    <Library Include="dll\x64\avdevice-58.dll" />
+    <Library Include="dll\x64\avformat-58.dll" />
+    <Library Include="dll\x64\avutil-56.dll" />
+    <Library Include="dll\x64\swresample-3.dll" />
+    <Library Include="dll\x64\swscale-5.dll" />
   </ItemGroup>
 </Project>

@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#include <string>
 
 
 namespace SoundLib {
