@@ -100,8 +100,10 @@ bool Mp3Audio::Load(std::string filePath) {
 		nullptr
 	);
 
-	if (this->hFile == INVALID_HANDLE_VALUE)
-		return FALSE; // エラー
+	if (this->hFile == INVALID_HANDLE_VALUE) {
+		Common::OutputDebugString("CreateFile resutns INVALID_HANDLE_VALUE filePath=%s\n", filePath.c_str());
+		return false;
+	}
 
 	// ファイルサイズ取得
 	this->mp3DataSize = GetDataSize();
@@ -111,8 +113,10 @@ bool Mp3Audio::Load(std::string filePath) {
 	DWORD readSize;
 
 	ReadFile(this->hFile, pHeader, 4, &readSize, nullptr);
-	if (!(pHeader[0] == 0xFF && (pHeader[1] & 0xE0) == 0xE0))
-		return FALSE;
+	if (!(pHeader[0] == 0xFF && (pHeader[1] & 0xE0) == 0xE0)) {
+		Common::OutputDebugString("invalid file filePath=%s\n", filePath.c_str());
+		return false;
+	}
 
 	// MPWGバージョン取得
 	BYTE version = (pHeader[1] >> 3) & 0x03;
@@ -212,7 +216,6 @@ void Mp3Audio::Reset() {
 	this->hasReadToEnd = false;
 }
 
-
 /* Private Functions  ------------------------------------------------------------------------------- */
 DWORD Mp3Audio::GetDataSize() {
 	DWORD ret;
@@ -251,7 +254,6 @@ DWORD Mp3Audio::GetDataSize() {
 
 	return ret;
 }
-
 
 WORD Mp3Audio::GetBitRate(BYTE* pHeader, int version) const {
 	//　レイヤー数取得

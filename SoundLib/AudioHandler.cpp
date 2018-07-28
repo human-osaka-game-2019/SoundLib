@@ -85,70 +85,87 @@ bool AudioHandler<T>::SetFrequencyRatio(float ratio) {
 /* Public Functions  -------------------------------------------------------------------------------- */
 template <typename T>
 bool AudioHandler<T>::Prepare(IXAudio2& rXAudio2) {
-	HRESULT ret = rXAudio2.CreateSourceVoice(&this->pVoice, this->pAudio->GetWaveFormatEx(), 0, static_cast<float>(MAX_FREQENCY_RATIO), this->pVoiceCallback);
-	if (FAILED(ret)) {
-		Common::OutputDebugString("error CreateSourceVoice ret=%d\n", ret);
+	HRESULT result = rXAudio2.CreateSourceVoice(&this->pVoice, this->pAudio->GetWaveFormatEx(), 0, static_cast<float>(MAX_FREQENCY_RATIO), this->pVoiceCallback);
+	if (FAILED(result)) {
+		Common::OutputDebugString("error CreateSourceVoice result=%d\n", result);
 		return false;
 	}
 	return true;
 }
 
 template <typename T>
-void AudioHandler<T>::Start(bool isLoopPlayback) {
+bool AudioHandler<T>::Start(bool isLoopPlayback) {
+	bool ret = true;
+
 	if (this->status == PlayingStatus::Pausing) {
 		Stop(true);
 	}
 	if (this->status == PlayingStatus::Stopped) {
 		this->isLoopPlayback = isLoopPlayback;
-		Start();
+		ret =  Start();
 	}
+	return ret;
 }
 
 template <typename T>
-void AudioHandler<T>::Start(IAudioHandlerDelegate<T>* pDelegate) {
+bool AudioHandler<T>::Start(IAudioHandlerDelegate<T>* pDelegate) {
+	bool ret = true;
+	
 	if(this->status == PlayingStatus::Pausing) {
-		Stop(true);
+		ret = Stop(true);
 	}
-	if (this->status == PlayingStatus::Stopped) {
+	if (ret && this->status == PlayingStatus::Stopped) {
 		this->pDelegate = pDelegate;
 		this->isLoopPlayback = false;
-		Start();
+		ret = Start();
 	}
+	return ret;
 }
 
 template <typename T>
-void AudioHandler<T>::Start(void(*onPlayedToEndCallback)(const T* pName)) {
+bool AudioHandler<T>::Start(void(*onPlayedToEndCallback)(const T* pName)) {
+	bool ret = true;
+	
 	if(this->status == PlayingStatus::Pausing) {
-		Stop(true);
+		ret = Stop(true);
 	}
-	if (this->status == PlayingStatus::Stopped) {
+	if (ret && this->status == PlayingStatus::Stopped) {
 		this->onPlayedToEndCallback = onPlayedToEndCallback;
 		this->isLoopPlayback = false;
-		Start();
+		ret = Start();
 	}
+	return ret;
 }
 
 template <typename T>
-void AudioHandler<T>::Stop() {
+bool AudioHandler<T>::Stop() {
+	bool ret = true;
+	
 	if (this->status == PlayingStatus::Playing) {
-		Stop(true);
+		ret = Stop(true);
 	}
+	return ret;
 }
 
 template <typename T>
-void AudioHandler<T>::Pause() {
+bool AudioHandler<T>::Pause() {
+	bool ret = true;
+	
 	if (this->status == PlayingStatus::Playing) {
-		this->pVoice->Stop();
+		ret = this->pVoice->Stop();
 		this->status = PlayingStatus::Pausing;
 	}
+	return ret;
 }
 
 template <typename T>
-void AudioHandler<T>::Resume() {
+bool AudioHandler<T>::Resume() {
+	bool ret = true;
 	if (this->status == PlayingStatus::Pausing) {
 		this->status = PlayingStatus::Playing;
-		this->pVoice->Start();
+		ret = this->pVoice->Start();
 	}
+	return ret;
 }
 
 template <typename T>
@@ -200,9 +217,9 @@ void AudioHandler<T>::Push() {
 
 	this->xAudioBuffer.AudioBytes = readLength;
 	this->xAudioBuffer.pAudioData = this->pReadBuffers[this->currentBufNum];
-	HRESULT ret = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
-	if (FAILED(ret)) {
-		Common::OutputDebugString("error SubmitSourceBuffer HRESULT=%d\n", ret);
+	HRESULT result = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
+	if (FAILED(result)) {
+		Common::OutputDebugString("error SubmitSourceBuffer HRESULT=%d\n", result);
 		return;
 	}
 
@@ -212,7 +229,7 @@ void AudioHandler<T>::Push() {
 }
 
 template <typename T>
-void AudioHandler<T>::Start() {
+bool AudioHandler<T>::Start() {
 	this->xAudioBuffer.Flags = 0;
 	this->bufferSize = this->pAudio->GetWaveFormatEx()->nAvgBytesPerSec;
 	for (int i = 0; i < BUF_COUNT; ++i) {
@@ -222,13 +239,22 @@ void AudioHandler<T>::Start() {
 	this->currentBufNum = 0;
 	this->status = PlayingStatus::Playing;
 	this->Push();
-	this->pVoice->Start();
+	HRESULT result = this->pVoice->Start();
+	if (FAILED(result)) {
+		Common::OutputDebugString("error IXAudio2SourceVoice::Start HRESULT=%d\n", result);
+		return false;
+	}
+	return true;
 }
 
 template <typename T>
-void AudioHandler<T>::Stop(bool clearsCallback) {
-	this->pVoice->Stop();
+bool AudioHandler<T>::Stop(bool clearsCallback) {
+	HRESULT result = this->pVoice->Stop();
 	this->status = PlayingStatus::Stopped;
+	if (FAILED(result)) {
+		Common::OutputDebugString("error IXAudio2SourceVoice::Stop HRESULT=%d\n", result);
+		return false;
+	}
 
 	for (int i = 0; i < BUF_COUNT; i++) {
 		delete[] this->pReadBuffers[i];
@@ -244,6 +270,8 @@ void AudioHandler<T>::Stop(bool clearsCallback) {
 		this->pDelegate = nullptr;
 		this->onPlayedToEndCallback = nullptr;
 	}
+
+	return true;
 }
 
 template class AudioHandler<char>;

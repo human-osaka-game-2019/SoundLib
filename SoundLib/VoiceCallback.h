@@ -92,7 +92,7 @@ public:
 
 private:
 	/* Variables ---------------------------------------------------------------------------------------- */
-	IVoiceCallbackDelegate * pDelegate;
+	IVoiceCallbackDelegate* pDelegate;
 
 	/* Constructor / Destructor ------------------------------------------------------------------------- */
 	VoiceCallback() = delete;

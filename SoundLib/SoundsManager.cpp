@@ -84,22 +84,22 @@ bool SoundsManagerTmpl<T>::SetFrequencyRatio(const T* pKey, float ratio) {
 /* Public Functions  -------------------------------------------------------------------------------- */
 template <typename T>
 bool SoundsManagerTmpl<T>::Initialize() {
-	HRESULT ret = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-	if (FAILED(ret)) {
-		Common::OutputDebugString("error CoInitializeEx ret=%d\n", ret);
+	HRESULT result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (FAILED(result)) {
+		Common::OutputDebugString("error CoInitializeEx result=%d\n", result);
 		return false;
 	}
 
-	ret = XAudio2Create(&this->pXAudio2);
-	if (FAILED(ret)) {
-		Common::OutputDebugString("error XAudio2Create ret=%d\n", ret);
+	result = XAudio2Create(&this->pXAudio2);
+	if (FAILED(result)) {
+		Common::OutputDebugString("error XAudio2Create result=%d\n", result);
 		return false;
 	}
 
 	IXAudio2MasteringVoice* master = nullptr;
-	ret = this->pXAudio2->CreateMasteringVoice(&master);
-	if (FAILED(ret)) {
-		Common::OutputDebugString("error CreateMasteringVoice ret=%d\n", ret);
+	result = this->pXAudio2->CreateMasteringVoice(&master);
+	if (FAILED(result)) {
+		Common::OutputDebugString("error CreateMasteringVoice result=%d\n", result);
 		return false;
 	}
 
@@ -109,7 +109,7 @@ bool SoundsManagerTmpl<T>::Initialize() {
 bool SoundsManagerTmpl<wchar_t>::AddFile(const wchar_t* pFilePath, const wchar_t* pKey) {
 	const char* pCharKey = Common::ToChar(pKey);
 
-	if (ExistsKey(pKey), false) {
+	if (ExistsKey(pKey, false)) {
 		Common::OutputDebugString("既に登録済みのキー%sが指定されました。\n", pCharKey);
 		return false;
 	}
@@ -128,7 +128,7 @@ bool SoundsManagerTmpl<wchar_t>::AddFile(const wchar_t* pFilePath, const wchar_t
 }
 
 bool SoundsManagerTmpl<char>::AddFile(const char* pFilePath, const char* pKey) {
-	if (ExistsKey(pKey), false) {
+	if (ExistsKey(pKey, false)) {
 		Common::OutputDebugString("既に登録済みのキー%sが指定されました。\n", pKey);
 		return false;
 	}
@@ -208,7 +208,7 @@ template <typename T>
 bool SoundsManagerTmpl<T>::ExistsKey(const T* pKey, bool isErrWhenNotExists) const {
 	auto itr = this->audioMap.find(pKey);
 	bool ret = (itr != this->audioMap.end());
-	if (!ret) {
+	if (!ret && isErrWhenNotExists) {
 		OutputStrWithKey("キー%sは存在しません。\n", pKey);
 	}
 	return ret;

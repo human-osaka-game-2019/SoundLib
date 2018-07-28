@@ -127,36 +127,42 @@ public:
 	/// ファイルの先頭から再生を行う。
 	/// </summary>
 	/// <param name="isLoopPlayback">ループ再生を行うかどうか</param>
-	void Start(bool isLoopPlayback);
+	/// <returns>成否</returns>
+	bool Start(bool isLoopPlayback);
 
 	/// <summary>
 	/// ファイルの先頭から再生を行う。
 	/// </summary>
 	/// <param name="pDelegate">最後まで再生完了後に呼び出すコールバック関数を定義したオブジェクト</param>
+	/// <returns>成否</returns>
 	/// <remarks>C++から設定する場合用</remarks>
-	void Start(IAudioHandlerDelegate<T>* pDelegate);
+	bool Start(IAudioHandlerDelegate<T>* pDelegate);
 
 	/// <summary>
 	/// ファイルの先頭から再生を行う。
 	/// </summary>
 	/// <param name="onPlayedToEndCallback">最後まで再生完了後に呼び出すコールバック関数</param>
+	/// <returns>成否</returns>
 	/// <remarks>C言語から設定する場合用</remarks>
-	void Start(void(*onPlayedToEndCallback)(const T* pName));
+	bool Start(void(*onPlayedToEndCallback)(const T* pName));
 
 	/// <summary>
 	/// 再生を停止する。
 	/// </summary>
-	void Stop();
+	/// <returns>成否</returns>
+	bool Stop();
 
 	/// <summary>
 	/// 再生を一時停止する。
 	/// </summary>
-	void Pause();
+	/// <returns>成否</returns>
+	bool Pause();
 
 	/// <summary>
 	/// 一時停止中の音声を続きから再生する。
 	/// </summary>
-	void Resume();
+	/// <returns>成否</returns>
+	bool Resume();
 
 	/// <summary>
 	/// XAusio2再生用バッファが空になったタイミングで呼び出されるコールバック関数。
@@ -189,8 +195,8 @@ private:
 
 	/* Functions ---------------------------------------------------------------------------------------- */
 	void Push();
-	void Start();
-	void Stop(bool clearsCallback);
+	bool Start();
+	bool Stop(bool clearsCallback);
 };
 }
 
