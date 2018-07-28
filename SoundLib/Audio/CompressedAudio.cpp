@@ -44,7 +44,7 @@ const WAVEFORMATEX* CompressedAudio::GetWaveFormatEx() const {
 }
 
 std::string CompressedAudio::GetFormatName() const {
-	return this->pCodecContext->codec->long_name;
+	return this->pCodecContext->codec->name;
 }
 
 int CompressedAudio::GetChannelCount() const {
