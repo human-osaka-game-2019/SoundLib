@@ -1,0 +1,137 @@
+﻿//----------------------------------------------------------
+// <filename>WaveAudio.cpp</filename>
+// <author>Masami Sugao</author>
+// <date>2018/07/16</date>
+//----------------------------------------------------------
+#include "Audio/WaveAudio.h"
+#include "Common.h"
+
+
+namespace SoundLib{
+namespace Audio {
+/* Constructor / Destructor ------------------------------------------------------------------------- */
+WaveAudio::WaveAudio() : hMmio(nullptr), offset(0), dataSize(0), restSize(0), hasReadToEnd(false) {}
+
+WaveAudio::~WaveAudio() {
+	if (this->hMmio != nullptr) {
+		mmioClose(this->hMmio, 0);
+		this->hMmio = nullptr;
+	}
+}
+
+
+/* Getters / Setters -------------------------------------------------------------------------------- */
+const WAVEFORMATEX* WaveAudio::GetWaveFormatEx() const {
+	return &this->waveFormatEx;
+}
+
+std::string WaveAudio::GetFormatName() const {
+	return "WAVE";
+}
+
+int WaveAudio::GetChannelCount() const {
+	return this->waveFormatEx.nChannels;
+}
+
+int WaveAudio::GetSamplingRate() const {
+	return this->waveFormatEx.nSamplesPerSec;
+}
+
+int WaveAudio::GetBitsPerSample() const {
+	return this->waveFormatEx.wBitsPerSample;
+}
+
+bool WaveAudio::HasReadToEnd() const {
+	return this->hasReadToEnd;
+}
+
+
+/* Public Functions  -------------------------------------------------------------------------------- */
+bool WaveAudio::Load(std::string filePath) {
+	// Waveファイルオープン
+	this->hMmio = mmioOpenA(const_cast<char*>(filePath.c_str()), nullptr, MMIO_READ);
+	if (!this->hMmio) {
+		// ファイルオープン失敗
+		Common::OutputDebugString("error mmioOpen\n");
+		return false;
+	}
+
+	// RIFFチャンク検索
+	MMRESULT mmRes;
+	MMCKINFO riffChunk;
+	riffChunk.fccType = mmioFOURCC('W', 'A', 'V', 'E');
+	mmRes = mmioDescend(this->hMmio, &riffChunk, NULL, MMIO_FINDRIFF);
+	if (mmRes != MMSYSERR_NOERROR) {
+		Common::OutputDebugString("error mmioDescend(wave) ret=%d\n", mmRes);
+		mmioClose(this->hMmio, 0);
+		return false;
+	}
+
+	// フォーマットチャンク検索
+	MMCKINFO formatChunk;
+	formatChunk.ckid = mmioFOURCC('f', 'm', 't', ' ');
+	mmRes = mmioDescend(this->hMmio, &formatChunk, &riffChunk, MMIO_FINDCHUNK);
+	if (mmRes != MMSYSERR_NOERROR) {
+		mmioClose(this->hMmio, 0);
+		return false;
+	}
+
+	// WAVEFORMATEX構造体格納
+	DWORD fmsize = formatChunk.cksize;
+	DWORD size = mmioRead(this->hMmio, (HPSTR)&this->waveFormatEx, fmsize);
+	if (size != fmsize) {
+		Common::OutputDebugString("error mmioRead(fmt) size=%d\n", size);
+		mmioClose(this->hMmio, 0);
+		return false;
+	}
+
+	// WAVEFORMATEX構造体格納
+	mmioAscend(this->hMmio, &formatChunk, 0);
+
+	// データチャンク検索
+	MMCKINFO dataChunk;
+	dataChunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
+	mmRes = mmioDescend(this->hMmio, &dataChunk, &riffChunk, MMIO_FINDCHUNK);
+	if (mmRes != MMSYSERR_NOERROR) {
+		Common::OutputDebugString("error mmioDescend(data) ret=%d\n", mmRes);
+		mmioClose(this->hMmio, 0);
+		return false;
+	}
+
+	// データチャンクの先頭までの位置をシークし直してオフセットとして保持する
+	this->offset = mmioSeek(this->hMmio, 0, SEEK_CUR);
+	this->dataSize = dataChunk.cksize;
+	this->restSize = this->dataSize;
+
+	return true;
+}
+
+long WaveAudio::Read(BYTE* pBuffer, long bufSize) {
+	long readSize = 0;
+	/*
+	 * バッファサイズとファイルの残りサイズのうち小さい方を読み出しサイズとして設定する。
+	 * ファイルの残りサイズより大きな値を設定してもファイル末尾までしか読み込みは行われないが、
+	 * ファイルの音声データサイズが奇数の場合は末尾に1バイトのNULL文字が格納されており
+	 * これも読み込んでしまうとノイズとなるので、音声データのみを読み込むようにする。
+	 */
+	long readableSize = bufSize > this->restSize ? this->restSize: bufSize;
+
+	if (readableSize == 0) {
+		this->hasReadToEnd = true;
+	} else {
+		// データの部分格納
+		readSize = mmioRead(this->hMmio, (HPSTR)pBuffer, readableSize);
+		this->restSize -= readSize;
+	}
+	return readSize;
+}
+
+void WaveAudio::Reset() {
+	// ファイルポインタを先頭に戻す
+	mmioSeek(this->hMmio, this->offset, SEEK_SET);
+	this->restSize = this->dataSize;
+	this->hasReadToEnd = false;
+}
+
+}
+}

@@ -13,9 +13,11 @@
 # Build results
 /Debug/
 SoundLib/[Dd]ebug/
+SoundLibTest/[Dd]ebug/
 [Dd]ebugPublic/
 /Release/
 SoundLib/[Rr]elease/
+SoundLibTest/[Rr]elease/
 [Rr]eleases/
 #x64/
 #x86/
@@ -265,3 +267,5 @@ __pycache__/
 #doxygen
 html/
 latex/
+
+SoundLibTest/Resources/*

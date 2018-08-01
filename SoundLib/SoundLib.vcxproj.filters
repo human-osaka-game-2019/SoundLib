@@ -9,122 +9,63 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="リソース ファイル\x86">
-      <UniqueIdentifier>{39546345-5532-4107-9c93-5739b152f82f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="Sources\AudioHandler.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="VoiceCallback.cpp">
+    <ClCompile Include="Sources\Common.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="AudioHandler.cpp">
+    <ClCompile Include="Sources\SoundsManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\Mp3Audio.cpp">
+    <ClCompile Include="Sources\VoiceCallback.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\WaveAudio.cpp">
+    <ClCompile Include="Sources\Audio\CompressedAudio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\CompressedAudio.cpp">
+    <ClCompile Include="Sources\Audio\Mp3Audio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Common.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundsManager.cpp">
+    <ClCompile Include="Sources\Audio\WaveAudio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="Resources\musicbox.mp3">
-      <Filter>リソース ファイル</Filter>
-    </Media>
-    <Media Include="Resources\jump03.mp3">
-      <Filter>リソース ファイル</Filter>
-    </Media>
-    <Media Include="Resources\toujyo.wav">
-      <Filter>リソース ファイル</Filter>
-    </Media>
-    <Media Include="Resources\bgm_maoudamashii_fantasy10.ogg">
-      <Filter>リソース ファイル</Filter>
-    </Media>
-    <Media Include="Resources\s3.wma">
-      <Filter>リソース ファイル</Filter>
-    </Media>
-    <Media Include="Resources\Sample_BeeMoved_48kHz16bit.m4a">
-      <Filter>リソース ファイル</Filter>
-    </Media>
-    <Media Include="Resources\musicbox_VBR.mp3">
-      <Filter>リソース ファイル</Filter>
-    </Media>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="IVoiceCallbackDelegate.h">
+    <ClInclude Include="Headers\AudioHandler.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Common.h">
+    <ClInclude Include="Headers\Common.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="AudioHandler.h">
+    <ClInclude Include="Headers\IAudioHandlerDelegate.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="SoundsManager.h">
+    <ClInclude Include="Headers\ISoundsManagerDelegate.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="IAudioHandlerDelegate.h">
+    <ClInclude Include="Headers\IVoiceCallbackDelegate.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="ISoundsManagerDelegate.h">
+    <ClInclude Include="Headers\SoundsManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="VoiceCallback.h">
+    <ClInclude Include="Headers\VoiceCallback.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Audio\IAudio.h">
+    <ClInclude Include="Headers\Audio\CompressedAudio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Audio\Mp3Audio.h">
+    <ClInclude Include="Headers\Audio\IAudio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Audio\WaveAudio.h">
+    <ClInclude Include="Headers\Audio\Mp3Audio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Audio\CompressedAudio.h">
+    <ClInclude Include="Headers\Audio\WaveAudio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="dll\x86\swscale-5.dll">
-      <Filter>リソース ファイル\x86</Filter>
-    </Library>
-    <Library Include="dll\x86\avcodec-58.dll">
-      <Filter>リソース ファイル\x86</Filter>
-    </Library>
-    <Library Include="dll\x86\avdevice-58.dll">
-      <Filter>リソース ファイル\x86</Filter>
-    </Library>
-    <Library Include="dll\x86\avformat-58.dll">
-      <Filter>リソース ファイル\x86</Filter>
-    </Library>
-    <Library Include="dll\x86\avutil-56.dll">
-      <Filter>リソース ファイル\x86</Filter>
-    </Library>
-    <Library Include="dll\x86\swresample-3.dll">
-      <Filter>リソース ファイル\x86</Filter>
-    </Library>
-    <Library Include="dll\x64\avcodec-58.dll" />
-    <Library Include="dll\x64\avdevice-58.dll" />
-    <Library Include="dll\x64\avformat-58.dll" />
-    <Library Include="dll\x64\avutil-56.dll" />
-    <Library Include="dll\x64\swresample-3.dll" />
-    <Library Include="dll\x64\swscale-5.dll" />
   </ItemGroup>
 </Project>
