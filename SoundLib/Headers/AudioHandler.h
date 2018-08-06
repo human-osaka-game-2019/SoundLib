@@ -149,8 +149,7 @@ public:
 	/// <summary>
 	/// 再生を停止する。
 	/// </summary>
-	/// <returns>成否</returns>
-	bool Stop();
+	void Stop();
 
 	/// <summary>
 	/// 再生を一時停止する。
@@ -167,7 +166,12 @@ public:
 	/// <summary>
 	/// XAusio2再生用バッファが空になったタイミングで呼び出されるコールバック関数。
 	/// </summary>
-	void BufferEndCallback();
+	void OnBufferEnd();
+
+	/// <summary>
+	/// XAudio2再生用バッファの再生がすべて完了したタイミングで呼び出されるコールバック関数。
+	/// </summary>
+	void OnStreamEnd();
 
 private:
 	/* Constants ---------------------------------------------------------------------------------------- */
@@ -186,6 +190,7 @@ private:
 	IAudioHandlerDelegate<T>* pDelegate;
 	void(*onPlayedToEndCallback)(const T* pName);
 	PlayingStatus status;
+	bool isRequiredToStop;
 
 	/* Constructor / Destructor ------------------------------------------------------------------------- */
 	AudioHandler(const AudioHandler<T>&) = delete;
@@ -197,6 +202,7 @@ private:
 	void Push();
 	bool Start();
 	bool Stop(bool clearsCallback);
+	void ExecutePlayedToEndCallback();
 };
 }
 

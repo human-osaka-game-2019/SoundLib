@@ -205,7 +205,7 @@ long CompressedAudio::Read(BYTE* pBuffer, long bufSize) {
 	av_frame_unref(this->pFrame);
 
 	av_packet_unref(this->pPacket);
-	
+
 	return filledLength;
 }
 

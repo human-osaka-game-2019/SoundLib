@@ -12,15 +12,19 @@ namespace SoundLib {
 /* Constructor / Destructor ------------------------------------------------------------------------- */
 template <typename T>
 AudioHandler<T>::AudioHandler(std::basic_string<T> name, Audio::IAudio* pAudio) :
-	name(name), 
-	pAudio(pAudio), 
-	pVoice(nullptr), 
-	pDelegate(nullptr), 
-	onPlayedToEndCallback(nullptr), 
-	status(PlayingStatus::Stopped) {
-		this->pVoiceCallback = new VoiceCallback(this);
-		this->xAudioBuffer = { 0 };
-		this->pReadBuffers = new BYTE*[BUF_COUNT];
+		name(name),
+		pAudio(pAudio),
+		pVoice(nullptr),
+		pDelegate(nullptr),
+		onPlayedToEndCallback(nullptr),
+		status(PlayingStatus::Stopped),
+		isRequiredToStop(false) {
+	this->pVoiceCallback = new VoiceCallback(this);
+	this->xAudioBuffer = { 0 };
+	this->pReadBuffers = new BYTE*[BUF_COUNT];
+	for (int i = 0; i < BUF_COUNT; i++) {
+		this->pReadBuffers[i] = nullptr;
+	}
 }
 
 template <typename T>
@@ -29,8 +33,10 @@ AudioHandler<T>::~AudioHandler() {
 
 	if (this->pVoice != nullptr) {
 		this->pVoice->DestroyVoice();
-		this->pVoice = nullptr;
 	}
+
+	delete[] this->pReadBuffers;
+	this->pReadBuffers = nullptr;
 
 	delete this->pAudio;
 	this->pAudio = nullptr;
@@ -38,8 +44,7 @@ AudioHandler<T>::~AudioHandler() {
 	delete this->pVoiceCallback;
 	this->pVoiceCallback = nullptr;
 
-	delete[] this->pReadBuffers;
-	this->pReadBuffers = nullptr;
+
 }
 
 /* Getters / Setters -------------------------------------------------------------------------------- */
@@ -110,7 +115,7 @@ bool AudioHandler<T>::Start(bool isLoopPlayback) {
 template <typename T>
 bool AudioHandler<T>::Start(IAudioHandlerDelegate<T>* pDelegate) {
 	bool ret = true;
-	
+
 	if(this->status == PlayingStatus::Pausing) {
 		ret = Stop(true);
 	}
@@ -125,7 +130,7 @@ bool AudioHandler<T>::Start(IAudioHandlerDelegate<T>* pDelegate) {
 template <typename T>
 bool AudioHandler<T>::Start(void(*onPlayedToEndCallback)(const T* pName)) {
 	bool ret = true;
-	
+
 	if(this->status == PlayingStatus::Pausing) {
 		ret = Stop(true);
 	}
@@ -138,19 +143,16 @@ bool AudioHandler<T>::Start(void(*onPlayedToEndCallback)(const T* pName)) {
 }
 
 template <typename T>
-bool AudioHandler<T>::Stop() {
-	bool ret = true;
-	
+void AudioHandler<T>::Stop() {
 	if (this->status == PlayingStatus::Playing) {
-		ret = Stop(true);
+		this->isRequiredToStop = true;
 	}
-	return ret;
 }
 
 template <typename T>
 bool AudioHandler<T>::Pause() {
 	bool ret = true;
-	
+
 	if (this->status == PlayingStatus::Playing) {
 		ret = this->pVoice->Stop();
 		this->status = PlayingStatus::Pausing;
@@ -169,8 +171,20 @@ bool AudioHandler<T>::Resume() {
 }
 
 template <typename T>
-void AudioHandler<T>::BufferEndCallback() {
+void AudioHandler<T>::OnBufferEnd() {
 	Push();
+}
+
+void AudioHandler<char>::OnStreamEnd() {
+	Common::OutputDebugString("%s の再生完了。\n", this->name.c_str());
+	ExecutePlayedToEndCallback();
+}
+
+void AudioHandler<wchar_t>::OnStreamEnd() {
+	const char* charName = Common::ToChar(this->name.c_str());
+	Common::OutputDebugString("%s の再生完了。\n", charName);
+	delete charName;
+	ExecutePlayedToEndCallback();
 }
 
 /* Private Functions  ------------------------------------------------------------------------------- */
@@ -179,44 +193,40 @@ void AudioHandler<T>::Push() {
 	if (this->status == PlayingStatus::Stopped) {
 		return;
 	}
+	if (this->xAudioBuffer.Flags == XAUDIO2_END_OF_STREAM) {
+		// 再生終了待機中なので処理なし
+		return;
+	}
 
-	if (this->pAudio->HasReadToEnd()) {
-		if (this->isLoopPlayback) {
+	if (this->isRequiredToStop) {
+		this->xAudioBuffer.Flags = XAUDIO2_END_OF_STREAM;
+		this->isRequiredToStop = false;
+	} 
+
+	long readLength = 0;
+	if (!this->pAudio->HasReadToEnd() && this->xAudioBuffer.Flags != XAUDIO2_END_OF_STREAM) {
+		// 音データ格納
+		memset(this->pReadBuffers[this->currentBufNum], 0, this->bufferSize);
+		readLength = this->pAudio->Read(this->pReadBuffers[this->currentBufNum], this->bufferSize);
+
+		if (this->pAudio->HasReadToEnd() && this->isLoopPlayback) {
 			this->pAudio->Reset();
-		} else {
-			Stop(false);
-			if (this->pDelegate != nullptr) {
-				this->pDelegate->OnPlayedToEnd(this->name);
-				this->pDelegate = nullptr;
-			} else if (this->onPlayedToEndCallback != nullptr) {
-				this->onPlayedToEndCallback(this->name.c_str());
-				this->onPlayedToEndCallback = nullptr;
-			}
+		}
+
+		if (readLength <= 0) {
+			/* ファイル末尾まで再生 or エラー発生時 */
+			// ファイル形式によりデコード不要なデータをデコードしてエラーとなるパターンがあるので
+			// エラーが発生した場合も続きから読み込み直す
+			Push();
 			return;
 		}
 	}
 
-	// 音データ格納
-	memset(this->pReadBuffers[this->currentBufNum], 0, this->bufferSize);
-	long readLength = this->pAudio->Read(this->pReadBuffers[this->currentBufNum], this->bufferSize);
-
-	if (readLength <= 0) {
-		if (this->pAudio->HasReadToEnd()) {
-			// ファイル末尾まで再生した後の処理
-			Push();
-		} else {
-			// エラー発生による停止
-			//this->Stop(true);
-
-			// ファイル形式によりデコード不要なデータをデコードしてエラーとなるパターンがあるので
-			// エラーが発生した場合も続きから読み込み直す
-			Push();
-		}
-		return;
-	}
-
 	this->xAudioBuffer.AudioBytes = readLength;
 	this->xAudioBuffer.pAudioData = this->pReadBuffers[this->currentBufNum];
+	if (this->pAudio->HasReadToEnd()) {
+		this->xAudioBuffer.Flags = XAUDIO2_END_OF_STREAM;
+	}
 	HRESULT result = this->pVoice->SubmitSourceBuffer(&this->xAudioBuffer);
 	if (FAILED(result)) {
 		Common::OutputDebugString("error SubmitSourceBuffer HRESULT=%d\n", result);
@@ -256,13 +266,13 @@ bool AudioHandler<T>::Stop(bool clearsCallback) {
 		return false;
 	}
 
+	if (!this->pAudio->HasReadToEnd()) {
+		this->pVoice->FlushSourceBuffers();
+	}
+
 	for (int i = 0; i < BUF_COUNT; i++) {
 		delete[] this->pReadBuffers[i];
 		this->pReadBuffers[i] = nullptr;
-	}
-
-	if (!this->pAudio->HasReadToEnd()) {
-		this->pVoice->FlushSourceBuffers();
 	}
 
 	this->pAudio->Reset();
@@ -272,6 +282,22 @@ bool AudioHandler<T>::Stop(bool clearsCallback) {
 	}
 
 	return true;
+}
+
+template <typename T>
+void AudioHandler<T>::ExecutePlayedToEndCallback() {
+	Stop(false);
+
+	if (this->pDelegate != nullptr) {
+		this->pDelegate->OnPlayedToEnd(this->name);
+		this->pDelegate = nullptr;
+	} else if (this->onPlayedToEndCallback != nullptr) {
+		this->onPlayedToEndCallback(this->name.c_str());
+		this->onPlayedToEndCallback = nullptr;
+	}
+
+	this->pDelegate = nullptr;
+	this->onPlayedToEndCallback = nullptr;
 }
 
 template class AudioHandler<char>;

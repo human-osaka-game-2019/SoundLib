@@ -36,7 +36,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	if (hFind != INVALID_HANDLE_VALUE) {
 		int number = 0;
 		do {
-			if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY || _tcscmp(win32fd.cFileName, _T("jump03.mp3")) == 0) {
+			if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY || _tcscmp(win32fd.cFileName, _T("kaifuku.wav")) == 0) {
 			} else {
 				// ファイルオープン
 				TCHAR filePath[256];
@@ -54,11 +54,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	// 同時再生テスト用音源
-	soundsManager.AddFile(_T("Resources\\jump03.mp3"), _T("mp3SE"));
+	soundsManager.AddFile(_T("Resources\\kaifuku.wav"), _T("SE"));
 
+	if (keys.size() == 0) {
+		OutputDebugStringEx(_T("Resourcesフォルダ内にテスト用音源を格納して下さい。\n"));
+		return -1;
+	}
 	isTakingTest = true;
 	TestPlaying(keys[currentKeysPos]);
-	while (isTakingTest){
+	while (isTakingTest) {
 		if (hasFinishedOneFIle) {
 			hasFinishedOneFIle = false;
 			TestPlaying(keys[currentKeysPos]);
@@ -118,27 +122,31 @@ static void TestPlaying(std::basic_string<TCHAR> key) {
 
 	// 同時再生
 	for (int i = 0; i < 2; ++i) {
-		isSuccess = soundsManager.Start(_T("mp3SE")) && isSuccess;
-		Sleep(2000);
+		isSuccess = soundsManager.Start(_T("SE")) && isSuccess;
+		Sleep(4000);
 	}
 	Sleep(1000);
 
 	// 一時停止
+	OutputDebugStringEx(_T("一時停止\n"));
 	isSuccess = soundsManager.Pause(charKey) && isSuccess;
 	PrintStatus(key);
 	Sleep(2000);
 
 	// 再開
+	OutputDebugStringEx(_T("再開\n"));
 	isSuccess = soundsManager.Resume(charKey) && isSuccess;
 	PrintStatus(key);
 	Sleep(60000);
 
 	// 停止
+	OutputDebugStringEx(_T("停止\n"));
 	isSuccess = soundsManager.Stop(charKey) && isSuccess;
 	PrintStatus(key);
 	Sleep(2000);
 
 	// 最初から1曲分再生し次の曲へ
+	OutputDebugStringEx(_T("最初から1曲分再生し次の曲へ\n"));
 	isSuccess = soundsManager.Start(charKey, OnPlayedToEnd) && isSuccess;
 }
 

@@ -23,7 +23,12 @@ public:
 	/// <summary>
 	/// XAusio2再生用バッファが空になったタイミングで呼び出されるコールバック関数。
 	/// </summary>
-	virtual void BufferEndCallback() = 0;
+	virtual void OnBufferEnd() = 0;
+
+	/// <summary>
+	/// XAudio2再生用バッファの再生がすべて完了したタイミングで呼び出されるコールバック関数。
+	/// </summary>
+	virtual void OnStreamEnd() = 0;
 };
 }
 #endif

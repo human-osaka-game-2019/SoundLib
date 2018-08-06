@@ -14,11 +14,11 @@ VoiceCallback::VoiceCallback(IVoiceCallbackDelegate* pDelegate) : pDelegate(pDel
 
 /* Public Functions  -------------------------------------------------------------------------------- */
 void STDMETHODCALLTYPE VoiceCallback::OnStreamEnd() {
-	Common::OutputDebugString("%s\n", __func__);
+	this->pDelegate->OnStreamEnd();
 }
 
 void STDMETHODCALLTYPE VoiceCallback::OnBufferEnd(void* pBufferContext) {
-	this->pDelegate->BufferEndCallback();
+	this->pDelegate->OnBufferEnd();
 }
 
 void STDMETHODCALLTYPE VoiceCallback::OnLoopEnd(void* pBufferContext) {

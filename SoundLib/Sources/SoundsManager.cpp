@@ -15,6 +15,7 @@ SoundsManagerTmpl<T>::SoundsManagerTmpl() : pXAudio2(nullptr) {
 
 template <typename T>
 SoundsManagerTmpl<T>::~SoundsManagerTmpl() {
+	this->pXAudio2->StopEngine();
 	for (auto& rAudioPair : this->audioMap) {
 		delete rAudioPair.second;
 		rAudioPair.second = nullptr;
@@ -157,8 +158,9 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, bool isLoopPlayback) {
 		return false;
 	}
 
-	this->audioMap[pKey]->Start(isLoopPlayback);
-	return true;
+	bool ret = this->audioMap[pKey]->Start(isLoopPlayback);
+	Common::OutputDebugString("%s の再生開始。\n", pKey);
+	return ret;
 }
 
 template <typename T>
@@ -167,8 +169,9 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, ISoundsManagerDelegate<T>* pDele
 		return false;
 	}
 
-	this->audioMap[pKey]->Start(pDelegate);
-	return true;
+	bool ret = this->audioMap[pKey]->Start(pDelegate);
+	Common::OutputDebugString("%s の再生開始。\n", pKey);
+	return ret;
 }
 
 template <typename T>
@@ -177,8 +180,9 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, void(*onPlayedToEndCallback)(con
 		return false;
 	}
 
-	this->audioMap[pKey]->Start(onPlayedToEndCallback);
-	return true;
+	bool ret = this->audioMap[pKey]->Start(onPlayedToEndCallback);
+	Common::OutputDebugString("%s の再生開始。\n", pKey);
+	return ret;
 }
 
 template <typename T>
@@ -188,6 +192,7 @@ bool SoundsManagerTmpl<T>::Stop(const T* pKey) {
 	}
 
 	this->audioMap[pKey]->Stop();
+	Common::OutputDebugString("%s の再生停止。\n", pKey);
 	return true;
 }
 
@@ -197,7 +202,8 @@ bool SoundsManagerTmpl<T>::Pause(const T* pKey) {
 		return false;
 	}
 
-	this->audioMap[pKey]->Pause();
+	bool ret = this->audioMap[pKey]->Pause();
+	Common::OutputDebugString("%s の再生を一時停止。\n", pKey);
 	return true;
 }
 
@@ -207,7 +213,8 @@ bool SoundsManagerTmpl<T>::Resume(const T* pKey) {
 		return false;
 	}
 
-	this->audioMap[pKey]->Resume();
+	bool ret = this->audioMap[pKey]->Resume();
+	Common::OutputDebugString("%s の再生を再開。\n", pKey);
 	return true;
 }
 
