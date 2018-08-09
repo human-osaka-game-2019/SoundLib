@@ -122,14 +122,14 @@ bool SoundsManagerTmpl<wchar_t>::AddFile(const wchar_t* pFilePath, const wchar_t
 		Common::OutputDebugString("既に登録済みのキー%sが指定されました。\n", pCharKey);
 		return false;
 	}
-	
+
 	const char* pCharFilePath = Common::ToChar(pFilePath);
 	Audio::IAudio* pAudio = nullptr;
 	bool ret = JudgeAudio(pCharFilePath, &pAudio);
 	if (ret) {
 		OutputAudioInfo(pAudio, pCharKey);
 		ret = AddToMap(pAudio, pKey);
-	} 
+	}
 
 	delete[] pCharKey;
 	delete[] pCharFilePath;
@@ -159,7 +159,7 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, bool isLoopPlayback) {
 	}
 
 	bool ret = this->audioMap[pKey]->Start(isLoopPlayback);
-	Common::OutputDebugString("%s の再生開始。\n", pKey);
+	OutputStrWithKey("%s の再生開始。\n", pKey);
 	return ret;
 }
 
@@ -170,7 +170,7 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, ISoundsManagerDelegate<T>* pDele
 	}
 
 	bool ret = this->audioMap[pKey]->Start(pDelegate);
-	Common::OutputDebugString("%s の再生開始。\n", pKey);
+	OutputStrWithKey("%s の再生開始。\n", pKey);
 	return ret;
 }
 
@@ -181,7 +181,7 @@ bool SoundsManagerTmpl<T>::Start(const T* pKey, void(*onPlayedToEndCallback)(con
 	}
 
 	bool ret = this->audioMap[pKey]->Start(onPlayedToEndCallback);
-	Common::OutputDebugString("%s の再生開始。\n", pKey);
+	OutputStrWithKey("%s の再生開始。\n", pKey);
 	return ret;
 }
 
@@ -192,7 +192,7 @@ bool SoundsManagerTmpl<T>::Stop(const T* pKey) {
 	}
 
 	this->audioMap[pKey]->Stop();
-	Common::OutputDebugString("%s の再生停止。\n", pKey);
+	OutputStrWithKey("%s の再生停止。\n", pKey);
 	return true;
 }
 
@@ -203,7 +203,7 @@ bool SoundsManagerTmpl<T>::Pause(const T* pKey) {
 	}
 
 	bool ret = this->audioMap[pKey]->Pause();
-	Common::OutputDebugString("%s の再生を一時停止。\n", pKey);
+	OutputStrWithKey("%s の再生を一時停止。\n", pKey);
 	return true;
 }
 
@@ -214,7 +214,7 @@ bool SoundsManagerTmpl<T>::Resume(const T* pKey) {
 	}
 
 	bool ret = this->audioMap[pKey]->Resume();
-	Common::OutputDebugString("%s の再生を再開。\n", pKey);
+	OutputStrWithKey("%s の再生を再開。\n", pKey);
 	return true;
 }
 

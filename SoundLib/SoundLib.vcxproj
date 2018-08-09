@@ -199,9 +199,11 @@
     <ClCompile Include="Sources\Common.cpp" />
     <ClCompile Include="Sources\Audio\Mp3Audio.cpp" />
     <ClCompile Include="Sources\Audio\WaveAudio.cpp" />
+    <ClCompile Include="Sources\SoundLibCWrapper.cpp" />
     <ClCompile Include="Sources\SoundsManager.cpp" />
     <ClCompile Include="Sources\VoiceCallback.cpp" />
     <ClInclude Include="Headers\Audio\CompressedAudio.h" />
+    <ClInclude Include="Headers\SoundLibCWrapper.h" />
     <ClInclude Include="Headers\VoiceCallback.h" />
   </ItemGroup>
   <ItemGroup>

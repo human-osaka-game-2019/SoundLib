@@ -201,7 +201,7 @@ void AudioHandler<T>::Push() {
 	if (this->isRequiredToStop) {
 		this->xAudioBuffer.Flags = XAUDIO2_END_OF_STREAM;
 		this->isRequiredToStop = false;
-	} 
+	}
 
 	long readLength = 0;
 	if (!this->pAudio->HasReadToEnd() && this->xAudioBuffer.Flags != XAUDIO2_END_OF_STREAM) {
