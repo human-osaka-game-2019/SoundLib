@@ -2,6 +2,12 @@
 #if _DEBUG
 #include "crtdbg.h"
 #endif
+#include "Audio/WaveAudio.h"
+#include "Audio/Mp3Audio.h"
+#if !defined(SOUND_LIB_LIGHT)
+#include "Audio/CompressedAudio.h"
+#endif
+
 
 namespace SoundLib {
 /* Constructor / Destructor ------------------------------------------------------------------------- */
@@ -234,24 +240,35 @@ bool SoundsManagerTmpl<T>::JudgeAudio(const char* pFilePath, Audio::IAudio** ppA
 	const char* pExtension = strrchr(pFilePath, '.');
 	if (pExtension != nullptr && strcmp(pExtension, ".wav") == 0) {
 		*ppAudio = new Audio::WaveAudio();
-	} else if (pExtension != nullptr && strcmp(pExtension, ".ogg") == 0) {
-		*ppAudio = new Audio::CompressedAudio();
+#ifdef SOUND_LIB_LIGHT
+	} else {
+#else
 	} else if (pExtension != nullptr && strcmp(pExtension, ".mp3") == 0) {
+#endif
 		*ppAudio = new Audio::Mp3Audio();
+#if !defined(SOUND_LIB_LIGHT)
 	} else {
 		*ppAudio = new Audio::CompressedAudio();
+#endif
 	}
 
 	int tryCount = 0;
 	bool couldLoad = false;
-	while (!(couldLoad = (*ppAudio)->Load(pFilePath)) && ++tryCount < 3) {
+#ifdef SOUND_LIB_LIGHT
+	int maxTryCount = 2;
+#else
+	int maxTryCount = 3;
+#endif
+	while (!(couldLoad = (*ppAudio)->Load(pFilePath)) && ++tryCount < maxTryCount) {
 		// 他の形式で読めるか試してみる
 		if (typeid(**ppAudio) == typeid(Audio::WaveAudio)) {
 			delete *ppAudio;
 			*ppAudio = new Audio::Mp3Audio();
+#if !defined(SOUND_LIB_LIGHT)
 		} else if (typeid(**ppAudio) == typeid(Audio::Mp3Audio)) {
 			delete *ppAudio;
 			*ppAudio = new Audio::CompressedAudio();
+#endif
 		} else {
 			delete *ppAudio;
 			*ppAudio = new Audio::WaveAudio();

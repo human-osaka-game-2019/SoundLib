@@ -6,9 +6,15 @@ C/C++Windowsゲーム用音声再生ライブラリ。
 複数の音声の同時再生が可能です。
 
 ## 対応フォーマット
+FULL版はffmpegを組み込んでいるので多くのフォーマットに対応していますが、その分libのサイズが大きく、メモリ使用量も多いです。  
+wavとmp3のみの再生を行う場合はLIGHT版がおすすめです。
+### FULL版
 - WAV
 - MP3
 - [ffmpegで対応しているフォーマット](http://fixedpoint.jp/ffmpeg/general.html#SEC3)
+### LIGHT版
+- WAV
+- MP3
 
 ## 環境構築
 プロジェクトのプロパティを以下のように設定して下さい。

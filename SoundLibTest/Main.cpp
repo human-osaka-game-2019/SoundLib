@@ -56,11 +56,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 				_tcscat_s(filePath, win32fd.cFileName);
 
 #if (USE_C_WRAPPER == true)
-				bool isSuccess = SoundLibCWrapper_AddFile(filePath, win32fd.cFileName);
+				bool couldLoad = SoundLibCWrapper_AddFile(filePath, win32fd.cFileName);
 #else
-				bool isSuccess = soundsManager.AddFile(filePath, win32fd.cFileName);
+				bool couldLoad = soundsManager.AddFile(filePath, win32fd.cFileName);
 #endif
-				if (isSuccess) {
+				if (couldLoad) {
 					keys.push_back(win32fd.cFileName);
 				} else {
 					isSuccess = false;

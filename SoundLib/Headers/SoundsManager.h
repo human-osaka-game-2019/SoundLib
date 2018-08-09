@@ -15,10 +15,9 @@
 #include "Common.h"
 #include "AudioHandler.h"
 #include "ISoundsManagerDelegate.h"
-#include "Audio/WaveAudio.h"
-#include "Audio/Mp3Audio.h"
-#include "Audio/CompressedAudio.h"
 
+
+#undef SOUND_LIB_LIGHT
 
 namespace SoundLib {
 /// <summary>
