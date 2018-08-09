@@ -23,9 +23,6 @@
     <ClCompile Include="Sources\VoiceCallback.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Audio\CompressedAudio.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Audio\Mp3Audio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -56,9 +53,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Headers\VoiceCallback.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\Audio\CompressedAudio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Audio\IAudio.h">

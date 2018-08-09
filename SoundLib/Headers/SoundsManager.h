@@ -17,7 +17,7 @@
 #include "ISoundsManagerDelegate.h"
 
 
-#undef SOUND_LIB_LIGHT
+#define SOUND_LIB_LIGHT
 
 namespace SoundLib {
 /// <summary>
