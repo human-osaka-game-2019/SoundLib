@@ -7,7 +7,8 @@ C/C++Windowsゲーム用音声再生ライブラリ。
 
 ## 対応フォーマット
 FULL版はffmpegを組み込んでいるので多くのフォーマットに対応していますが、その分libのサイズが大きく、メモリ使用量も多いです。  
-wavとmp3のみの再生を行う場合はLIGHT版がおすすめです。
+wavとmp3のみの再生を行う場合はLIGHT版がおすすめです。
+
 ### FULL版
 - WAV
 - MP3
@@ -28,9 +29,9 @@ SoundLib.libは32bit、64bitそれぞれに対応するDebug版とRelease版が�
 ## 使用方法
 ### Include
 #### C++
-SoundLib.hを`#include`に設定して下さい。 
+SoundsManager.hを`#include`に設定して下さい。 
 ```cpp
-#include <SoundLib.h>
+#include <SoundsManager.h>
 ``` 
 
 #### C言語
@@ -74,7 +75,8 @@ bool isSuccess = SoundLibCWrapper_AddFile(filePath, _T("bgm"));
 ```C
 // 解放
 SoundLibCWrapper_Free();
-```
+```
+
 
 
 ### 再生・停止
