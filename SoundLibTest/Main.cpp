@@ -1,7 +1,7 @@
 ﻿#include <windows.h>
 #include <crtdbg.h>
 
-#define USE_C_WRAPPER true
+#define USE_C_WRAPPER false
 #if (USE_C_WRAPPER == true)
 #include "SoundLibCWrapper.h"
 #else
@@ -23,7 +23,7 @@ static std::vector<std::basic_string<TCHAR>> keys;
 static int currentKeysPos = 0;
 
 static void OnPlayedToEnd(const TCHAR* pKey);
-static void TestPlaying(std::basic_string<TCHAR> key);
+static void TestPlaying();
 static void PrintStatus(std::basic_string<TCHAR> key);
 static bool hasFinishedOneFIle = false;;
 static bool isTakingTest;
@@ -52,16 +52,25 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 			} else {
 				// ファイルオープン
 				TCHAR filePath[256];
+				memset(filePath, 0x00, sizeof(filePath) * sizeof(TCHAR));
 				_tcscpy_s(filePath, _T("Resources\\"));
 				_tcscat_s(filePath, win32fd.cFileName);
 
+				TCHAR key2[256];
+				memset(key2, 0x00, sizeof(key2) * sizeof(TCHAR));
+				_tcscat_s(key2, win32fd.cFileName);
+				_tcscat_s(key2, _T("2"));
+
 #if (USE_C_WRAPPER == true)
 				bool couldLoad = SoundLibCWrapper_AddFile(filePath, win32fd.cFileName);
+				couldLoad = SoundLibCWrapper_AddFile(filePath, key2) && couldLoad;
 #else
 				bool couldLoad = soundsManager.AddFile(filePath, win32fd.cFileName);
+				couldLoad = soundsManager.AddFile(filePath, key2) && couldLoad;
 #endif
 				if (couldLoad) {
 					keys.push_back(win32fd.cFileName);
+					keys.push_back(key2);
 				} else {
 					isSuccess = false;
 				}
@@ -83,11 +92,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		return -1;
 	}
 	isTakingTest = true;
-	TestPlaying(keys[currentKeysPos]);
+	TestPlaying();
 	while (isTakingTest) {
 		if (hasFinishedOneFIle) {
 			hasFinishedOneFIle = false;
-			TestPlaying(keys[currentKeysPos]);
+			TestPlaying();
 		}
 		Sleep(1000);
 	}
@@ -101,17 +110,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 static void OnPlayedToEnd(const TCHAR* pKey) {
 	OutputDebugStringEx(_T("%s has stopped\n"), pKey);
-	if (++currentKeysPos < static_cast<int>(keys.size())) {
+	currentKeysPos += 2;
+	if (currentKeysPos < static_cast<int>(keys.size())) {
 		hasFinishedOneFIle = true;
 	} else {
 		isTakingTest = false;
 	}
 }
 
-static void TestPlaying(std::basic_string<TCHAR> key) {
-	const TCHAR* charKey = const_cast<const TCHAR*>(key.c_str());
+static void TestPlaying() {
+	const TCHAR* charKey = const_cast<const TCHAR*>(keys[currentKeysPos].c_str());
+	const TCHAR* secondCharKey = const_cast<const TCHAR*>(keys[currentKeysPos + 1].c_str());
 	OutputDebugStringEx(_T("++++++++++++ start to test %s ++++++++++++++++++++\n"), charKey);
-	PrintStatus(key);
+	PrintStatus(keys[currentKeysPos]);
 
 	// 再生開始
 #if (USE_C_WRAPPER == true)
@@ -119,7 +130,7 @@ static void TestPlaying(std::basic_string<TCHAR> key) {
 #else
 	isSuccess = soundsManager.Start(charKey, true) && isSuccess;
 #endif
-	PrintStatus(key);
+	PrintStatus(keys[currentKeysPos]);
 	Sleep(1000);
 
 	// ボリューム変更
@@ -186,6 +197,18 @@ static void TestPlaying(std::basic_string<TCHAR> key) {
 	}
 	Sleep(1000);
 
+	// 多重再生
+	OutputDebugStringEx(_T("多重再生\n"));
+#if (USE_C_WRAPPER == true)
+	isSuccess = SoundLibCWrapper_Start(secondCharKey, true) && isSuccess;
+#else
+	isSuccess = soundsManager.Start(secondCharKey, true) && isSuccess;
+#endif
+	PrintStatus(keys[currentKeysPos + 1]);
+	Sleep(7000);
+	isSuccess = soundsManager.Stop(secondCharKey) && isSuccess;
+	Sleep(2000);
+
 	// 一時停止
 	OutputDebugStringEx(_T("一時停止\n"));
 #if (USE_C_WRAPPER == true)
@@ -193,7 +216,7 @@ static void TestPlaying(std::basic_string<TCHAR> key) {
 #else
 	isSuccess = soundsManager.Pause(charKey) && isSuccess;
 #endif
-	PrintStatus(key);
+	PrintStatus(keys[currentKeysPos]);
 	Sleep(2000);
 
 	// 再開
@@ -203,7 +226,7 @@ static void TestPlaying(std::basic_string<TCHAR> key) {
 #else
 	isSuccess = soundsManager.Resume(charKey) && isSuccess;
 #endif
-	PrintStatus(key);
+	PrintStatus(keys[currentKeysPos]);
 	Sleep(60000);
 
 	// 停止
@@ -213,7 +236,7 @@ static void TestPlaying(std::basic_string<TCHAR> key) {
 #else
 	isSuccess = soundsManager.Stop(charKey) && isSuccess;
 #endif
-	PrintStatus(key);
+	PrintStatus(keys[currentKeysPos]);
 	Sleep(2000);
 
 	// 最初から1曲分再生し次の曲へ

@@ -93,10 +93,10 @@ bool Mp3Audio::Load(std::string filePath) {
 	this->hFile = CreateFileA(
 		filePath.c_str(),
 		GENERIC_READ,
-		0,
+		FILE_SHARE_READ,
 		nullptr,
 		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
+		FILE_ATTRIBUTE_READONLY,
 		nullptr
 	);
 

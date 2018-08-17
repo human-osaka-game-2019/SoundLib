@@ -55,7 +55,7 @@ bool isSuccess = soundsManager.Initialize();
 // 第2引数は音声ファイルを識別するための任意の文字列をキーとして指定する。
 // この後の操作関数の呼び出し時には、ここで設定したキーを指定して音声を識別する。
 const TCHAR* filePath = _T("music.wav");
-bool isSuccess = soundsManager.AddFile(filePath, _T("bgm"));
+isSuccess = soundsManager.AddFile(filePath, _T("bgm"));
 ```
 
 #### C言語
@@ -68,7 +68,7 @@ bool isSuccess = SoundLibCWrapper_Initialize();
 // 第2引数は音声ファイルを識別するための任意の文字列をキーとして指定する。
 // この後の操作関数の呼び出し時には、ここで設定したキーを指定して音声を識別する。
 const TCHAR* filePath = _T("music.wav");
-bool isSuccess = SoundLibCWrapper_AddFile(filePath, _T("bgm"));
+isSuccess = SoundLibCWrapper_AddFile(filePath, _T("bgm"));
 ```
 
 `SoundLibCWrapper_Initialize()`を呼び出して初期化を行った場合、最後に必ず解放処理を行って下さい。
@@ -88,13 +88,13 @@ SoundLibCWrapper_Free();
 bool isSuccess = soundsManager.Start(_T("bgm"), true);
 
 // 一時停止
-bool isSuccess = soundsManager.Pause(_T("bgm"));
+isSuccess = soundsManager.Pause(_T("bgm"));
 
 // 一時停止中の音声を続きから再生
-bool isSuccess = soundsManager.Resume(_T("bgm"));
+isSuccess = soundsManager.Resume(_T("bgm"));
 
 // 再生停止
-bool isSuccess = soundsManager.Stop(_T("bgm"));
+isSuccess = soundsManager.Stop(_T("bgm"));
 ```
 
 #### C言語
@@ -105,16 +105,16 @@ bool isSuccess = soundsManager.Stop(_T("bgm"));
 bool isSuccess = SoundLibCWrapper_Start(_T("bgm"), false);
 
 // 一時停止
-bool isSuccess = SoundLibCWrapper_Pause(_T("bgm"));
+isSuccess = SoundLibCWrapper_Pause(_T("bgm"));
 
 // 一時停止中の音声を続きから再生
-bool isSuccess = SoundLibCWrapper_Resume(_T("bgm"));
+isSuccess = SoundLibCWrapper_Resume(_T("bgm"));
 
 // 再生停止
-bool isSuccess = SoundLibCWrapper_Stop(_T("bgm"));
+isSuccess = SoundLibCWrapper_Stop(_T("bgm"));
 
 // SoundLibCWrapper_Start()の第2引数にtrueを渡すとループ再生になる。
-bool isSuccess = SoundLibCWrapper_Start(_T("bgm"), true);
+isSuccess = SoundLibCWrapper_Start(_T("bgm"), true);
 ```
 
 ### 再生状態取得
@@ -243,6 +243,37 @@ void foo() {
 	}
 }
 ```
+
+### 同一サウンドの多重再生
+同一サウンドを多重再生する場合、同じファイルを別のキーで複数回登録して使用して下さい。
+#### C++
+```Cpp
+const TCHAR* filePath = _T("music.wav");
+// 1つ目の登録
+bool isSuccess = soundsManager.AddFile(filePath, _T("bgm1"));
+// 同じファイルを異なるキーで登録
+isSuccess = soundsManager.AddFile(filePath, _T("bgm2"));
+
+// 1つ目の再生
+isSuccess = soundsManager.Start(_T("bgm1"));
+// 2つ目を重ねて再生
+isSuccess = soundsManager.Start(_T("bgm2"));
+```
+
+#### C言語
+```C
+const TCHAR* filePath = _T("music.wav");
+// 1つ目の登録
+bool isSuccess = SoundLibCWrapper_AddFile(filePath, _T("bgm1"));
+// 同じファイルを異なるキーで登録
+isSuccess = SoundLibCWrapper_AddFile(filePath, _T("bgm2"));
+
+// 1つ目の再生
+isSuccess = SoundLibCWrapper_Start(_T("bgm1"), false);
+// 2つ目を重ねて再生
+isSuccess = SoundLibCWrapper_Start(_T("bgm2"), false);
+```
+
 
 ## 使用ライブラリ
 再生にはXAudio2を使用しています。  
