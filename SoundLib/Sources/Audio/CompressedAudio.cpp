@@ -28,16 +28,16 @@ CompressedAudio::CompressedAudio() : pFormatContext(nullptr),
 									 remainingConvertedBufSize(0) {}
 
 CompressedAudio::~CompressedAudio() {
-	delete[] this->pRemainingConvertedBuf;
-	this->pRemainingConvertedBuf = nullptr;
-	this->remainingConvertedBufSize = 0;
-
 	av_frame_free(&this->pFrame);
 	av_packet_free(&this->pPacket);
 	swr_free(&this->pSwr);
 	avformat_close_input(&this->pFormatContext);
 	avcodec_free_context(&this->pCodecContext);
 	avformat_free_context(this->pFormatContext);
+
+	delete[] this->pRemainingConvertedBuf;
+	this->pRemainingConvertedBuf = nullptr;
+	this->remainingConvertedBufSize = 0;
 }
 
 
